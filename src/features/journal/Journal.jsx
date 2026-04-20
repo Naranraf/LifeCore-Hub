@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css'; // Requires legacy peer deps on React 19
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db, getServerTimestamp } from '../../lib/firebase';
+import { db } from '../../lib/firebase';
 import useAuthStore from '../../hooks/useAuth';
 import { Book, Plus, Trash2, Edit3, Save } from 'lucide-react';
 import './Journal.css';
@@ -60,7 +60,7 @@ export default function Journal() {
           title,
           content,
           plainTextPreview: content.replace(/<[^>]+>/g, '').substring(0, 100),
-          updatedAt: getServerTimestamp(),
+          updatedAt: new Date().toISOString(),
         });
       } else {
         // Create new
@@ -68,8 +68,8 @@ export default function Journal() {
           title: title || 'Untitled Entry',
           content,
           plainTextPreview: content.replace(/<[^>]+>/g, '').substring(0, 100),
-          createdAt: getServerTimestamp(),
-          updatedAt: getServerTimestamp(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         });
         setActiveEntry({ id: newDocRef.id, title, content });
       }
@@ -132,8 +132,18 @@ export default function Journal() {
               <p className="journal__empty">No journal entries found.</p>
             ) : (
               entries.map(entry => {
-                const date = entry.createdAt?.toDate ? entry.createdAt.toDate().toLocaleDateString() : 'Just now';
-                const time = entry.createdAt?.toDate ? entry.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                let dateStr = 'Just now';
+                let timeStr = '';
+                if (entry.createdAt) {
+                  const d = new Date(entry.createdAt);
+                  if (!isNaN(d)) {
+                    dateStr = d.toLocaleDateString();
+                    timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  } else if (entry.createdAt.toDate) { // Fallback for old Firebase timestamps
+                    dateStr = entry.createdAt.toDate().toLocaleDateString();
+                    timeStr = entry.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  }
+                }
 
                 return (
                   <div 
@@ -144,7 +154,7 @@ export default function Journal() {
                     <div className="journal__item-content">
                       <h4 className="journal__item-title">{entry.title || 'Untitled'}</h4>
                       <p className="journal__item-preview">{entry.plainTextPreview || 'Empty note...'}</p>
-                      <span className="journal__item-date">{date} {time}</span>
+                      <span className="journal__item-date">{dateStr} {timeStr}</span>
                     </div>
                     <button className="journal__item-delete" onClick={(e) => handleDelete(e, entry.id)}>
                       <Trash2 size={14} />

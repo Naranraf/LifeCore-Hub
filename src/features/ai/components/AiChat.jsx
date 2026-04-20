@@ -49,9 +49,15 @@ export default function AiChat() {
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
       console.error("AI Chat Error:", error);
+      
+      let errorMessage = "Lo siento, tuve un problema al procesar tu solicitud. ¿Podrías intentar de nuevo?";
+      if (error.code === 'functions/resource-exhausted' || error.message.includes('resource-exhausted') || error.message.includes('Free plan')) {
+        errorMessage = "🔋 Batería de IA agotada: Has alcanzado tu límite gratuito inicial de 15 consultas mágicas. Para evitar la saturación de los servidores de Google, por favor actualiza a un plan Premium para uso ilimitado.";
+      }
+
       setMessages(prev => [...prev, { 
         role: 'ai', 
-        content: "Lo siento, tuve un problema al procesar tu solicitud. ¿Podrías intentar de nuevo?",
+        content: errorMessage,
         isError: true 
       }]);
     } finally {

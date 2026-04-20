@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import { db, getServerTimestamp } from '../../../lib/firebase';
+import { db } from '../../../lib/firebase';
 import useAuthStore from '../../../hooks/useAuth';
 import { StickyNote, Plus, Trash2, Palette } from 'lucide-react';
 
@@ -40,7 +40,7 @@ export default function NotesWidget() {
         title,
         content,
         color: selectedColor,
-        createdAt: getServerTimestamp(),
+        createdAt: new Date().toISOString(),
       });
       setTitle('');
       setContent('');

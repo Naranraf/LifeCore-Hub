@@ -3,11 +3,12 @@
  * Will include task lists, calendar, and study/work notes.
  */
 import React, { useState, useEffect } from 'react';
-import { CalendarCheck, ListChecks, StickyNote, RefreshCw, AlertCircle, Plus, Check } from 'lucide-react';
+import { CalendarCheck, ListChecks, StickyNote, RefreshCw, AlertCircle, Plus, Check, ArrowUp, ArrowDown, Maximize2, Minimize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useAuthStore from '../../hooks/useAuth';
 import { fetchCalendarEvents, fetchTaskLists, fetchTasks, addTask } from '../../services/googleApi';
 import NotesWidget from './components/NotesWidget';
+import CalendarWidget from './components/CalendarWidget';
 import './Productivity.css';
 
 export default function Productivity() {
@@ -22,6 +23,41 @@ export default function Productivity() {
   const [loadingTasks, setLoadingTasks] = useState(false);
   const [error, setError] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+
+  const defaultLayout = [
+    { id: 'calendar', fullWidth: true },
+    { id: 'tasks', fullWidth: false },
+    { id: 'notes', fullWidth: true }
+  ];
+  const [layout, setLayout] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lyfe_prod_layout');
+      return saved ? JSON.parse(saved) : defaultLayout;
+    } catch(e) { return defaultLayout; }
+  });
+
+  const saveLayout = (newLayout) => {
+    setLayout(newLayout);
+    localStorage.setItem('lyfe_prod_layout', JSON.stringify(newLayout));
+  };
+
+  const moveWidget = (id, direction) => {
+    const idx = layout.findIndex(w => w.id === id);
+    if (idx < 0) return;
+    const newLayout = [...layout];
+    if (direction === 'up' && idx > 0) {
+      [newLayout[idx - 1], newLayout[idx]] = [newLayout[idx], newLayout[idx - 1]];
+      saveLayout(newLayout);
+    } else if (direction === 'down' && idx < layout.length - 1) {
+      [newLayout[idx + 1], newLayout[idx]] = [newLayout[idx], newLayout[idx + 1]];
+      saveLayout(newLayout);
+    }
+  };
+
+  const toggleSize = (id) => {
+    const newLayout = layout.map(w => w.id === id ? { ...w, fullWidth: !w.fullWidth } : w);
+    saveLayout(newLayout);
+  };
 
   // Fetch Calendar
   const loadCalendar = async () => {
@@ -120,87 +156,92 @@ export default function Productivity() {
       )}
 
       <div className="prod-page__grid">
-        {/* Calendar Widget */}
-        <section className="prod-widget glass-panel">
-          <div className="prod-widget__header">
-            <h3><CalendarCheck size={18} /> Google Calendar</h3>
-            <button className="prod-widget__refresh" onClick={loadCalendar} disabled={loadingCal || !googleAccessToken}>
-              <RefreshCw size={14} className={loadingCal ? 'spin' : ''} />
-            </button>
-          </div>
-          <div className="prod-widget__content">
-            {loadingCal ? (
-              <p className="prod-widget__empty">Loading events...</p>
-            ) : events.length === 0 ? (
-              <p className="prod-widget__empty">No upcoming events found.</p>
-            ) : (
-              <ul className="prod-widget__list">
-                {events.map((ev) => (
-                  <li key={ev.id} className="prod-widget__item">
-                    <span className="prod-widget__item-title">{ev.summary}</span>
-                    <span className="prod-widget__item-time">
-                      {ev.start?.dateTime ? new Date(ev.start.dateTime).toLocaleDateString() : 'All day'}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
+        {layout.map((widgetConfig) => {
+          const { id, fullWidth } = widgetConfig;
+          const gridColumnStyle = fullWidth ? { gridColumn: '1 / -1' } : { gridColumn: 'auto' };
 
-        {/* Tasks Widget */}
-        <section className="prod-widget glass-panel">
-          <div className="prod-widget__header">
-            <h3><ListChecks size={18} /> Google Tasks</h3>
-            {taskLists.length > 0 && (
-              <select 
-                className="prod-widget__select" 
-                value={selectedList} 
-                onChange={e => setSelectedList(e.target.value)}
-              >
-                {taskLists.map(list => (
-                  <option key={list.id} value={list.id}>{list.title}</option>
-                ))}
-              </select>
-            )}
-            <button className="prod-widget__refresh" onClick={() => loadTasks(selectedList)} disabled={loadingTasks || !googleAccessToken}>
-              <RefreshCw size={14} className={loadingTasks ? 'spin' : ''} />
-            </button>
-          </div>
-          <div className="prod-widget__content">
-            {googleAccessToken && (
-             <form className="prod-widget__form" onSubmit={handleAddTask}>
-               <input 
-                 type="text" 
-                 placeholder="New task..." 
-                 value={newTaskTitle}
-                 onChange={e => setNewTaskTitle(e.target.value)}
-               />
-               <button type="submit" disabled={!newTaskTitle.trim()}><Plus size={16} /></button>
-             </form>
-            )}
+          const LayoutControls = () => (
+            <div className="prod-widget__controls" style={{ display: 'flex', gap: '4px', position: 'absolute', top: '-10px', right: '10px', background: 'var(--bg-main)', padding: '2px 8px', borderRadius: '12px', border: '1px solid var(--border-color)', zIndex: 10 }}>
+              <button title="Move Up" onClick={() => moveWidget(id, 'up')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowUp size={14} /></button>
+              <button title="Move Down" onClick={() => moveWidget(id, 'down')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowDown size={14} /></button>
+              <button title="Toggle Full Width" onClick={() => toggleSize(id)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', marginLeft: '4px' }}>
+                {fullWidth ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+              </button>
+            </div>
+          );
 
-            {loadingTasks ? (
-              <p className="prod-widget__empty">Loading tasks...</p>
-            ) : tasks.length === 0 ? (
-              <p className="prod-widget__empty">All done! No pending tasks.</p>
-            ) : (
-              <ul className="prod-widget__list">
-                {tasks.map((task) => (
-                  <li key={task.id} className="prod-widget__item prod-widget__item--task">
-                   <div className="prod-widget__task-check"></div>
-                   <span className="prod-widget__item-title">{task.title}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
+          if (id === 'calendar') {
+            return (
+              <section key={id} className="prod-widget glass-panel" style={{ position: 'relative', height: 'auto', minHeight: '350px', ...gridColumnStyle }}>
+                <LayoutControls />
+                <CalendarWidget events={events} onRefresh={loadCalendar} loading={loadingCal} />
+              </section>
+            );
+          }
 
-        {/* Local Notes (Keep Alternative) */}
-        <section className="glass-panel" style={{ gridColumn: '1 / -1', height: 'auto', minHeight: '300px' }}>
-          <NotesWidget />
-        </section>
+          if (id === 'tasks') {
+            return (
+              <section key={id} className="prod-widget glass-panel" style={{ position: 'relative', ...gridColumnStyle }}>
+                <LayoutControls />
+                <div className="prod-widget__header">
+                  <h3><ListChecks size={18} /> Google Tasks</h3>
+                  {taskLists.length > 0 && (
+                    <select 
+                      className="prod-widget__select" 
+                      value={selectedList} 
+                      onChange={e => setSelectedList(e.target.value)}
+                    >
+                      {taskLists.map(list => (
+                        <option key={list.id} value={list.id}>{list.title}</option>
+                      ))}
+                    </select>
+                  )}
+                  <button className="prod-widget__refresh" onClick={() => loadTasks(selectedList)} disabled={loadingTasks || !googleAccessToken}>
+                    <RefreshCw size={14} className={loadingTasks ? 'spin' : ''} />
+                  </button>
+                </div>
+                <div className="prod-widget__content">
+                  {googleAccessToken && (
+                   <form className="prod-widget__form" onSubmit={handleAddTask}>
+                     <input 
+                       type="text" 
+                       placeholder="New task..." 
+                       value={newTaskTitle}
+                       onChange={e => setNewTaskTitle(e.target.value)}
+                     />
+                     <button type="submit" disabled={!newTaskTitle.trim()}><Plus size={16} /></button>
+                   </form>
+                  )}
+
+                  {loadingTasks ? (
+                    <p className="prod-widget__empty">Loading tasks...</p>
+                  ) : tasks.length === 0 ? (
+                    <p className="prod-widget__empty">All done! No pending tasks.</p>
+                  ) : (
+                    <ul className="prod-widget__list">
+                      {tasks.map((task) => (
+                        <li key={task.id} className="prod-widget__item prod-widget__item--task">
+                         <div className="prod-widget__task-check"></div>
+                         <span className="prod-widget__item-title">{task.title}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </section>
+            );
+          }
+
+          if (id === 'notes') {
+            return (
+              <section key={id} className="glass-panel" style={{ position: 'relative', height: 'auto', minHeight: '300px', ...gridColumnStyle }}>
+                <LayoutControls />
+                <NotesWidget />
+              </section>
+            );
+          }
+          return null;
+        })}
       </div>
 
     </div>

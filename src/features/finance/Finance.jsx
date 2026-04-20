@@ -13,8 +13,10 @@ import useFinanceStore from './hooks/useFinance';
 import TransactionModal from './components/TransactionModal';
 import './Finance.css';
 
+const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'MXN', 'BRL', 'CAD', 'AUD'];
+
 export default function Finance() {
-  const { transactions, loading, initListener, addTransaction, deleteTransaction, cleanup } = useFinanceStore();
+  const { transactions, currency, setCurrency, loading, initListener, addTransaction, deleteTransaction, cleanup } = useFinanceStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function Finance() {
   }, [transactions]);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
   };
 
   const handleAddTransaction = async (data) => {
@@ -55,14 +57,24 @@ export default function Finance() {
             <p className="feature-page__desc">Manage your income, expenses, and budgets securely.</p>
           </div>
         </div>
-        <button
-          className="finance-page__add-btn"
-          onClick={() => setIsModalOpen(true)}
-          id="btn-open-txn-modal"
-        >
-          <Plus size={18} />
-          <span>New Transaction</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <select 
+            value={currency} 
+            onChange={(e) => setCurrency(e.target.value)}
+            className="finance-page__currency-select glass-panel"
+            title="Select Base Currency"
+          >
+            {SUPPORTED_CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <button
+            className="finance-page__add-btn"
+            onClick={() => setIsModalOpen(true)}
+            id="btn-open-txn-modal"
+          >
+            <Plus size={18} />
+            <span>New Transaction</span>
+          </button>
+        </div>
       </header>
 
       {/* Summary Cards */}

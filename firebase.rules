@@ -26,6 +26,16 @@ service cloud.firestore {
       match /private/{docId} {
         allow read, write: if isOwner(userId);
       }
+      
+      // Diary/Journal Access
+      match /journal/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Local Notes Access
+      match /notes/{docId} {
+        allow read, write: if isOwner(userId);
+      }
     }
 
     // Finanzas (Multi-tenant check obligatorio)

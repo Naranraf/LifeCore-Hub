@@ -8,9 +8,11 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { logger } = require("firebase-functions");
 const { initializeApp } = require("firebase-admin/app");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { VertexAI } = require("@google-cloud/vertexai");
 
 initializeApp();
+const db = getFirestore();
 
 // Initialize Vertex AI with the project and region
 const vertexAI = new VertexAI({
@@ -38,8 +40,25 @@ exports.chatWithGemini = onCall({
     throw new HttpsError("invalid-argument", "El prompt es obligatorio.");
   }
 
+  const uid = request.auth.uid;
+  const userRef = db.collection('users').doc(uid);
+  const MAX_FREE_MESSAGES = 15;
+
   try {
-    // 2. Get Gemini 1.5 Flash model via Vertex AI
+    // 2. Check Paywall / Usage limit
+    const userSnap = await userRef.get();
+    let currentUsage = 0;
+    
+    if (userSnap.exists) {
+      const userData = userSnap.data();
+      currentUsage = userData.geminiUsageCount || 0;
+    }
+
+    if (currentUsage >= MAX_FREE_MESSAGES) {
+      throw new HttpsError("resource-exhausted", "Free plan usage limit reached.");
+    }
+
+    // 3. Get Gemini 1.5 Flash model via Vertex AI
     const model = vertexAI.getGenerativeModel({
       model: "gemini-1.5-flash-001",
     });
@@ -56,14 +75,22 @@ exports.chatWithGemini = onCall({
     }
     contents.push({ role: "user", parts: [{ text: prompt }] });
 
-    // 4. Generate response
     const result = await model.generateContent({ contents });
     const response = result.response;
     const text = response.candidates[0].content.parts[0].text;
 
+    // 5. Increment Usage counter in Firestore tracking
+    await userRef.set({
+      geminiUsageCount: FieldValue.increment(1)
+    }, { merge: true });
+
     return { text };
   } catch (error) {
     logger.error("Vertex AI Error:", error.message);
+    // Rethrow standard HttpsError to client
+    if (error instanceof HttpsError) {
+      throw error;
+    }
     throw new HttpsError("internal", `Error al procesar: ${error.message}`);
   }
 });

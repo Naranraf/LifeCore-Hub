@@ -8,16 +8,21 @@ import {
   addDoc,
   deleteDoc,
   doc,
-  serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import useAuthStore from '../../../hooks/useAuth';
 
 const useFinanceStore = create((set, get) => ({
   transactions: [],
+  currency: localStorage.getItem('lyfecore_currency') || 'USD',
   loading: true,
   error: null,
   unsubscribe: null,
+
+  setCurrency: (newCurrency) => {
+    localStorage.setItem('lyfecore_currency', newCurrency);
+    set({ currency: newCurrency });
+  },
 
   // Start listening to transactions for the currently authenticated user
   initListener: () => {
@@ -66,7 +71,7 @@ const useFinanceStore = create((set, get) => ({
       const payload = {
         ...data,
         ownerId: user.uid,
-        createdAt: serverTimestamp(),
+        createdAt: new Date().toISOString(),
       };
       await addDoc(collection(db, 'finance_transactions'), payload);
       // Let the snapshot listener update the local state
