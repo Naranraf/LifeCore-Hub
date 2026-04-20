@@ -6,6 +6,7 @@ import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../../lib/firebase';
 import useAuthStore from '../../hooks/useAuth';
 import { Book, Plus, Trash2, Edit3, Save, Sparkles, Loader2 } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import './Journal.css';
 
 export default function Journal() {
@@ -56,6 +57,9 @@ export default function Journal() {
   const handleSave = async () => {
     if (!user || (!title.trim() && !content.trim())) return;
     setIsSaving(true);
+    
+    // Sanitize rich text against XSS before saving to DB
+    const cleanContent = DOMPurify.sanitize(content);
 
     try {
       if (activeEntry) {
@@ -63,16 +67,16 @@ export default function Journal() {
         const docRef = doc(db, 'users', user.uid, 'journal', activeEntry.id);
         await updateDoc(docRef, {
           title,
-          content,
-          plainTextPreview: content.replace(/<[^>]+>/g, '').substring(0, 100),
+          content: cleanContent,
+          plainTextPreview: cleanContent.replace(/<[^>]+>/g, '').substring(0, 100),
           updatedAt: new Date().toISOString(),
         });
       } else {
         // Create new
         const newDocRef = await addDoc(collection(db, 'users', user.uid, 'journal'), {
           title: title || 'Untitled Entry',
-          content,
-          plainTextPreview: content.replace(/<[^>]+>/g, '').substring(0, 100),
+          content: cleanContent,
+          plainTextPreview: cleanContent.replace(/<[^>]+>/g, '').substring(0, 100),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });

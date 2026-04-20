@@ -7,7 +7,7 @@
  * but API keys for Gemini/Google APIs live ONLY in Cloud Functions.
  */
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { getFirestore, serverTimestamp } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
 
@@ -24,6 +24,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+
+// Enforce Session-Only Persistence (Mitigates Session Hijacking)
+setPersistence(auth, browserSessionPersistence)
+  .catch((err) => console.warn('[Auth] Persistence setup failed:', err.message));
+
 
 /**
  * Google Auth Provider.
