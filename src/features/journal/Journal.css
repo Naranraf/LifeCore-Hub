@@ -1,0 +1,226 @@
+.journal-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Take full space */
+}
+
+.journal__layout {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  min-height: 500px;
+  height: calc(100vh - 180px); /* Fill screen optimally */
+}
+
+/* Sidebar List */
+.journal__sidebar {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Contains inner scrollable list */
+}
+
+.journal__sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--glass-border);
+}
+.journal__sidebar-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+.journal__new-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.15);
+  color: var(--accent);
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+.journal__new-btn:hover {
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.25);
+}
+
+.journal__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.journal__empty {
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 40px;
+  font-size: 14px;
+}
+
+.journal__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px;
+  background: var(--glass-border);
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.journal__item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.journal__item--active {
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.1);
+  border-color: rgba(var(--accent-rgb, 59, 130, 246), 0.3);
+}
+
+.journal__item-content {
+  flex: 1;
+  overflow: hidden;
+}
+.journal__item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.journal__item-preview {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0 0 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+.journal__item-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.journal__item-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 4px;
+  opacity: 0;
+  transition: all 0.2s;
+  border-radius: 6px;
+}
+.journal__item:hover .journal__item-delete {
+  opacity: 1;
+}
+.journal__item-delete:hover {
+  background: var(--glass-border);
+  color: var(--error);
+}
+
+/* Editor Area */
+.journal__editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0; /* Remove internal padding, quill handles it */
+}
+
+.journal__editor-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--glass-border);
+}
+
+.journal__title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  outline: none;
+  font-family: var(--font-display);
+}
+.journal__title-input::placeholder {
+  color: var(--text-muted);
+}
+
+.journal__save-btn {
+  padding: 10px 20px;
+}
+
+/* Quill Editor Overrides */
+.journal__quill-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.journal-page .quill {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.journal-page .ql-toolbar.ql-snow {
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--glass-border);
+  padding: 12px 20px;
+  font-family: inherit;
+}
+
+.journal-page .ql-container.ql-snow {
+  border: none;
+  flex: 1;
+  overflow-y: auto;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.journal-page .ql-editor {
+  padding: 24px 32px;
+  min-height: 100%;
+}
+
+.journal-page .ql-editor.ql-blank::before {
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+/* Fix quill icons for dark mode */
+[data-theme="dark"] .journal-page .ql-snow .ql-stroke {
+  stroke: var(--text-main);
+}
+[data-theme="dark"] .journal-page .ql-snow .ql-fill, 
+[data-theme="dark"] .journal-page .ql-snow .ql-stroke.ql-fill {
+  fill: var(--text-main);
+}
+[data-theme="dark"] .journal-page .ql-snow .ql-picker {
+  color: var(--text-main);
+}
+[data-theme="dark"] .journal-page .ql-snow .ql-picker-options {
+  background-color: var(--glass-bg);
+  border-color: var(--border-color);
+}

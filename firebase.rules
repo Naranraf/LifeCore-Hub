@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(ownerId) {
+      return isAuthenticated() && request.auth.uid == ownerId;
+    }
+
+    // Denegación implícita de todo lo que no esté explicitado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Perfiles de Usuario (Regla: Solo el propio usuario puede leer/escribir su perfil)
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Private subcollection for OAuth tokens (Google Calendar/Tasks)
+      // Only the owner can write; Cloud Functions (Admin SDK) bypass rules for reads.
+      match /private/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Finanzas (Multi-tenant check obligatorio)
+    match /finance_transactions/{txId} {
+      allow read: if isOwner(resource.data.ownerId);
+      allow create: if isOwner(request.resource.data.ownerId);
+      allow update, delete: if isOwner(resource.data.ownerId);
+    }
+
+    // Salud (Diet/Health)
+    match /health_logs/{logId} {
+      allow read: if isOwner(resource.data.ownerId);
+      allow create: if isOwner(request.resource.data.ownerId);
+      allow update, delete: if isOwner(resource.data.ownerId);
+    }
+    
+    // Productividad (Tasks/Calendar)
+    match /productivity_tasks/{taskId} {
+      allow read: if isOwner(resource.data.ownerId);
+      allow create: if isOwner(request.resource.data.ownerId);
+      allow update, delete: if isOwner(resource.data.ownerId);
+    }
+
+    // AI & Settings
+    match /ai_preferences/{prefId} {
+      allow read: if isOwner(resource.data.ownerId);
+      allow create: if isOwner(request.resource.data.ownerId);
+      allow update, delete: if isOwner(resource.data.ownerId);
+    }
+  }
+}

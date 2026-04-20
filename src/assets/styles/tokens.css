@@ -1,0 +1,61 @@
+/* ===========================
+   Design Tokens — Theming System
+   =========================== */
+
+/* Fallback default theme (dark) */
+:root {
+  /* Colors */
+  --primary: #0a0a0c;
+  --secondary: #141417;
+  --tertiary: #1f1f23;
+  --accent: #3b82f6;
+  --accent-secondary: #8b5cf6;
+  --accent-gradient: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+  
+  /* Backgrounds & Glass */
+  --bg-gradient: radial-gradient(circle at top left, rgba(59, 130, 246, 0.1), transparent 40%),
+                 radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.1), transparent 40%);
+  --glass-bg: rgba(20, 20, 23, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+  
+  /* Text */
+  --text-main: #f8f8fb;
+  --text-muted: #a1a1aa;
+  
+  /* Utilities */
+  --border-color: var(--glass-border);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* Typography */
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+}
+
+[data-theme="dark"] {
+  --primary: #0a0a0c;
+  --secondary: #141417;
+  --tertiary: #1f1f23;
+  --accent: #3b82f6;
+  --accent-secondary: #8b5cf6;
+  --glass-bg: rgba(20, 20, 23, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --text-main: #f8f8fb;
+  --text-muted: #a1a1aa;
+}
+
+[data-theme="light"] {
+  --primary: #f8f8f8;
+  --secondary: #ffffff;
+  --tertiary: #f0f0f0;
+  --accent: #0055ff;
+  --accent-secondary: #6b3ce2;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --text-main: #111111;
+  --text-muted: #555555;
+  --bg-gradient: radial-gradient(circle at top left, rgba(0, 85, 255, 0.05), transparent 40%),
+                 radial-gradient(circle at bottom right, rgba(107, 60, 226, 0.05), transparent 40%);
+}

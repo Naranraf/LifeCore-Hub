@@ -1,0 +1,296 @@
+.prod-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.prod-page__alert {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--glass-border);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.prod-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.prod-widget {
+  display: flex;
+  flex-direction: column;
+  height: 400px; /* Fixed height to keep it neat */
+}
+
+.prod-widget__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--glass-border);
+}
+
+.prod-widget__header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.prod-widget__select {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+.prod-widget__refresh {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+.prod-widget__refresh:hover {
+  color: var(--accent);
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.prod-widget__content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prod-widget__empty {
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.prod-widget__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prod-widget__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--glass-border);
+  border-radius: 8px;
+  transition: transform 0.1s ease;
+}
+.prod-widget__item:hover {
+  transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.08); /* slight highlight */
+}
+
+.prod-widget__item-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+.prod-widget__item-time {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.prod-widget__item--task {
+  justify-content: flex-start;
+  gap: 12px;
+}
+.prod-widget__task-check {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+}
+.prod-widget__item--task:hover .prod-widget__task-check {
+  border-color: var(--accent);
+}
+
+.prod-widget__form {
+  display: flex;
+  gap: 8px;
+}
+.prod-widget__form input {
+  flex: 1;
+  background: var(--glass-border);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-main);
+  outline: none;
+  font-size: 14px;
+}
+.prod-widget__form input:focus {
+  border-color: var(--accent);
+}
+.prod-widget__form button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 12px;
+}
+
+/* ==================================
+   LyfeCore Notes Widget (Keep Clone)
+   ================================== */
+.notes-widget {
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-widget__add-btn {
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.1);
+  border: 1px solid rgba(var(--accent-rgb, 59, 130, 246), 0.2);
+  color: var(--accent);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.notes-widget__add-btn:hover {
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.2);
+}
+
+.notes-widget__content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Creator Form */
+.notes-widget__creator {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  transition: background 0.3s ease;
+}
+.notes-widget__input {
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  outline: none;
+}
+.notes-widget__textarea {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  color: var(--text-muted);
+  outline: none;
+  resize: none;
+  min-height: 60px;
+  font-family: inherit;
+}
+.notes-widget__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.notes-widget__colors {
+  display: flex;
+  gap: 6px;
+}
+.notes-widget__color-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.notes-widget__color-btn.active {
+  border-color: var(--text-main);
+  transform: scale(1.1);
+}
+
+/* Notes Masonry Grid */
+.notes-widget__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.notes-widget__card {
+  position: relative;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  min-height: 100px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.notes-widget__card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.notes-widget__card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: var(--text-main);
+}
+.notes-widget__card-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-main);
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.notes-widget__delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.2);
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.notes-widget__card:hover .notes-widget__delete {
+  opacity: 1;
+}
+.notes-widget__delete:hover {
+  background: var(--error);
+}

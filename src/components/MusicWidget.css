@@ -1,0 +1,120 @@
+.music-widget__toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  background: var(--glass-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  transition: all 0.2s ease;
+}
+
+.music-widget__toggle:hover {
+  transform: scale(1.05);
+  border-color: var(--accent);
+}
+
+.music-widget__icon--playing {
+  color: var(--accent);
+  animation: float 2s infinite ease-in-out alternate;
+}
+
+@keyframes float {
+  0% { transform: translateY(-1px); }
+  100% { transform: translateY(1px); }
+}
+
+.music-widget__panel {
+  position: fixed;
+  bottom: 84px;
+  right: 24px;
+  width: 300px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.music-widget__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.music-widget__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.music-widget__close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+}
+.music-widget__close:hover {
+  color: var(--error);
+}
+
+.music-widget__form {
+  display: flex;
+  gap: 8px;
+}
+
+.music-widget__form input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+}
+.music-widget__form input:focus {
+  border-color: var(--accent);
+}
+
+.music-widget__form button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.music-widget__form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.music-widget__player-container {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.music-widget__empty {
+  padding: 20px 10px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}

@@ -1,0 +1,8 @@
+# LyfeCore Hub
+
+node_modules/
+dist/
+.env
+*.local
+.firebase/
+*-debug.log

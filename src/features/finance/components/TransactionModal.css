@@ -1,0 +1,149 @@
+/* ===========================
+   Transaction Modal Styles
+   =========================== */
+
+.txn-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.txn-modal {
+  width: 90%;
+  max-width: 460px;
+  padding: 32px;
+}
+
+.txn-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.txn-modal__header h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.txn-modal__close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 6px;
+}
+.txn-modal__close:hover {
+  background: var(--glass-border);
+  color: var(--text-main);
+}
+
+.txn-modal__error {
+  background: rgba(var(--error-rgb, 239, 68, 68), 0.1);
+  border: 1px solid rgba(var(--error-rgb, 239, 68, 68), 0.3);
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--error);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.txn-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.txn-modal__type-toggle {
+  display: flex;
+  background: var(--glass-border);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+}
+.txn-modal__type-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+.txn-modal__type-btn--expense {
+  background: rgba(var(--error-rgb, 239, 68, 68), 0.15);
+  color: var(--error);
+}
+.txn-modal__type-btn--income {
+  background: rgba(var(--success-rgb, 16, 185, 129), 0.15);
+  color: var(--success);
+}
+
+.txn-modal__row {
+  display: flex;
+  gap: 16px;
+}
+.txn-modal__row > * {
+  flex: 1;
+}
+
+.txn-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.txn-modal__field label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.txn-modal__field input,
+.txn-modal__field select {
+  padding: 12px 14px;
+  background: var(--glass-border);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-family: inherit;
+  color: var(--text-main);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.txn-modal__field input:focus,
+.txn-modal__field select:focus {
+  border-color: var(--accent);
+}
+
+.txn-modal__field input.error-input {
+  border-color: rgba(var(--error-rgb, 239, 68, 68), 0.5);
+}
+.field-error {
+  color: var(--error);
+  font-size: 12px;
+  margin-top: -2px;
+}
+
+.txn-modal__submit {
+  padding: 14px;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 10px;
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb, 59, 130, 246), 0.3);
+}
+.txn-modal__submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.txn-modal__submit:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--accent-rgb, 59, 130, 246), 0.4);
+}
