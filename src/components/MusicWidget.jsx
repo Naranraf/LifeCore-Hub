@@ -98,7 +98,21 @@ export default function MusicWidget() {
               </div>
             ) : (
               <div className="music-widget__empty">
-                <p>Paste a YouTube video or live stream to listen while you work.</p>
+                <p style={{ marginBottom: '12px' }}>Quick Presets (Lofi):</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <button 
+                    onClick={() => setVideoId('jfKfPfyJRdk')} 
+                    style={{ padding: '8px', background: 'var(--glass-border)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    <Play size={14} style={{ color: 'var(--accent)' }}/> Lofi Girl Radio
+                  </button>
+                  <button 
+                    onClick={() => setVideoId('4xDzrJKXOOY')} 
+                    style={{ padding: '8px', background: 'var(--glass-border)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    <Play size={14} style={{ color: 'var(--accent-secondary)' }}/> Synthwave Radio
+                  </button>
+                </div>
               </div>
             )}
           </motion.div>

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css'; // Requires legacy peer deps on React 19
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../../lib/firebase';
 import useAuthStore from '../../hooks/useAuth';
-import { Book, Plus, Trash2, Edit3, Save } from 'lucide-react';
+import { Book, Plus, Trash2, Edit3, Save, Sparkles, Loader2 } from 'lucide-react';
 import './Journal.css';
 
 export default function Journal() {
@@ -15,6 +16,8 @@ export default function Journal() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsights, setAiInsights] = useState(null);
 
   // Fetch entries from Firestore
   useEffect(() => {
@@ -40,12 +43,14 @@ export default function Journal() {
     setActiveEntry(entry);
     setTitle(entry.title || '');
     setContent(entry.content || '');
+    setAiInsights(null); // Reset insights when changing entries
   };
 
   const handleNewEntry = () => {
     setActiveEntry(null);
     setTitle('');
     setContent('');
+    setAiInsights(null);
   };
 
   const handleSave = async () => {
@@ -77,6 +82,29 @@ export default function Journal() {
       console.error("Save error", e);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAnalyze = async () => {
+    if (!content.trim() || isAnalyzing) return;
+    setIsAnalyzing(true);
+    setAiInsights(null);
+    try {
+      const analyzeFn = httpsCallable(functions, 'chatWithGemini');
+      const plainText = content.replace(/<[^>]+>/g, '');
+      const prompt = `Act as a wellness coach and psychologist. Analyze this personal journal entry. Provide:
+1. Expected mood or sentiment.
+2. 2-3 key themes/topics discussed.
+3. One short encouraging thought or reflection question for the user. Keep it brief. 
+Entry:\n"${plainText}"`;
+      
+      const res = await analyzeFn({ prompt });
+      setAiInsights(res.data.text);
+    } catch (err) {
+      console.error("AI Analysis failed:", err);
+      setAiInsights("Error: Could not retrieve AI insights. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -176,23 +204,46 @@ export default function Journal() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            <button 
-              className="feature-page__cta journal__save-btn" 
-              onClick={handleSave}
-              disabled={isSaving || (!title && !content)}
-            >
-              <Save size={16} /> {isSaving ? 'Saving...' : 'Save'}
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                className="feature-page__cta journal__analyze-btn" 
+                onClick={handleAnalyze}
+                disabled={isAnalyzing || !content.trim()}
+                style={{ background: 'var(--accent-secondary)' }}
+              >
+                {isAnalyzing ? <Loader2 size={16} className="spin" /> : <Sparkles size={16} />}
+                {isAnalyzing ? ' Analyzing...' : ' Analyze with AI'}
+              </button>
+              <button 
+                className="feature-page__cta journal__save-btn" 
+                onClick={handleSave}
+                disabled={isSaving || (!title && !content)}
+              >
+                <Save size={16} /> {isSaving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
           </div>
-          <div className="journal__quill-container">
-             {/* Note: ReactQuill might throw a React 19 findDOMNode warning, but it functionally works */}
-            <ReactQuill 
-              theme="snow" 
-              value={content} 
-              onChange={setContent} 
-              modules={modules}
-              placeholder="Write your thoughts here..."
-            />
+          <div className="journal__quill-container" style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: '16px', overflowY: 'auto' }}>
+            <div style={{ flex: 1, minHeight: '300px' }}>
+              <ReactQuill 
+                theme="snow" 
+                value={content} 
+                onChange={setContent} 
+                modules={modules}
+                placeholder="Write your thoughts here..."
+                style={{ height: 'calc(100% - 42px)' }}
+              />
+            </div>
+            {aiInsights && (
+              <div className="journal__insights glass-panel" style={{ padding: '16px', background: 'var(--glass-border)', borderRadius: '12px', borderLeft: '4px solid var(--accent-secondary)', marginTop: '8px' }}>
+                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--accent-secondary)' }}>
+                  <Sparkles size={18} /> AI Insight
+                </h4>
+                <div style={{ whiteSpace: 'pre-wrap', fontSize: '14px', color: 'var(--text-main)', lineHeight: '1.6' }}>
+                  {aiInsights}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

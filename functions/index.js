@@ -10,6 +10,7 @@ const { logger } = require("firebase-functions");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { VertexAI } = require("@google-cloud/vertexai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 initializeApp();
 const db = getFirestore();
@@ -99,3 +100,62 @@ exports.chatWithGemini = onCall({
  * Future Function: syncGoogleData
  * Will use the user's stored OAuth token to sync with Calendar/Tasks.
  */
+
+/**
+ * AI Financial Quantitative Analyst Proxy
+ * 
+ * Uses @google/generative-ai SDK with Gemini 1.5 Pro.
+ * Retrieves sensitive financial_records natively on the backend, ensuring data
+ * cannot be tampered with by the client, and sends them directly to the AI for analysis.
+ */
+exports.analyzeFinancialRecords = onCall({
+  cors: [/localhost/, "https://lyfecore-hub.web.app", "https://lyfecore-hub.firebaseapp.com"],
+}, async (request) => {
+  // 1. Mandatory Auth Validation
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Auth is required to run quantitative analysis.");
+  }
+
+  const { prompt } = request.data;
+  const uid = request.auth.uid;
+
+  try {
+    // 2. Secret Engine Init (Fallback to standard process.env mapped by .env or Firebase Secrets)
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY not configured in environment variables.");
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    
+    // 3. System Prompt and Model Configuration (Gemini 1.5 Pro)
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-pro",
+      systemInstruction: "Actúa como un Analista Financiero Cuantitativo experto. Tu objetivo es procesar estructuradamente los datos de deudas e inversiones proporcionados. Genera recomendaciones exactas de optimización de pagos (ej: método avalancha/bola de nieve basado en interest_rate), calcula el progreso actual ($ pagado vs $ total), y otorga proyecciones de ahorro basadas en el posible excedente mensual del usuario tras mitigar la deuda.",
+    });
+
+    // 4. Retrieve context securely from Firestore (Zero-Client Tampering)
+    const recordsSnap = await db.collection("financial_records")
+      .where("user_id", "==", uid)
+      .get();
+    
+    const financialData = recordsSnap.docs.map(doc => doc.data());
+    const aiContext = `
+      [SISTEMA AUTOMÁTICO] - Registros Financieros Actuales del Usuario:
+      ${JSON.stringify(financialData, null, 2)}
+      ---
+      [MENSAJE DEL USUARIO]:
+      ${prompt || "Genera el reporte cuantitativo estándar basado en mis registros."}
+    `;
+
+    // 5. Generate and Return Content
+    const result = await model.generateContent(aiContext);
+    const response = await result.response;
+    
+    return { text: response.text() };
+
+  } catch (error) {
+    logger.error("Financial Analyst AI Error:", error.message);
+    throw new HttpsError("internal", `API Error: ${error.message}`);
+  }
+});

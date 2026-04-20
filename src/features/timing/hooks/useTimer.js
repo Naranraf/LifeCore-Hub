@@ -229,6 +229,7 @@ const useTimerStore = create((set, get) => {
 
     /** Start or resume the timer. */
     start: () => {
+      requestNotificationPermission(); // Triggered by user gesture
       const state = get();
       const w = getWorker();
       const targetEndTime = Date.now() + state.remaining;

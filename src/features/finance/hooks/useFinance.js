@@ -8,6 +8,8 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  setDoc,
+  getDoc
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import useAuthStore from '../../../hooks/useAuth';
@@ -19,17 +21,41 @@ const useFinanceStore = create((set, get) => ({
   error: null,
   unsubscribe: null,
 
-  setCurrency: (newCurrency) => {
+  setCurrency: async (newCurrency) => {
     localStorage.setItem('lyfecore_currency', newCurrency);
     set({ currency: newCurrency });
+    
+    // Cloud sync logic
+    const { user } = useAuthStore.getState();
+    if (user) {
+      try {
+        const settingsRef = doc(db, 'users', user.uid, 'settings', 'preferences');
+        await setDoc(settingsRef, { currency: newCurrency }, { merge: true });
+      } catch (err) {
+        console.error('Failed to sync currency to cloud', err);
+      }
+    }
   },
 
   // Start listening to transactions for the currently authenticated user
-  initListener: () => {
+  initListener: async () => {
     const { user } = useAuthStore.getState();
     if (!user) {
       set({ error: 'User not authenticated', loading: false });
       return;
+    }
+
+    // Try picking up cloud currency preference first
+    try {
+      const settingsRef = doc(db, 'users', user.uid, 'settings', 'preferences');
+      const settingsSnap = await getDoc(settingsRef);
+      if (settingsSnap.exists() && settingsSnap.data().currency) {
+        const cloudCurrency = settingsSnap.data().currency;
+        localStorage.setItem('lyfecore_currency', cloudCurrency);
+        set({ currency: cloudCurrency });
+      }
+    } catch(err) {
+      console.warn('Could not fetch cloud currency pref', err);
     }
 
     const { unsubscribe } = get();

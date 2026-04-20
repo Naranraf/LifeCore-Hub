@@ -11,9 +11,10 @@ import { Wallet, Plus, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useFinanceStore from './hooks/useFinance';
 import TransactionModal from './components/TransactionModal';
+import SpendingChart from './components/SpendingChart';
 import './Finance.css';
 
-const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'MXN', 'BRL', 'CAD', 'AUD'];
+const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'MXN', 'BRL', 'CAD', 'AUD', 'CRC', 'COP', 'ARS', 'CLP', 'PEN', 'UYU'];
 
 export default function Finance() {
   const { transactions, currency, setCurrency, loading, initListener, addTransaction, deleteTransaction, cleanup } = useFinanceStore();
@@ -126,6 +127,11 @@ export default function Finance() {
           </motion.div>
         </div>
       ) : (
+        <>
+        {/* Weekly Chart */}
+        <div className="glass-panel" style={{ marginBottom: '20px' }}>
+          <SpendingChart transactions={transactions} currency={currency} />
+        </div>
         <div className="finance-page__list glass-panel">
           <div className="finance-page__list-header">
             <h3>Recent Transactions</h3>
@@ -141,7 +147,7 @@ export default function Finance() {
                 </div>
                 <div className="finance-page__item-info">
                   <span className="finance-page__item-cat">{txn.category.replace('_', ' ')}</span>
-                  <span className="finance-page__item-date">{txn.date} {txn.description && `· ${txn.description}`}</span>
+                  <span className="finance-page__item-date">{new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium' }).format(new Date(txn.date))} {txn.description && `· ${txn.description}`}</span>
                 </div>
                 <div className="finance-page__item-amount" style={{ color: txn.type === 'expense' ? 'var(--error)' : 'var(--success)' }}>
                   {txn.type === 'expense' ? '-' : '+'}{formatCurrency(txn.amount)}
@@ -157,6 +163,7 @@ export default function Finance() {
             ))}
           </div>
         </div>
+        </>
       )}
 
       <TransactionModal

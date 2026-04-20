@@ -4,6 +4,8 @@
  */
 import React, { useState, useEffect } from 'react';
 import { CalendarCheck, ListChecks, StickyNote, RefreshCw, AlertCircle, Plus, Check, ArrowUp, ArrowDown, Maximize2, Minimize2 } from 'lucide-react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import { motion } from 'framer-motion';
 import useAuthStore from '../../hooks/useAuth';
 import { fetchCalendarEvents, fetchTaskLists, fetchTasks, addTask } from '../../services/googleApi';
@@ -36,9 +38,37 @@ export default function Productivity() {
     } catch(e) { return defaultLayout; }
   });
 
-  const saveLayout = (newLayout) => {
+  const { user } = useAuthStore(); // Add user from authStore locally
+
+  // Fetch Layout from cloud on mount
+  useEffect(() => {
+    if (!user) return;
+    const fetchLayout = async () => {
+      try {
+        const ref = doc(db, 'users', user.uid, 'settings', 'preferences');
+        const snap = await getDoc(ref);
+        if (snap.exists() && snap.data().productivityLayout) {
+          const cloudLayout = snap.data().productivityLayout;
+          localStorage.setItem('lyfe_prod_layout', JSON.stringify(cloudLayout));
+          setLayout(cloudLayout);
+        }
+      } catch (err) {
+        console.warn('Could not fetch cloud layout:', err);
+      }
+    };
+    fetchLayout();
+  }, [user]);
+
+  const saveLayout = async (newLayout) => {
     setLayout(newLayout);
     localStorage.setItem('lyfe_prod_layout', JSON.stringify(newLayout));
+    if (user) {
+      try {
+        await setDoc(doc(db, 'users', user.uid, 'settings', 'preferences'), { productivityLayout: newLayout }, { merge: true });
+      } catch(err) {
+        console.error('Failed to sync layout', err);
+      }
+    }
   };
 
   const moveWidget = (id, direction) => {
