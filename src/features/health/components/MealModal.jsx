@@ -92,7 +92,7 @@ export default function MealModal({ isOpen, onClose, onSave }) {
               </div>
 
               {formData.type === 'meal' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '12px' }}>
                   <div className="form-group">
                     <label>Protein (g)</label>
                     <input type="number" value={formData.protein} onChange={e => setFormData({...formData, protein: e.target.value})} className="modal-input" />

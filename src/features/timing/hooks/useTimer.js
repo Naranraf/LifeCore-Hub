@@ -13,6 +13,7 @@
  * focus → shortBreak → focus → shortBreak → ... → longBreak (after N cycles)
  */
 import { create } from 'zustand';
+import { useAppStore } from '../../../store/useAppStore';
 
 const STORAGE_KEY = 'lyfecore_timer_state';
 
@@ -160,6 +161,11 @@ const useTimerStore = create((set, get) => {
 
         if (type === 'TICK') {
           set({ remaining });
+          useAppStore.getState().syncTimerState({ 
+            remainingSeconds: Math.ceil(remaining / 1000),
+            isActive: state.status === 'running',
+            currentPhase: state.phase
+          });
         }
 
         if (type === 'COMPLETE') {
@@ -203,6 +209,12 @@ const useTimerStore = create((set, get) => {
             sessionCount: state.phase === PHASES.FOCUS
               ? state.sessionCount + 1
               : state.sessionCount,
+          });
+
+          useAppStore.getState().syncTimerState({ 
+            remainingSeconds: Math.ceil(nextDuration / 1000),
+            isActive: false,
+            currentPhase: nextPhase
           });
 
           saveState(get());

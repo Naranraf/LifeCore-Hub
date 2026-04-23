@@ -13,6 +13,8 @@ import { motion } from 'framer-motion';
 import useHealthStore from './hooks/useHealth';
 import MealModal from './components/MealModal';
 import MacroRing from './components/MacroRing';
+import WorkoutView from './components/WorkoutView';
+import NutritionView from './components/NutritionView';
 import './Health.css';
 
 export default function Health() {
@@ -154,6 +156,15 @@ export default function Health() {
           </div>
         </div>
       )}
+
+      <div className="tier1-marker" style={{ marginBottom: '40px', border: '2px solid var(--accent)', borderRadius: '16px', padding: '4px' }}>
+        <div style={{ background: 'var(--accent)', color: 'white', fontSize: '10px', fontWeight: '900', padding: '2px 10px', borderRadius: '12px 12px 0 0', display: 'inline-block' }}>WORKOUT STUDIO (TIER 1)</div>
+        <WorkoutView />
+      </div>
+
+      <div style={{ marginBottom: '40px' }}>
+        <NutritionView />
+      </div>
 
       <MealModal
         isOpen={isModalOpen}

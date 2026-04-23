@@ -16,7 +16,11 @@
 .txn-modal {
   width: 90%;
   max-width: 460px;
+  max-height: 90vh; /* Prevents cutoff */
+  overflow-y: auto;
   padding: 32px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
 }
 
 .txn-modal__header {
@@ -87,9 +91,11 @@
 .txn-modal__row {
   display: flex;
   gap: 16px;
+  flex-wrap: wrap;
 }
 .txn-modal__row > * {
   flex: 1;
+  min-width: 140px; /* Forces wrap on small space */
 }
 
 .txn-modal__field {

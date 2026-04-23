@@ -19,7 +19,7 @@
   color: white;
   border: none;
   padding: 10px 20px;
-  borderRadius: 12px;
+  border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -72,9 +72,13 @@
 .modal-content {
   width: 100%;
   max-width: 500px;
+  max-height: 90vh; /* Prevents cutoff on small screens */
+  overflow-y: auto;
   padding: 32px;
   position: relative;
   border: 1px solid var(--glass-border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
 }
 
 .modal-header {

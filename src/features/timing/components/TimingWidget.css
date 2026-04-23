@@ -2,42 +2,29 @@
  * TimingWidget Styles — Draggable Focus Hub Pop-up
  * 
  * Component: TimingWidget
- * Initial Positioning: Top-Right
+ * Optimized for Portal rendering and Framer Motion Drag.
  */
 .timing-widget__constraints {
   position: fixed;
-  inset: 20px;
+  inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: 9998;
 }
 
-.timing-widget__toggle {
+.timing-widget__panel-motion {
   position: fixed;
-  bottom: 24px;
-  left: 24px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  background: var(--glass-bg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  will-change: transform;
 }
 
 .timing-widget__panel {
-  position: fixed;
-  top: 40px;
-  right: 40px;
+  position: relative;
   width: 320px;
-  padding: 0; /* Header-content separation */
+  padding: 0;
   display: flex;
   flex-direction: column;
-  z-index: 1000;
   border: 1px solid var(--border-color);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
   overflow: hidden;
@@ -51,11 +38,12 @@
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid var(--border-color);
-  touch-action: none; /* Required for dragging */
+  touch-action: none;
+  cursor: grab;
 }
 
 .timing-widget__header:active {
-  cursor: grabbing !important;
+  cursor: grabbing;
 }
 
 .timing-widget__title {
@@ -70,22 +58,7 @@
 
 .timing-widget__actions {
   display: flex;
-  gap: 4px;
-}
-
-.timing-widget__action-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  padding: 4px;
-  border-radius: 6px;
-  display: flex;
-  transition: all 0.2s;
-}
-.timing-widget__action-btn:hover,
-.timing-widget__action-btn.active {
-  background: var(--glass-border);
-  color: var(--text-main);
+  gap: 8px;
 }
 
 .timing-widget__content {
@@ -138,17 +111,7 @@
 
 .timing-widget__save-btn {
   width: 100%;
-  padding: 10px;
-  background: var(--accent-gradient);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  margin-top: 8px;
 }
 
 .timing-widget__timer-mini {
@@ -166,29 +129,10 @@
   gap: 16px;
 }
 
-.timing-widget__ctrl {
-  background: var(--glass-border);
-  border: none;
-  color: var(--text-main);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.timing-widget__ctrl:hover {
-  background: var(--glass-border);
-  transform: scale(1.1);
-}
-
 .timing-widget__ctrl--main {
-  width: 48px;
-  height: 48px;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  width: 54px;
+  height: 54px;
+  border-radius: 50% !important;
 }
 
 .timing-widget__phase-label {
@@ -198,15 +142,9 @@
   letter-spacing: 0.1em;
 }
 
-/* Response for small screens */
+/* Responsive adjustment for Portal */
 @media (max-width: 600px) {
-  .timing-widget__toggle {
-    bottom: 16px;
-    left: 16px;
-  }
   .timing-widget__panel {
-    bottom: 76px;
-    left: 16px;
-    width: calc(100vw - 32px);
+    width: calc(100vw - 40px);
   }
 }
