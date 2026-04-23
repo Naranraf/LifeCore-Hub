@@ -3,7 +3,7 @@ schemaVersion: "v1"
 
 # Configuración de los scripts (Optimizado para Vite)
 scripts:
-  build: "npm run build"
+  build: "npm run build && ls -R dist"
   run: "npm run start:prod" # Usamos el 'serve' que instalamos localmente para máxima velocidad
 
 # Configuración del entorno y Secretos

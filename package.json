@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start:prod": "serve -s dist"
+    "start:prod": "serve -p 8080 -s dist"
   },
   "dependencies": {
     "dompurify": "^3.4.0",
