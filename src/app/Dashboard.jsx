@@ -22,6 +22,8 @@ import useAuthStore from '../hooks/useAuth';
 import useFinanceStore from '../features/finance/hooks/useFinance';
 import useHealthStore from '../features/health/hooks/useHealth';
 import useTimerStore from '../features/timing/hooks/useTimer';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 import './Dashboard.css';
 
 const cardVariants = {
@@ -39,20 +41,21 @@ const cardVariants = {
 function StatCard({ icon: Icon, iconColor, title, value, subtitle, index }) {
   return (
     <motion.div
-      className="dashboard__card glass-panel"
       custom={index}
       initial="hidden"
       animate="visible"
       variants={cardVariants}
     >
-      <div className="dashboard__card-header">
-        <div className="dashboard__card-icon" style={{ background: 'var(--glass-border)', color: iconColor }}>
-          <Icon size={22} />
+      <Card className="dashboard__card">
+        <div className="dashboard__card-header">
+          <div className="dashboard__card-icon" style={{ background: 'var(--glass-border)', color: iconColor }}>
+            <Icon size={22} />
+          </div>
+          <span className="dashboard__card-title">{title}</span>
         </div>
-        <span className="dashboard__card-title">{title}</span>
-      </div>
-      <p className="dashboard__card-value" style={{ fontWeight: 'bold' }}>{value}</p>
-      <p className="dashboard__card-subtitle">{subtitle}</p>
+        <p className="dashboard__card-value" style={{ fontWeight: 'bold' }}>{value}</p>
+        <p className="dashboard__card-subtitle">{subtitle}</p>
+      </Card>
     </motion.div>
   );
 }
@@ -93,7 +96,10 @@ export default function Dashboard() {
     return cal;
   }, [logs]);
 
-  const formattedBalance = new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(balance);
+  const formattedBalance = new Intl.NumberFormat('en-US', { 
+    style: 'currency', 
+    currency: currency || 'USD' 
+  }).format(balance || 0);
 
   return (
     <div className="dashboard">
@@ -203,19 +209,22 @@ function StreakCard({ label, count, icon }) {
   const milestone = count >= 50 ? '🔥' : count >= 25 ? '⭐' : count >= 10 ? '✨' : '';
   return (
     <motion.div
-      className="dashboard__card glass-panel"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      style={{ 
-        padding: '20px', 
-        textAlign: 'center',
-        borderColor: count >= 10 ? 'var(--warning)' : undefined,
-        boxShadow: count >= 25 ? '0 0 20px rgba(245, 158, 11, 0.15)' : undefined,
-      }}
     >
-      <div style={{ fontSize: '28px', marginBottom: '4px' }}>{icon}</div>
-      <p style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-display)' }}>{count} {milestone}</p>
-      <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{label}</p>
+      <Card 
+        className="dashboard__card" 
+        style={{ 
+          padding: '20px', 
+          textAlign: 'center',
+          borderColor: count >= 10 ? 'var(--warning)' : undefined,
+          boxShadow: count >= 25 ? '0 0 20px rgba(245, 158, 11, 0.15)' : undefined,
+        }}
+      >
+        <div style={{ fontSize: '28px', marginBottom: '4px' }}>{icon}</div>
+        <p style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-display)' }}>{count} {milestone}</p>
+        <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{label}</p>
+      </Card>
     </motion.div>
   );
 }

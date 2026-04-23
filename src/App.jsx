@@ -9,6 +9,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import useAuthStore from './hooks/useAuth';
+import { useAppStore } from './store/useAppStore';
 import Sidebar from './components/Sidebar';
 import Login from './app/Login';
 import Dashboard from './app/Dashboard';
@@ -20,11 +21,13 @@ import AiChat from './features/ai/components/AiChat';
 import Journal from './features/journal/Journal';
 import MusicWidget from './components/MusicWidget';
 import TimingWidget from './features/timing/components/TimingWidget';
+import FloatingToolbar from './components/FloatingToolbar';
 import './app/FeaturePages.css';
 
 export default function App() {
   const { user, loading, init } = useAuthStore();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const sidebarCollapsed = useAppStore((state) => state.ui.sidebarCollapsed);
+  const toggleSidebar = useAppStore((state) => state.toggleSidebar);
 
   useEffect(() => {
     const unsubscribe = init();
@@ -57,7 +60,7 @@ export default function App() {
     <Router id="app-root">
       <Sidebar
         collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed((prev) => !prev)}
+        onToggle={toggleSidebar}
       />
       <main
         id="main-content-area"
@@ -83,6 +86,7 @@ export default function App() {
       </main>
       <MusicWidget />
       <TimingWidget />
+      <FloatingToolbar />
     </Router>
   );
 }

@@ -11,12 +11,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Timer, X, Play, Pause, RotateCcw, SkipForward, Settings, Check } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { useAppStore } from '../../../store/useAppStore';
 import useTimerStore, { PHASES } from '../hooks/useTimer';
 import PomodoroTimer from './PomodoroTimer';
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
 import './TimingWidget.css';
 
 export default function TimingWidget() {
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = useAppStore((state) => state.ui.isTimingOpen);
+  const setIsOpen = useAppStore((state) => state.toggleTiming);
   const [showSettings, setShowSettings] = useState(false);
   const dragControls = useDragControls();
   const constraintsRef = useRef(null);
@@ -76,23 +80,11 @@ export default function TimingWidget() {
       {/* Constraints boundary (invisible, covers screen when dragging) */}
       <div className="timing-widget__constraints" ref={constraintsRef} />
 
-      <button 
-        id="btn-timing-toggle"
-        className="timing-widget__toggle glass-panel"
-        onClick={() => setIsOpen(!isOpen)}
-        style={{ 
-          borderColor: status === 'running' ? getPhaseColor() : 'var(--border-color)',
-          boxShadow: status === 'running' ? `0 0 15px ${getPhaseColor()}40` : 'none'
-        }}
-      >
-        <Timer size={20} className={status === 'running' ? 'timing-widget__icon--active' : ''} />
-      </button>
-
       <AnimatePresence>
         {isOpen && (
           <motion.div
             id="container-timing-window"
-            className="timing-widget__panel glass-panel"
+            className="timing-widget__panel-motion"
             drag
             dragControls={dragControls}
             dragListener={false}
@@ -100,10 +92,11 @@ export default function TimingWidget() {
             dragConstraints={constraintsRef}
             onDragEnd={handleDragEnd}
             style={{ x: position.x, y: position.y }}
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
           >
+            <Card className="timing-widget__panel">
             {/* Drag Handle / Header */}
             <div 
               className="timing-widget__header" 
@@ -190,12 +183,13 @@ export default function TimingWidget() {
                       />
                     </div>
                   </div>
-                  <button className="timing-widget__save-btn" onClick={handleSaveSettings}>
+                  <Button variant="primary" size="small" className="timing-widget__save-btn" onClick={handleSaveSettings}>
                     <Check size={14} /> Save Changes
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
+            </Card>
           </motion.div>
         )}
       </AnimatePresence>

@@ -61,8 +61,6 @@ export default function PomodoroTimer({
       <svg
         className="pomodoro-timer__svg"
         viewBox="0 0 280 280"
-        width="280"
-        height="280"
       >
         {/* Background ring */}
         <circle

@@ -33,7 +33,7 @@
   position: fixed;
   top: 40px;
   right: 40px;
-  width: 280px;
+  width: 320px;
   padding: 0; /* Header-content separation */
   display: flex;
   flex-direction: column;
@@ -107,8 +107,8 @@
 
 .timing-widget__settings-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
 .timing-widget__field {
@@ -128,10 +128,11 @@
   background: var(--glass-border);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 6px 8px;
   color: var(--text-main);
   font-family: var(--font-sans);
   font-size: 13px;
+  width: 100%;
   outline: none;
 }
 
@@ -151,12 +152,12 @@
 }
 
 .timing-widget__timer-mini {
-  width: 140px;
-  height: 140px;
+  width: 200px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: scale(0.65); /* Scale down the circular component */
+  margin: 0 auto;
 }
 
 .timing-widget__controls {
