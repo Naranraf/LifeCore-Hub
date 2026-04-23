@@ -1,6 +1,10 @@
 /**
- * MacroRing — Pure CSS/SVG donut chart showing macro breakdown.
- * Zero external dependencies.
+ * MacroRing — Nutrition breakdown visualization.
+ * 
+ * Purpose: Provides a pure CSS/SVG donut chart for daily macronutrient tracking (Protein, Carbs, Fats).
+ * Responsibilities:
+ * - Calculate percentage-based stroke-dasharray for SVG circles.
+ * - Render a legend with precise gram counts and percentage shares.
  */
 import React from 'react';
 
@@ -21,7 +25,7 @@ export default function MacroRing({ protein, carbs, fat }) {
   const fLen = (fPct / 100) * circumference;
 
   return (
-    <div style={{ padding: '20px 24px' }}>
+    <div id="chart-macros-donut" style={{ padding: '20px 24px' }}>
       <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', color: 'var(--text-main)' }}>
         Macros Today
       </h3>

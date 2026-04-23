@@ -1,8 +1,12 @@
 /**
  * AI Page — Gemini AI Assistant module.
  * 
- * Securely communicates with Gemini AI via Firebase Cloud Functions
+ * Purpose: Securely communicates with Gemini AI via Firebase Cloud Functions
  * to protect API keys and handle complex logic.
+ * Responsibilities:
+ * - Manage chat history and user input.
+ * - Call backend BFF for context-aware AI text generation.
+ * - Provide actionable suggestions based on app data.
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, SendHorizonal, Loader2 } from 'lucide-react';
@@ -72,7 +76,7 @@ export default function AiChat() {
   };
 
   return (
-    <div className="feature-page ai-chat">
+    <div id="page-ai-chat" className="feature-page ai-chat">
       <header className="feature-page__header">
         <div className="feature-page__icon" style={{ background: 'var(--accent-gradient)', color: '#fff' }}>
           <Bot size={24} />

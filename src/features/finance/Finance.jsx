@@ -47,7 +47,7 @@ export default function Finance() {
   };
 
   return (
-    <div className="feature-page finance-page">
+    <div id="page-finance" className="feature-page finance-page">
       <header className="feature-page__header finance-page__header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div className="feature-page__icon" style={{ background: 'var(--glass-border)', color: 'var(--accent)' }}>
@@ -62,7 +62,7 @@ export default function Finance() {
           <select 
             value={currency} 
             onChange={(e) => setCurrency(e.target.value)}
-            className="finance-page__currency-select glass-panel"
+            className="lyfe-select"
             title="Select Base Currency"
           >
             {SUPPORTED_CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}

@@ -1,6 +1,11 @@
 /**
- * Productivity Page — Stub for Productivity Hub module.
- * Will include task lists, calendar, and study/work notes.
+ * Productivity Page — Centralized Hub for Schedule and Tasks.
+ * 
+ * Purpose: Integrates Google Calendar, Google Tasks, and local notes into a single dashboard.
+ * Features:
+ * - Dynamic widget layout (Calendar, Tasks, Notes) with reordering and resizing.
+ * - Real-time sync with Google API (Calendar and Tasks).
+ * - Cloud-persisted layout preferences via Firebase.
  */
 import React, { useState, useEffect } from 'react';
 import { CalendarCheck, ListChecks, StickyNote, RefreshCw, AlertCircle, Plus, Check, ArrowUp, ArrowDown, Maximize2, Minimize2 } from 'lucide-react';
@@ -160,7 +165,7 @@ export default function Productivity() {
   };
 
   return (
-    <div className="feature-page prod-page">
+    <div id="page-productivity" className="feature-page prod-page">
       <header className="feature-page__header">
         <div className="feature-page__icon" style={{ background: 'var(--glass-border)', color: 'var(--warning)' }}>
           <CalendarCheck size={24} />
@@ -217,7 +222,7 @@ export default function Productivity() {
                   <h3><ListChecks size={18} /> Google Tasks</h3>
                   {taskLists.length > 0 && (
                     <select 
-                      className="prod-widget__select" 
+                      className="lyfe-select" 
                       value={selectedList} 
                       onChange={e => setSelectedList(e.target.value)}
                     >

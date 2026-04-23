@@ -1,7 +1,13 @@
-/* ===========================
-   Timing Page — Premium Layout
-   =========================== */
-
+/**
+ * Timing Page Styles — High-Performance Focus UI
+ * 
+ * Purpose: Manages the visual layout of the Pomodoro Timing Engine.
+ * Features:
+ * - Centered timer dashboard with glassmorphism panels.
+ * - Circular control group (Play/Pause/Reset) with gradient accents.
+ * - Session statistics grid with custom icon containers.
+ * - Configuration modal for session duration management.
+ */
 .timing-page .feature-page__header {
   position: relative;
 }

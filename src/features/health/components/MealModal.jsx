@@ -1,3 +1,11 @@
+/**
+ * MealModal Component — Health data entry interface.
+ * 
+ * Purpose: Allows users to log meals, exercises, and water intake.
+ * Features:
+ * - Dynamic form fields based on log type (e.g., macros for meals).
+ * - Animated glass-panel overlay via Framer Motion.
+ */
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,6 +43,7 @@ export default function MealModal({ isOpen, onClose, onSave }) {
       {isOpen && (
         <div className="modal-overlay">
           <motion.div
+            id="modal-health-log"
             className="modal-content glass-panel"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -51,7 +60,7 @@ export default function MealModal({ isOpen, onClose, onSave }) {
                 <select 
                   value={formData.type} 
                   onChange={e => setFormData({...formData, type: e.target.value})}
-                  className="modal-input"
+                  className="lyfe-select"
                 >
                   <option value="meal">Meal</option>
                   <option value="exercise">Exercise</option>

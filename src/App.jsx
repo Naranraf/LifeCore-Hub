@@ -19,6 +19,7 @@ import Timing from './features/timing/Timing';
 import AiChat from './features/ai/components/AiChat';
 import Journal from './features/journal/Journal';
 import MusicWidget from './components/MusicWidget';
+import TimingWidget from './features/timing/components/TimingWidget';
 import './app/FeaturePages.css';
 
 export default function App() {
@@ -53,12 +54,13 @@ export default function App() {
 
   // Authenticated layout
   return (
-    <Router>
+    <Router id="app-root">
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed((prev) => !prev)}
       />
       <main
+        id="main-content-area"
         className="main-content"
         style={{
           flex: 1,
@@ -80,6 +82,7 @@ export default function App() {
         </Routes>
       </main>
       <MusicWidget />
+      <TimingWidget />
     </Router>
   );
 }

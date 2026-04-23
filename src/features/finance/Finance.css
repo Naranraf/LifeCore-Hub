@@ -1,7 +1,13 @@
-/* ===========================
-   Finance Page Styles
-   =========================== */
-
+/**
+ * Finance Page Styles — Fiscal Management Architecture
+ * 
+ * Purpose: Styles for the Finance module, including transaction lists, charts, and summary stats.
+ * Features:
+ * - Responsive grid for fiscal summary cards.
+ * - Interactive transaction list with deletion states.
+ * - Premium, high-contrast currency selector.
+ * - Integration with global glassmorphism tokens.
+ */
 .finance-page__header {
   justify-content: space-between;
   flex-wrap: wrap;
@@ -20,6 +26,7 @@
   font-weight: 600;
   box-shadow: 0 4px 16px rgba(var(--accent-rgb, 59, 130, 246), 0.25);
 }
+
 .finance-page__add-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(var(--accent-rgb, 59, 130, 246), 0.4);
@@ -37,11 +44,13 @@
   flex-direction: column;
   gap: 8px;
 }
+
 .finance-page__stat-label {
   font-size: 14px;
   color: var(--text-muted);
   font-weight: 500;
 }
+
 .finance-page__stat-value {
   font-family: var(--font-display);
   font-size: 32px;
@@ -53,10 +62,12 @@
   display: flex;
   flex-direction: column;
 }
+
 .finance-page__list-header {
   padding: 20px 24px;
   border-bottom: 1px solid var(--border-color);
 }
+
 .finance-page__list-header h3 {
   font-size: 16px;
   font-weight: 600;
@@ -75,12 +86,15 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   transition: background 0.2s;
 }
+
 .finance-page__item:last-child {
   border-bottom: none;
 }
+
 .finance-page__item:hover {
   background: rgba(255, 255, 255, 0.02);
 }
+
 .finance-page__item:hover .finance-page__item-del {
   opacity: 1;
 }
@@ -101,12 +115,14 @@
   flex-direction: column;
   overflow: hidden;
 }
+
 .finance-page__item-cat {
   font-size: 14px;
   font-weight: 600;
   text-transform: capitalize;
   color: var(--text-main);
 }
+
 .finance-page__item-date {
   font-size: 12px;
   color: var(--text-muted);
@@ -133,6 +149,7 @@
   opacity: 0;
   transition: all 0.2s;
 }
+
 .finance-page__item-del:hover {
   background: var(--glass-border);
   color: var(--error);
@@ -143,3 +160,6 @@
     opacity: 1;
   }
 }
+
+
+/* Remaining Finance Page Styles ... */

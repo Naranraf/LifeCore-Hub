@@ -1,13 +1,12 @@
 /**
- * Timing Page — Full Pomodoro Engine Interface
+ * Timing Page — Primary interface for the Pomodoro Timing Engine.
  * 
+ * Purpose: Manages focus sessions and breaks to optimize productivity.
  * Features:
- * - Circular SVG timer with phase-aware colors
- * - Play/Pause/Reset/Skip controls
- * - Session stats (focus time, completed sessions)
- * - Settings panel for customizing durations
- * - Web Worker integration for background persistence
- * - Browser notifications on phase transitions
+ * - Real-time synchronization with a background Web Worker.
+ * - Circular progress visualization and phase-aware theme colors.
+ * - Persisted session statistics (completed cycles, total focus time).
+ * - Modal-based configuration for custom session durations.
  */
 import React, { useEffect, useState } from 'react';
 import {
@@ -63,7 +62,7 @@ export default function Timing() {
   const totalFocusMin = Math.floor(totalFocusMs / 60000);
 
   return (
-    <div className="feature-page timing-page">
+    <div id="page-timing" className="feature-page timing-page">
       <header className="feature-page__header">
         <div
           className="feature-page__icon"

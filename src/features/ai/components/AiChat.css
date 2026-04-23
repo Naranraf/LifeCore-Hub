@@ -1,7 +1,13 @@
-/* ===========================
-   AI Chat — Immersive Interface
-   =========================== */
-
+/**
+ * AI Chat Styles — Immersive Intelligence Interface
+ * 
+ * Component: AiChat
+ * Features:
+ * - Message bubble architecture with distinct user/AI states.
+ * - Dynamic loading indicators (pulsing dots) for background processing.
+ * - Responsive message stream with fade-in animations.
+ * - Premium interactive input wrapper with gradient action button.
+ */
 .ai-chat__container {
   display: flex;
   flex-direction: column;

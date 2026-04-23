@@ -1,3 +1,12 @@
+/**
+ * Health Page — Nutrition and Physical Activity Tracker
+ * 
+ * Purpose: Centralizes meal logging, macro calculation, and exercise tracking.
+ * Features:
+ * - Real-time macro visualization (Donut Chart).
+ * - Calorie intake vs. expenditure tracking.
+ * - Integration with Firestore for persistent health logs.
+ */
 import React, { useEffect, useState, useMemo } from 'react';
 import { HeartPulse, Plus, Apple, Dumbbell, Droplets, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -39,7 +48,7 @@ export default function Health() {
   const currentDisplayDate = new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium' }).format(new Date());
 
   return (
-    <div className="feature-page health-page">
+    <div id="page-health" className="feature-page health-page">
       <header className="feature-page__header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div className="feature-page__icon" style={{ background: 'var(--glass-border)', color: 'var(--success)' }}>

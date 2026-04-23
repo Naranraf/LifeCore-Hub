@@ -1,9 +1,11 @@
 /**
- * Sidebar Component — Primary navigation for LyfeCore Hub.
+ * Sidebar Component — Primary navigation structure for LyfeCore Hub.
  * 
- * Design: Glassmorphism panel with animated nav items.
- * Uses lucide-react for consistent iconography.
- * Active route is highlighted via react-router-dom's useLocation.
+ * Purpose: Provides access to all active features and modules.
+ * Features:
+ * - Glassmorphism design and responsive collapsed state.
+ * - Dynamic navigation item rendering.
+ * - Integrated user profile, theme toggle, and logout actions.
  */
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -40,7 +42,7 @@ export default function Sidebar({ collapsed, onToggle }) {
   const { theme, toggleTheme } = useThemeStore();
 
   return (
-    <aside className={`sidebar glass-panel ${collapsed ? 'sidebar--collapsed' : ''}`}>
+    <aside id="sidebar-navigation" className={`sidebar glass-panel ${collapsed ? 'sidebar--collapsed' : ''}`}>
       {/* Brand */}
       <div className="sidebar__brand">
         {!collapsed && (

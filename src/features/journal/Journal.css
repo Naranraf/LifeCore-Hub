@@ -1,3 +1,13 @@
+/**
+ * Journal Page Styles — Personal Reflection UI
+ * 
+ * Purpose: Provides styling for the rich-text journal editor and entry sidebar.
+ * Features:
+ * - Two-column layout (Sidebar + Editor).
+ * - React Quill (Rich Text) UI overrides for dark theme and glass aesthetics.
+ * - Sanitized entry preview lists with active states.
+ * - Integration with global theme and typography tokens.
+ */
 .journal-page {
   display: flex;
   flex-direction: column;

@@ -1,3 +1,13 @@
+/**
+ * Journal Page — Private Reflection and AI Analysis module.
+ * 
+ * Purpose: Provides a rich-text environment for personal writing, with integrated AI sentiment analysis.
+ * Features:
+ * - Rich text editing via React Quill.
+ * - Real-time sync with Firestore.
+ * - AI Insights powered by Gemini (mood, themes, suggestions).
+ * - XSS protection via DOMPurify.
+ */
 import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css'; // Requires legacy peer deps on React 19
@@ -138,7 +148,7 @@ Entry:\n"${plainText}"`;
   };
 
   return (
-    <div className="feature-page journal-page">
+    <div id="page-journal" className="feature-page journal-page">
       <header className="feature-page__header" style={{ marginBottom: '16px' }}>
         <div className="feature-page__icon" style={{ background: 'var(--glass-border)', color: 'var(--accent)' }}>
           <Book size={24} />

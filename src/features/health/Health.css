@@ -1,3 +1,12 @@
+/**
+ * Health Page Styles — Wellness & Nutrition UI
+ * 
+ * Purpose: Provides styling for the health dashboard, meal logs, and modal interfaces.
+ * Features:
+ * - Fade-in animations for section transitions.
+ * - Reusable modal layouts (overlay, content, header, actions).
+ * - Macro visualization styling overrides for consistent premium look.
+ */
 .health-page {
   animation: fadeIn 0.5s ease-out;
 }

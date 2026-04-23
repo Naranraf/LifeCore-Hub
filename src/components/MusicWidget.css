@@ -1,3 +1,12 @@
+/**
+ * MusicWidget Styles — Ambient Audio Interface
+ * 
+ * Component: MusicWidget
+ * Features:
+ * - Floating action button (FAB) with pulse animation for playback state.
+ * - Glassmorphism panel for YouTube embed integration.
+ * - Responsive positioning and hover interactions.
+ */
 .music-widget__toggle {
   position: fixed;
   bottom: 24px;

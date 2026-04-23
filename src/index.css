@@ -1,3 +1,8 @@
+/* ==========================================================================
+   Global Index Styles
+   Purpose: Base layout, typography resets, and global utility classes
+   such as glass-panel and scrollbar customization.
+   ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap');
 
 /* Let tokens.css handle the CSS variables, these elements just use them */
@@ -62,4 +67,49 @@ button:active {
   display: flex;
   width: 100%;
   min-height: 100vh;
+}
+
+/* ==========================================================================
+   LyfeCore Hub Global Utility: .lyfe-select
+   Purpose: Premium, high-contrast dropdown style to fix system-color 
+   inheritance and legibility issues in all themes.
+   ========================================================================== */
+.lyfe-select {
+  background-color: var(--text-main);
+  color: var(--primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 16px;
+  padding-right: 40px;
+  border-radius: 12px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.lyfe-select:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
+}
+
+.lyfe-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Force options to have proper background and color on all browsers */
+.lyfe-select option {
+  background-color: var(--text-main);
+  color: var(--primary);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  padding: 8px;
 }

@@ -1,3 +1,12 @@
+/**
+ * MusicWidget Component — Ambient background music player.
+ * 
+ * Purpose: Allows users to play YouTube audio/video while working.
+ * Features:
+ * - YouTube URL extraction and embedding.
+ * - Quick-play presets for focus music (Lofi, Synthwave).
+ * - Draggable/Floating UI via Framer Motion.
+ */
 import React, { useState } from 'react';
 import { Music, X, Play, MonitorPlay } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,6 +54,7 @@ export default function MusicWidget() {
   return (
     <>
       <button 
+        id="btn-music-toggle"
         className="music-widget__toggle glass-panel" 
         onClick={() => setIsOpen(!isOpen)}
         title="Background Music Player"
@@ -55,6 +65,7 @@ export default function MusicWidget() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id="container-music-player"
             className="music-widget__panel glass-panel"
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

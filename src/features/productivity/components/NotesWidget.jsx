@@ -1,3 +1,12 @@
+/**
+ * NotesWidget Component — Light-weight thought capturing.
+ * 
+ * Purpose: Provides a sticky-note style interface for quick jotting.
+ * Features:
+ * - Real-time sync with Firestore.
+ * - Color-coded categorization.
+ * - Integration with productivity layout engine.
+ */
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -61,7 +70,7 @@ export default function NotesWidget() {
   };
 
   return (
-    <div className="notes-widget">
+    <div id="widget-notes-hub" className="notes-widget">
       <div className="prod-widget__header">
         <h3><StickyNote size={18} /> LyfeCore Notes</h3>
         <button 

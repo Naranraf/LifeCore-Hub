@@ -1,3 +1,9 @@
+/**
+ * TransactionModal Component — Data entry for financial records.
+ * 
+ * Purpose: Provides a secure, validated form to log income and expenses.
+ * UI: Uses Framer Motion for glass-panel animations and Zod for schema validation.
+ */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -12,7 +18,7 @@ export default function TransactionModal({ isOpen, onClose, onSave }) {
     date: new Date().toISOString().split('T')[0],
     description: '',
   });
-  
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,7 +45,7 @@ export default function TransactionModal({ isOpen, onClose, onSave }) {
     };
 
     const result = transactionSchema.safeParse(payload);
-    
+
     if (!result.success) {
       const fieldErrors = {};
       result.error.errors.forEach(err => {
@@ -78,6 +84,7 @@ export default function TransactionModal({ isOpen, onClose, onSave }) {
           onClick={onClose}
         >
           <motion.div
+            id="modal-transaction"
             className="txn-modal glass-panel"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -114,7 +121,7 @@ export default function TransactionModal({ isOpen, onClose, onSave }) {
 
               {/* Amount */}
               <div className="txn-modal__field">
-                <label>Amount (USD)</label>
+                <label>Amount</label>
                 <input
                   type="number"
                   step="0.01"
@@ -132,6 +139,7 @@ export default function TransactionModal({ isOpen, onClose, onSave }) {
                 <div className="txn-modal__field">
                   <label>Category</label>
                   <select
+                    className="lyfe-select"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   >

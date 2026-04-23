@@ -1,7 +1,13 @@
-/* ===========================
-   Sidebar — Premium Glass Nav
-   =========================== */
-
+/**
+ * Sidebar Styles — Premium Navigation Architecture
+ * 
+ * Component: Sidebar
+ * Design System: Glassmorphism / Infinity UI
+ * Responsibilities:
+ * - Fluid layout transitions (Collapsed vs Expanded)
+ * - Navigation link states (Active, Hover, Gradient AI button)
+ * - User profile section and theme toggle styling
+ */
 .sidebar {
   position: sticky;
   top: 0;

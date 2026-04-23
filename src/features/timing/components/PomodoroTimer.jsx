@@ -1,9 +1,11 @@
 /**
- * PomodoroTimer — Circular timer display component.
+ * PomodoroTimer Component — Visual countdown visualization.
  * 
- * Uses SVG for the progress ring. The ring is calculated from
- * the remaining time vs total duration of the current phase.
- * Pure presentational — all logic lives in useTimer hook.
+ * Purpose: Provides a high-fidelity SVG progress ring and digital clock.
+ * Responsibilities:
+ * - Calculate SVG dash offset based on time remaining.
+ * - Render phase-specific metadata (label, emoji, theme color).
+ * - Display ambient glow effects synced with the current state.
  */
 import React, { useMemo } from 'react';
 import './PomodoroTimer.css';
@@ -42,6 +44,7 @@ export default function PomodoroTimer({
   remaining,
   totalDuration,
   status,
+  className = '',
 }) {
   const config = getPhaseConfig(phase);
   const timeDisplay = formatTime(remaining);
@@ -54,7 +57,7 @@ export default function PomodoroTimer({
   const strokeDashoffset = CIRCLE_CIRCUMFERENCE * (1 - progress);
 
   return (
-    <div className="pomodoro-timer">
+    <div className={`pomodoro-timer ${className}`}>
       <svg
         className="pomodoro-timer__svg"
         viewBox="0 0 280 280"

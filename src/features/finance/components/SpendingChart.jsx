@@ -1,6 +1,10 @@
 /**
- * SpendingChart — Pure CSS bar chart showing last 7 days of spending.
- * Zero external dependencies.
+ * SpendingChart — Visual summary of fiscal activity.
+ * 
+ * Purpose: Provides a pure CSS bar chart showing the last 7 days of income and expenses.
+ * Responsibilities:
+ * - Calculate daily aggregates from transaction history.
+ * - Render responsive, reactive bar components representing cash flow.
  */
 import React, { useMemo } from 'react';
 
@@ -30,7 +34,7 @@ export default function SpendingChart({ transactions, currency }) {
   const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(n);
 
   return (
-    <div style={{ padding: '20px 24px' }}>
+    <div id="chart-finance-weekly" style={{ padding: '20px 24px' }}>
       <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', color: 'var(--text-main)' }}>
         Weekly Overview
       </h3>

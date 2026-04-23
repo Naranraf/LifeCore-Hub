@@ -102,8 +102,7 @@
   color: var(--text-muted);
 }
 
-.txn-modal__field input,
-.txn-modal__field select {
+.txn-modal__field input {
   padding: 12px 14px;
   background: var(--glass-border);
   border: 1px solid var(--border-color);
@@ -114,8 +113,7 @@
   outline: none;
   transition: border-color 0.2s;
 }
-.txn-modal__field input:focus,
-.txn-modal__field select:focus {
+.txn-modal__field input:focus {
   border-color: var(--accent);
 }
 

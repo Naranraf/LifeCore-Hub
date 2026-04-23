@@ -1,3 +1,12 @@
+/**
+ * CalendarWidget Component — Monthly schedule view.
+ * 
+ * Purpose: Provides a grid-based visualization of Google Calendar events.
+ * Features:
+ * - Dynamic month switching and leap year support.
+ * - Event highlighting/badging based on Google Calendar data.
+ * - Integration with productivity layout engine.
+ */
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import './CalendarWidget.css';
@@ -58,7 +67,7 @@ export default function CalendarWidget({ events, onRefresh, loading }) {
   const totalSlots = [...blanks, ...days];
 
   return (
-    <div className="calendar-widget">
+    <div id="widget-calendar" className="calendar-widget">
       <div className="cal-header">
         <div className="cal-title">
           <CalendarIcon size={18} />

@@ -1,6 +1,8 @@
-/* ===========================
+/* ==========================================================================
    Design Tokens — Theming System
-   =========================== */
+   Purpose: Centralized source of truth for colors, typography, glass effects,
+   and theme-specific variables (Dark/Light modes).
+   ========================================================================== */
 
 /* Fallback default theme (dark) */
 :root {
