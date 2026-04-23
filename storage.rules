@@ -1,0 +1,24 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper to check if file size is below 5MB
+    function isWithinSizeLimit() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+
+    // User-specific folders: {userId}/{feature}/{filename}
+    match /{userId}/{allPaths=**} {
+      
+      // Allow read/write only if the authenticated user matches the folder ID
+      allow read, write: if isAuthenticated() 
+                          && request.auth.uid == userId
+                          && (request.method != 'CREATE' || isWithinSizeLimit());
+    }
+  }
+}

@@ -34,42 +34,6 @@ export const useAppStore = create((set) => ({
     currentPhase: 'focus' // focus, shortBreak, longBreak
   },
 
-  // --- Health & Workout State ---
-  activeWorkout: {
-    isActive: false,
-    startTime: null,
-    title: 'New Session',
-    exercises: [] // Array of { id, name, sets: [{ type, weight, reps, rpe, completed }] }
-  },
-
-  nutrition: {
-    currentMacros: { protein: 0, carbs: 0, fat: 0, calories: 0 },
-    dailyLogs: []
-  },
-
-  // --- Actions ---
-  addNutritionLog: (log) => set((state) => {
-    const newMacros = {
-      protein: parseFloat((state.nutrition.currentMacros.protein + log.protein).toFixed(1)),
-      carbs: parseFloat((state.nutrition.currentMacros.carbs + log.carbs).toFixed(1)),
-      fat: parseFloat((state.nutrition.currentMacros.fat + log.fat).toFixed(1)),
-      calories: state.nutrition.currentMacros.calories + log.calories,
-    };
-    return {
-      nutrition: {
-        currentMacros: newMacros,
-        dailyLogs: [log, ...state.nutrition.dailyLogs]
-      }
-    };
-  }),
-
-  clearNutrition: () => set((state) => ({
-    nutrition: {
-      currentMacros: { protein: 0, carbs: 0, fat: 0, calories: 0 },
-      dailyLogs: []
-    }
-  })),
-
   setSession: (userData) => set((state) => ({ 
     session: { ...state.session, ...userData } 
   })),
@@ -90,55 +54,6 @@ export const useAppStore = create((set) => ({
     ui: { ...state.ui, activeMusicId: id }
   })),
 
-  // --- Workout Actions ---
-  startWorkout: (title) => set((state) => ({
-    activeWorkout: {
-      isActive: true,
-      startTime: Date.now(),
-      title: title || 'New Session',
-      exercises: []
-    }
-  })),
-
-  finishWorkout: () => set((state) => ({
-    activeWorkout: { isActive: false, startTime: null, title: 'New Session', exercises: [] }
-  })),
-
-  addExercise: (exerciseName) => set((state) => ({
-    activeWorkout: {
-      ...state.activeWorkout,
-      exercises: [
-        ...state.activeWorkout.exercises,
-        { id: crypto.randomUUID(), name: exerciseName, sets: [] }
-      ]
-    }
-  })),
-
-  addSet: (exerciseId) => set((state) => ({
-    activeWorkout: {
-      ...state.activeWorkout,
-      exercises: state.activeWorkout.exercises.map(ex => 
-        ex.id === exerciseId 
-          ? { ...ex, sets: [...ex.sets, { type: 'normal', weight: 0, reps: 0, rpe: 0, completed: false }] }
-          : ex
-      )
-    }
-  })),
-
-  updateSet: (exerciseId, setIndex, data) => set((state) => ({
-    activeWorkout: {
-      ...state.activeWorkout,
-      exercises: state.activeWorkout.exercises.map(ex => 
-        ex.id === exerciseId 
-          ? { 
-              ...ex, 
-              sets: ex.sets.map((s, idx) => idx === setIndex ? { ...s, ...data } : s) 
-            }
-          : ex
-      )
-    }
-  })),
-  
   syncTimerState: (timerData) => set((state) => ({
     activeTimer: { ...state.activeTimer, ...timerData }
   })),

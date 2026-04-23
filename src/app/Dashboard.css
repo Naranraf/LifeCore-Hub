@@ -5,6 +5,9 @@
 .dashboard {
   max-width: 1200px;
   width: 100%;
+  min-height: calc(100vh - 100px); /* Adjust for header/nav */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */
@@ -20,6 +23,27 @@
 .dashboard__greeting {
   font-size: 28px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard__alpha-badge {
+  font-size: 10px;
+  font-weight: 800;
+  background: var(--accent-gradient);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  animation: alpha-pulse 2s infinite alternate;
+}
+
+@keyframes alpha-pulse {
+  from { opacity: 0.8; box-shadow: 0 0 10px rgba(139, 92, 246, 0.2); }
+  to { opacity: 1; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
 }
 .dashboard__name {
   background: var(--accent-gradient);
@@ -129,5 +153,75 @@
   }
   .dashboard__grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* --- INSTITUTIONAL FOOTER --- */
+.dashboard__footer {
+  margin-top: auto;
+  padding: 64px 0 48px;
+  border-top: 1px solid var(--glass-border);
+  position: relative;
+  width: 100%;
+}
+
+.footer__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer__logo {
+  font-size: 22px;
+  font-weight: 800;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.04em;
+}
+
+.footer__brand p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.footer__meta {
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: right;
+}
+
+.footer__meta p {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.footer__disclaimer {
+  font-size: 12px !important;
+  font-style: italic;
+  opacity: 0.5;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .footer__content {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  .footer__meta {
+    text-align: center;
+    max-width: 100%;
   }
 }

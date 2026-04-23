@@ -35,15 +35,18 @@ export default function Journal() {
     if (!user) return;
     
     // Listen to real-time changes
-    const q = query(collection(db, 'users', user.uid, 'journal'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, 'users', user.uid, 'journal'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setEntries(data);
     }, (error) => {
-      console.error("Error fetching journal entries", error);
+      if (error.code === 'permission-denied') {
+        console.warn("[Journal] Listener detached (Auth Transition)");
+      } else {
+        console.error("[Journal] Error fetching journal entries", error);
+      }
     });
 
     return () => unsubscribe();

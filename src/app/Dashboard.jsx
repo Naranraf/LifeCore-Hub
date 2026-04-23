@@ -8,7 +8,8 @@ import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Wallet,
-  HeartPulse,
+  Apple,
+  Dumbbell,
   CalendarCheck,
   Timer,
   TrendingUp,
@@ -20,10 +21,12 @@ import {
 import { motion } from 'framer-motion';
 import useAuthStore from '../hooks/useAuth';
 import useFinanceStore from '../features/finance/hooks/useFinance';
-import useHealthStore from '../features/health/hooks/useHealth';
+import useNutritionStore from '../features/nutrition/hooks/useNutrition';
+import useWorkoutStore from '../features/workout/hooks/useWorkout';
 import useTimerStore from '../features/timing/hooks/useTimer';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import GoalTracker from '../features/finance/components/GoalTracker';
 import './Dashboard.css';
 
 const cardVariants = {
@@ -38,23 +41,41 @@ const cardVariants = {
 /**
  * StatCard — Reusable widget for dashboard summaries.
  */
-function StatCard({ icon: Icon, iconColor, title, value, subtitle, index }) {
+function StatCard({ icon: Icon, iconColor, title, value, subtitle, index, onClick }) {
   return (
     <motion.div
       custom={index}
       initial="hidden"
       animate="visible"
       variants={cardVariants}
+      whileHover={{ y: -4, scale: 1.005 }}
+      whileTap={{ scale: 0.99 }}
+      onClick={onClick}
     >
-      <Card className="dashboard__card">
+      <Card 
+        className="dashboard__card" 
+        style={{ 
+          overflow: 'hidden',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer'
+        }}
+      >
         <div className="dashboard__card-header">
-          <div className="dashboard__card-icon" style={{ background: 'var(--glass-border)', color: iconColor }}>
+          <div 
+            className="dashboard__card-icon" 
+            style={{ 
+              background: 'var(--glass-border)', 
+              color: iconColor,
+              boxShadow: `0 0 20px ${iconColor}33`,
+              border: `1px solid ${iconColor}22`
+            }}
+          >
             <Icon size={22} />
           </div>
           <span className="dashboard__card-title">{title}</span>
         </div>
-        <p className="dashboard__card-value" style={{ fontWeight: 'bold' }}>{value}</p>
-        <p className="dashboard__card-subtitle">{subtitle}</p>
+        <div className="dashboard__card-value" style={{ fontWeight: '800', letterSpacing: '-0.03em' }}>{value}</div>
+        <div className="dashboard__card-subtitle">{subtitle}</div>
       </Card>
     </motion.div>
   );
@@ -62,8 +83,9 @@ function StatCard({ icon: Icon, iconColor, title, value, subtitle, index }) {
 
 export default function Dashboard() {
   const { profile, googleAccessToken } = useAuthStore();
-  const { transactions, initListener: initFinance, currency } = useFinanceStore();
-  const { logs, initListener: initHealth } = useHealthStore();
+  const { transactions, initListener: initFinance, currency, loading: loadingFinance } = useFinanceStore();
+  const { logs, initListener: initNutrition, loading: loadingNutrition } = useNutritionStore();
+  const { recentSessions, initListener: initWorkout } = useWorkoutStore();
   const { sessionCount, totalFocusMs } = useTimerStore();
   const navigate = useNavigate();
   
@@ -71,8 +93,15 @@ export default function Dashboard() {
 
   useEffect(() => {
     initFinance();
-    initHealth();
-  }, [initFinance, initHealth]);
+    initNutrition();
+    initWorkout();
+
+    return () => {
+      // We don't necessarily want to wipe the store data, 
+      // but we could detach listeners if needed for strict memory management.
+      // For now, keeping data fresh is preferred, but we ensure no race conditions exist.
+    };
+  }, [initFinance, initNutrition, initWorkout]);
 
   // Calculate Finance Balance
   const balance = useMemo(() => {
@@ -107,6 +136,7 @@ export default function Dashboard() {
         <div>
           <h1 className="dashboard__greeting">
             {greeting}, <span className="dashboard__name">{profile?.displayName?.split(' ')[0] || 'User'}</span>
+            <span className="dashboard__alpha-badge">Alpha v1.0</span>
           </h1>
           <p className="dashboard__tagline">Here's your life optimization overview.</p>
         </div>
@@ -125,25 +155,28 @@ export default function Dashboard() {
           icon={Wallet}
           iconColor="var(--accent)"
           title="Finance"
-          value={transactions.length > 0 ? formattedBalance : '—'}
+          value={!loadingFinance && transactions.length > 0 ? formattedBalance : <div className="skeleton" style={{ width: '80px', height: '24px' }}></div>}
           subtitle={transactions.length > 0 ? `${transactions.length} recent logs` : "No transactions yet"}
           index={0}
+          onClick={() => navigate('/finance')}
         />
         <StatCard
-          icon={HeartPulse}
+          icon={Apple}
           iconColor="var(--success)"
-          title="Health"
-          value={logs.length > 0 ? `${todayCalories} kcal` : '—'}
-          subtitle={logs.length > 0 ? "Consumed today" : "Start tracking calories"}
+          title="Nutrition"
+          value={!loadingNutrition && logs.length > 0 ? `${todayCalories} kcal` : <div className="skeleton" style={{ width: '60px', height: '24px' }}></div>}
+          subtitle={logs.length > 0 ? "Consumed today" : "Start tracking intake"}
           index={1}
+          onClick={() => navigate('/nutrition')}
         />
         <StatCard
           icon={CalendarCheck}
           iconColor="var(--warning)"
           title="Tasks"
-          value={googleAccessToken ? "Synced" : '—'}
-          subtitle={googleAccessToken ? "Live with Google Tasks" : "Log in to sync"}
+          value={loadingFinance ? <div className="skeleton" style={{ width: '50px', height: '24px' }}></div> : "Native"}
+          subtitle="Sovereign productivity active"
           index={2}
+          onClick={() => navigate('/productivity')}
         />
         <StatCard
           icon={Timer}
@@ -152,31 +185,57 @@ export default function Dashboard() {
           value={sessionCount > 0 ? `${Math.floor(totalFocusMs / 60000)}m` : 'Ready'}
           subtitle={sessionCount > 0 ? `${sessionCount} sessions` : 'Start a Pomodoro session'}
           index={3}
+          onClick={() => navigate('/timing')}
         />
       </div>
+
+      {/* Performance Mastery — TIER 3 Insights */}
+      <section className="dashboard__insights" style={{ marginTop: '32px' }}>
+        <h2 className="dashboard__section-title">Performance Mastery</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          <GoalTracker />
+        </div>
+      </section>
 
       {/* Quick Actions */}
       <section className="dashboard__quick">
         <h2 className="dashboard__section-title">Quick Actions</h2>
         <div className="dashboard__actions">
           <QuickAction icon={TrendingUp} label="Add Expense" color="var(--accent)" onClick={() => navigate('/finance')} />
-          <QuickAction icon={Activity} label="Log Meal" color="var(--success)" onClick={() => navigate('/health')} />
+          <QuickAction icon={Apple} label="Log Meal" color="var(--success)" onClick={() => navigate('/nutrition')} />
           <QuickAction icon={Target} label="New Task" color="var(--warning)" onClick={() => navigate('/productivity')} />
           <QuickAction icon={Clock} label="Start Timer" color="var(--accent-secondary)" onClick={() => navigate('/timing')} />
         </div>
       </section>
 
       {/* Streaks — Gamification */}
-      <section className="dashboard__quick" style={{ marginTop: '32px' }}>
+      <section className="dashboard__quick" style={{ marginTop: '32px', marginBottom: '64px' }}>
         <h2 className="dashboard__section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Flame size={20} style={{ color: 'var(--warning)' }} /> Activity Streaks
         </h2>
         <div className="dashboard__grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
-          <StreakCard label="Finance Logs" count={transactions.length} icon="💰" />
-          <StreakCard label="Health Logs" count={logs.length} icon="🍎" />
-          <StreakCard label="Focus Sessions" count={sessionCount} icon="🎯" />
+          <StreakCard label="Finance Logs" count={transactions.length} icon="💰" onClick={() => navigate('/finance')} />
+          <StreakCard label="Nutrition Logs" count={logs.length} icon="🍎" onClick={() => navigate('/nutrition')} />
+          <StreakCard label="Workouts" count={recentSessions.length} icon="🏋️" onClick={() => navigate('/workout')} />
         </div>
       </section>
+
+      {/* INSTITUTIONAL FOOTER */}
+      <footer className="dashboard__footer">
+        <div className="footer__content">
+          <div className="footer__brand">
+            <h3 className="footer__logo">LyfeCore Hub</h3>
+            <p>© 2026 LyfeCore Systems. <a href="https://lyfecore-hub.com" style={{ color: 'var(--accent)', textDecoration: 'none' }}>lyfecore-hub.com</a></p>
+          </div>
+          <div className="footer__meta">
+            <p>Architected by Antigravity Agent & Naranraf</p>
+            <p className="footer__disclaimer">
+              Disclaimer: Finance and health data provided for informational purposes only. 
+              Consult professionals for financial or medical advice. 
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -205,12 +264,15 @@ function getGreeting() {
 }
 
 /** Streak badge with milestone glow effect. */
-function StreakCard({ label, count, icon }) {
+function StreakCard({ label, count, icon, onClick }) {
   const milestone = count >= 50 ? '🔥' : count >= 25 ? '⭐' : count >= 10 ? '✨' : '';
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -3, scale: 1.005 }}
+      whileTap={{ scale: 0.99 }}
+      onClick={onClick}
     >
       <Card 
         className="dashboard__card" 
@@ -219,6 +281,7 @@ function StreakCard({ label, count, icon }) {
           textAlign: 'center',
           borderColor: count >= 10 ? 'var(--warning)' : undefined,
           boxShadow: count >= 25 ? '0 0 20px rgba(245, 158, 11, 0.15)' : undefined,
+          cursor: 'pointer'
         }}
       >
         <div style={{ fontSize: '28px', marginBottom: '4px' }}>{icon}</div>

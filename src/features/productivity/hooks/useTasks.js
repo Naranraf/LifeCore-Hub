@@ -28,27 +28,33 @@ const useTaskStore = create((set, get) => ({
     const user = useAuthStore.getState().user;
     if (!user) return;
 
-    set({ loading: true });
-    
     // Cleanup previous listener
-    if (get().unsubscribe) get().unsubscribe();
+    const currentUnsubscribe = get().unsubscribe;
+    if (currentUnsubscribe) {
+      currentUnsubscribe();
+      set({ unsubscribe: null });
+    }
 
+    set({ loading: true, error: null });
+    
     const q = query(
       collection(db, 'productivity_tasks'),
-      where('ownerId', '==', user.uid),
-      where('status', 'in', ['pending', 'completed']),
-      orderBy('createdAt', 'desc')
+      where('ownerId', '==', user.uid)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tasks = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const tasks = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // In-memory sort
+      
       set({ tasks, loading: false });
     }, (err) => {
-      console.error('[Tasks] Sync Error:', err);
-      set({ error: err.message, loading: false });
+      if (err.code === 'permission-denied') {
+        console.warn('[Tasks] Listener detached (Auth Transition)');
+      } else {
+        console.error('[Tasks] Sync Error:', err);
+        set({ error: err.message, loading: false });
+      }
     });
 
     set({ unsubscribe });

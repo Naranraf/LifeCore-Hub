@@ -12,7 +12,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Wallet,
-  HeartPulse,
+  Apple,
+  Dumbbell,
   CalendarCheck,
   Timer,
   Book,
@@ -30,7 +31,8 @@ import './Sidebar.css';
 const NAV_ITEMS = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/finance', label: 'Finance', icon: Wallet },
-  { path: '/health', label: 'Health', icon: HeartPulse },
+  { path: '/nutrition', label: 'Nutrition', icon: Apple },
+  { path: '/workout', label: 'Workout', icon: Dumbbell },
   { path: '/productivity', label: 'Productivity', icon: CalendarCheck },
   { path: '/timing', label: 'Timing', icon: Timer },
   { path: '/journal', label: 'Journal', icon: Book },

@@ -158,13 +158,19 @@ const FinanceAnalytics = () => {
 
             {/* --- MACD INDICATOR PANE --- */}
             <div style={{ height: '120px', marginTop: '10px' }}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minHeight={120}>
                 <ComposedChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                   <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={10} />
                   <YAxis stroke="var(--text-muted)" fontSize={10} hide />
                   <Tooltip contentStyle={{ background: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white' }} />
-                  <Legend verticalAlign="bottom" height={20} iconSize={8} wrapperStyle={{ fontSize: '10px' }} />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={20} 
+                    iconSize={8} 
+                    wrapperStyle={{ fontSize: '10px' }} 
+                    formatter={(value) => <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{value}</span>}
+                  />
                   
                   <Bar name="MACD Histogram" dataKey="histogram" barSize={8}>
                     {chartData.map((entry, index) => (

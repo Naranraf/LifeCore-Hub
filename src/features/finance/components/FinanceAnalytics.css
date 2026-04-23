@@ -87,6 +87,28 @@
   letter-spacing: 0.05em;
 }
 
+.ledger__table-wrapper {
+  mask-image: linear-gradient(to right, black 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
+  transition: all 0.3s ease;
+}
+
+.ledger__table-wrapper::-webkit-scrollbar {
+  height: 4px;
+}
+
+.ledger__table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  opacity: 0.3;
+}
+
+/* SMA & Indicator legend fixes */
+.recharts-legend-item-text {
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Customizing Recharts elements via CSS if needed */
 .recharts-cartesian-grid-horizontal line {
   stroke: rgba(255, 255, 255, 0.05);

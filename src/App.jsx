@@ -7,14 +7,15 @@
  * 3. Auth listener initializes once on mount via useAuth.init().
  */
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import useAuthStore from './hooks/useAuth';
 import { useAppStore } from './store/useAppStore';
 import Sidebar from './components/Sidebar';
 import Login from './app/Login';
 import Dashboard from './app/Dashboard';
 import Finance from './features/finance/Finance';
-import Health from './features/health/Health';
+import Nutrition from './features/nutrition/components/Nutrition';
+import Workout from './features/workout/components/Workout';
 import Productivity from './features/productivity/Productivity';
 import Timing from './features/timing/Timing';
 import AiChat from './features/ai/components/AiChat';
@@ -36,6 +37,13 @@ export default function App() {
     };
   }, [init]);
 
+  // Atmospheric Context Controller
+  const location = useLocation();
+  useEffect(() => {
+    const path = location.pathname.split('/')[1] || 'dashboard';
+    document.body.setAttribute('data-feature', path);
+  }, [location]);
+
   // Loading state while Firebase checks auth
   if (loading) {
     return (
@@ -48,16 +56,12 @@ export default function App() {
 
   // Auth gate
   if (!user) {
-    return (
-      <Router>
-        <Login />
-      </Router>
-    );
+    return <Login />;
   }
 
   // Authenticated layout
   return (
-    <Router id="app-root">
+    <>
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={toggleSidebar}
@@ -76,7 +80,8 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/finance" element={<Finance />} />
-          <Route path="/health" element={<Health />} />
+          <Route path="/nutrition" element={<Nutrition />} />
+          <Route path="/workout" element={<Workout />} />
           <Route path="/productivity" element={<Productivity />} />
           <Route path="/timing" element={<Timing />} />
           <Route path="/ai" element={<AiChat />} />
@@ -87,6 +92,6 @@ export default function App() {
       <MusicWidget />
       <TimingWidget />
       <FloatingToolbar />
-    </Router>
+    </>
   );
 }

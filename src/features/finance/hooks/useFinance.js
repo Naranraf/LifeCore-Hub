@@ -16,6 +16,10 @@ import useAuthStore from '../../../hooks/useAuth';
 
 const useFinanceStore = create((set, get) => ({
   transactions: [],
+  goals: {
+    savingGoal: 10000,
+    currentProgress: 0
+  },
   currency: localStorage.getItem('lyfecore_currency') || 'USD',
   loading: true,
   error: null,
@@ -40,52 +44,59 @@ const useFinanceStore = create((set, get) => ({
   // Start listening to transactions for the currently authenticated user
   initListener: async () => {
     const { user } = useAuthStore.getState();
-    if (!user) {
-      set({ error: 'User not authenticated', loading: false });
-      return;
-    }
+    if (!user) return;
 
-    // Try picking up cloud currency preference first
+    // Cloud sync logic (currency and goals)
     try {
       const settingsRef = doc(db, 'users', user.uid, 'settings', 'preferences');
       const settingsSnap = await getDoc(settingsRef);
-      if (settingsSnap.exists() && settingsSnap.data().currency) {
-        const cloudCurrency = settingsSnap.data().currency;
-        localStorage.setItem('lyfecore_currency', cloudCurrency);
-        set({ currency: cloudCurrency });
+      if (settingsSnap.exists()) {
+        const data = settingsSnap.data();
+        if (data.currency) {
+          localStorage.setItem('lyfecore_currency', data.currency);
+          set({ currency: data.currency });
+        }
+        if (data.savingGoal) {
+          set(state => ({ goals: { ...state.goals, savingGoal: data.savingGoal } }));
+        }
       }
-    } catch(err) {
-      console.warn('Could not fetch cloud currency pref', err);
+    } catch (err) {
+      console.warn('[Finance] Cloud prefs sync skipped:', err.message);
     }
 
     const { unsubscribe } = get();
-    if (unsubscribe) unsubscribe();
+    if (unsubscribe) {
+      unsubscribe();
+      set({ unsubscribe: null });
+    }
 
     set({ loading: true, error: null });
 
     const q = query(
       collection(db, 'finance_transactions'),
-      where('ownerId', '==', user.uid),
-      orderBy('date', 'desc')
+      where('ownerId', '==', user.uid)
     );
 
     const newUnsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const trxs = snapshot.docs.map((docSnap) => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
+        const trxs = snapshot.docs
+          .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date desc
+
         set({ transactions: trxs, loading: false });
       },
       (error) => {
-        console.error('[Finance] Error fetching transactions:', error);
-        set({ error: error.message, loading: false });
+        if (error.code === 'permission-denied') {
+          console.warn('[Finance] Listener detached (Auth Transition)');
+        } else {
+          console.error('[Finance] Error fetching transactions:', error);
+          set({ error: error.message, loading: false });
+        }
       }
     );
 
     set({ unsubscribe: newUnsubscribe });
-    return newUnsubscribe;
   },
 
   addTransaction: async (data) => {
@@ -106,6 +117,27 @@ const useFinanceStore = create((set, get) => ({
       console.error('[Finance] Add failed:', err);
       set({ error: err.message, loading: false });
       throw err;
+    }
+  },
+
+  updateTransaction: async (id, updates) => {
+    try {
+      const trxRef = doc(db, 'finance_transactions', id);
+      await setDoc(trxRef, { ...updates, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (err) {
+      console.error('[Finance] Update failed:', err);
+    }
+  },
+
+  setGoal: async (amount) => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+    try {
+      set(state => ({ goals: { ...state.goals, savingGoal: amount } }));
+      const settingsRef = doc(db, 'users', user.uid, 'settings', 'preferences');
+      await setDoc(settingsRef, { savingGoal: amount }, { merge: true });
+    } catch (err) {
+      console.error('[Finance] Set Goal failed:', err);
     }
   },
 

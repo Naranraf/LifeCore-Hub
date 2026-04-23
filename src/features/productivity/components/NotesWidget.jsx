@@ -1,141 +1,160 @@
-/**
- * NotesWidget Component — Light-weight thought capturing.
- * 
- * Purpose: Provides a sticky-note style interface for quick jotting.
- * Features:
- * - Real-time sync with Firestore.
- * - Color-coded categorization.
- * - Integration with productivity layout engine.
- */
-import React, { useState, useEffect } from 'react';
-import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import useAuthStore from '../../../hooks/useAuth';
-import { StickyNote, Plus, Trash2, Palette } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  StickyNote, Plus, Trash2, Palette, Save, X, Loader2, CheckCircle2, Tag 
+} from 'lucide-react';
+import useNotesStore from '../hooks/useNotes';
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
+import './NotesWidget.css';
 
 const NOTE_COLORS = [
-  'var(--glass-border)', // Default
+  'var(--glass-border)',
   'rgba(239, 68, 68, 0.15)', // Red
   'rgba(245, 158, 11, 0.15)', // Yellow
   'rgba(16, 185, 129, 0.15)', // Green
   'rgba(59, 130, 246, 0.15)', // Blue
+  'rgba(168, 85, 247, 0.15)', // Purple
 ];
 
+/**
+ * Advanced NotesWidget — TIER 3 UX Refinement.
+ * 
+ * Features:
+ * - Online editing with Autosave (Debounced).
+ * - Real-time saving indicators.
+ * - Categorization & Color Palette.
+ * - Discard changes fallback.
+ */
 export default function NotesWidget() {
-  const { user } = useAuthStore();
-  const [notes, setNotes] = useState([]);
-  
-  // UI State
-  const [isAdding, setIsAdding] = useState(false);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [selectedColor, setSelectedColor] = useState(NOTE_COLORS[0]);
+  const { 
+    notes, loading, saving, initListener, createNote, updateNoteDebounced, deleteNote, cleanup 
+  } = useNotesStore();
+
+  const [editingId, setEditingId] = useState(null);
+  const [localNote, setLocalNote] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
-    const q = query(collection(db, 'users', user.uid, 'notes'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setNotes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
-    return () => unsubscribe();
-  }, [user]);
+    initListener();
+    return () => cleanup();
+  }, []);
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    if (!user || (!title.trim() && !content.trim())) return;
-
-    try {
-      await addDoc(collection(db, 'users', user.uid, 'notes'), {
-        title,
-        content,
-        color: selectedColor,
-        createdAt: new Date().toISOString(),
-      });
-      setTitle('');
-      setContent('');
-      setSelectedColor(NOTE_COLORS[0]);
-      setIsAdding(false);
-    } catch(err) {
-      console.error("Failed to add note", err);
-    }
+  const handleStartEdit = (note) => {
+    setEditingId(note.id);
+    setLocalNote({ ...note });
   };
 
-  const handleDelete = async (id) => {
-    if (!user) return;
-    try {
-      await deleteDoc(doc(db, 'users', user.uid, 'notes', id));
-    } catch(err) {
-      console.error("Failed to delete note", err);
-    }
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setLocalNote(null);
+  };
+
+  const handleUpdate = (field, value) => {
+    const updated = { ...localNote, [field]: value };
+    setLocalNote(updated);
+    updateNoteDebounced(localNote.id, { [field]: value });
+  };
+
+  const handleCreate = async () => {
+    const newId = await createNote();
+    if (newId) setEditingId(newId);
   };
 
   return (
-    <div id="widget-notes-hub" className="notes-widget">
+    <div id="widget-notes-advanced" className="notes-widget">
       <div className="prod-widget__header">
-        <h3><StickyNote size={18} /> LyfeCore Notes</h3>
-        <button 
-          className="notes-widget__add-btn" 
-          onClick={() => setIsAdding(!isAdding)}
-          title="New Note"
-        >
-          <Plus size={16} />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <StickyNote size={18} />
+          <h3>LyfeCore Notes</h3>
+          {saving && (
+            <div className="notes-widget__status-pill">
+              <Loader2 size={10} className="spin" /> <span>Autosaving...</span>
+            </div>
+          )}
+        </div>
+        <Button variant="glass" size="small" onClick={handleCreate} title="Create Note">
+          <Plus size={16} /> New Thought
+        </Button>
       </div>
 
       <div className="notes-widget__content">
-        {/* Note Creator */}
-        {isAdding && (
-          <form className="notes-widget__creator glass-panel" onSubmit={handleCreate} style={{ background: selectedColor }}>
-            <input 
-              type="text" 
-              placeholder="Title" 
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              className="notes-widget__input"
-            />
-            <textarea 
-              placeholder="Take a note..." 
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              className="notes-widget__textarea"
-              autoFocus
-            />
-            <div className="notes-widget__actions">
-              <div className="notes-widget__colors">
-                {NOTE_COLORS.map(color => (
-                  <button 
-                    key={color}
-                    type="button"
-                    className={`notes-widget__color-btn ${selectedColor === color ? 'active' : ''}`}
-                    style={{ background: color }}
-                    onClick={() => setSelectedColor(color)}
-                  />
-                ))}
-              </div>
-              <button type="submit" className="feature-page__cta">Save</button>
-            </div>
-          </form>
-        )}
-
-        {/* Notes Grid */}
-        {notes.length === 0 && !isAdding ? (
-          <p className="prod-widget__empty">No notes yet. Add your first thought!</p>
+        {loading && notes.length === 0 ? (
+          <div className="prod-widget__empty"><Loader2 className="spin" /> Loading thoughts...</div>
+        ) : notes.length === 0 ? (
+          <div className="prod-widget__empty">
+            <p>Your mind is clear. Capture a new thought!</p>
+          </div>
         ) : (
           <div className="notes-widget__grid">
-            {notes.map(note => (
-              <div key={note.id} className="notes-widget__card" style={{ background: note.color || NOTE_COLORS[0] }}>
-                {note.title && <h4 className="notes-widget__card-title">{note.title}</h4>}
-                {note.content && <p className="notes-widget__card-text">{note.content}</p>}
-                
-                <button 
-                  className="notes-widget__delete" 
-                  onClick={() => handleDelete(note.id)}
-                  title="Delete Note"
+            {notes.map(note => {
+              const isEditing = editingId === note.id;
+              const displayNote = isEditing ? localNote : note;
+
+              return (
+                <Card 
+                  key={note.id} 
+                  className={`notes-widget__card ${isEditing ? 'is-editing' : ''}`}
+                  style={{ background: displayNote.color || NOTE_COLORS[0] }}
+                  onClick={() => !isEditing && handleStartEdit(note)}
                 >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
+                  <div className="notes-widget__card-header">
+                    {isEditing ? (
+                      <input 
+                        type="text"
+                        value={displayNote.title}
+                        onChange={(e) => handleUpdate('title', e.target.value)}
+                        placeholder="Thought Title"
+                        className="notes-widget__title-input"
+                        autoFocus
+                      />
+                    ) : (
+                      <h4 className="notes-widget__card-title">{note.title || 'Untitled Thought'}</h4>
+                    )}
+                    <div className="notes-widget__card-meta">
+                      {isEditing && (
+                        <button className="notes-widget__icon-btn cancel" onClick={(e) => { e.stopPropagation(); handleCancelEdit(); }}>
+                          <X size={14} />
+                        </button>
+                      )}
+                      <button className="notes-widget__icon-btn delete" onClick={(e) => { e.stopPropagation(); deleteNote(note.id); }}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="notes-widget__card-body">
+                    {isEditing ? (
+                      <textarea 
+                        value={displayNote.content}
+                        onChange={(e) => handleUpdate('content', e.target.value)}
+                        placeholder="Start typing your ideas..."
+                        className="notes-widget__content-input"
+                      />
+                    ) : (
+                      <p className="notes-widget__card-text">{note.content || 'No content yet...'}</p>
+                    )}
+                  </div>
+
+                  {isEditing && (
+                    <div className="notes-widget__card-footer">
+                      <div className="notes-widget__color-picker">
+                        {NOTE_COLORS.map(color => (
+                          <button 
+                            key={color}
+                            className={`color-dot ${displayNote.color === color ? 'active' : ''}`}
+                            style={{ background: color }}
+                            onClick={() => handleUpdate('color', color)}
+                          />
+                        ))}
+                      </div>
+                      <div className="notes-widget__save-indicator">
+                        {saving ? <Loader2 size={12} className="spin" /> : <CheckCircle2 size={12} style={{ color: 'var(--success)' }} />}
+                        <span>{saving ? 'Saving' : 'Synced'}</span>
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

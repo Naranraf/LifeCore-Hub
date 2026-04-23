@@ -1,0 +1,32 @@
+/**
+ * Workout Module Styles
+ */
+
+.workout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.workout-active-view {
+  animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.workout-session-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.workout-session-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent-gradient);
+}
