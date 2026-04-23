@@ -5,4 +5,4 @@ runConfig:
   memoryMiB: 512
 scripts:
   build: "npm run build"
-  run: "npx serve -s dist -l $PORT"
+  run: "serve -s dist -l $PORT"
