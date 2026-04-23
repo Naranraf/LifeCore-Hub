@@ -59,10 +59,10 @@
 
 .analytics__chart-container {
   margin: 16px 0;
-  min-height: 300px;
+  min-height: 400px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .analytics__empty {

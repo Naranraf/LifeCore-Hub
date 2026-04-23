@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, Legend, Bar
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, Legend, Bar, Cell
 } from 'recharts';
 import { TrendingUp, Calendar, Filter, Table, Edit3, Save } from 'lucide-react';
 import useFinanceStore from '../hooks/useFinance';
@@ -24,7 +24,7 @@ const FinanceAnalytics = () => {
   const [localAmounts, setLocalAmounts] = useState({});
   const debounceTimer = useRef(null);
 
-  // --- LOGIC: Technical Chart Data ---
+  // --- LOGIC: Technical Chart Data (SMA + MACD) ---
   const chartData = useMemo(() => {
     if (!transactions.length) return [];
     const expenses = transactions
@@ -41,20 +41,56 @@ const FinanceAnalytics = () => {
         key = `W${firstDay.toISOString().split('T')[0]}`;
       } else key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
-      // Use local amount if it exists, otherwise use transaction amount
       const amount = localAmounts[t.id] !== undefined ? localAmounts[t.id] : Number(t.amount);
       groups[key] = (groups[key] || 0) + amount;
     });
 
     const sortedGroups = Object.entries(groups).map(([date, amount]) => ({ date, amount }));
-    return sortedGroups.map((entry, idx, arr) => {
+    
+    // Helper: Calculate EMA with safety check
+    const calculateEMA = (data, period) => {
+      if (!data || data.length === 0) return [];
+      const k = 2 / (period + 1);
+      let emaArr = [];
+      let prevEma = data[0]?.amount || 0;
+      
+      data.forEach((d, i) => {
+        const currentEma = i === 0 ? prevEma : (d.amount * k) + (prevEma * (1 - k));
+        emaArr.push(currentEma);
+        prevEma = currentEma;
+      });
+      return emaArr;
+    };
+
+    const ema12 = calculateEMA(sortedGroups, 12);
+    const ema26 = calculateEMA(sortedGroups, 26);
+
+    // Final mapping with SMA and MACD
+    const result = sortedGroups.map((entry, idx, arr) => {
+      // SMA
       let sma = null;
       if (idx >= smaWindow - 1) {
         const windowSlice = arr.slice(idx - smaWindow + 1, idx + 1);
         const sum = windowSlice.reduce((acc, curr) => acc + curr.amount, 0);
         sma = Number((sum / smaWindow).toFixed(2));
       }
-      return { ...entry, sma };
+
+      // MACD Line: EMA(12) - EMA(26)
+      const macd12 = ema12[idx] || 0;
+      const macd26 = ema26[idx] || 0;
+      const macdLine = Number((macd12 - macd26).toFixed(2));
+      return { ...entry, sma, macdLine };
+    });
+
+    // Signal Line: EMA(9) of MACD Line with safety check
+    if (result.length === 0) return [];
+    const k9 = 2 / (9 + 1);
+    let prevSignal = result[0]?.macdLine || 0;
+    return result.map((entry, idx) => {
+      const signalLine = idx === 0 ? prevSignal : Number(((entry.macdLine * k9) + (prevSignal * (1 - k9))).toFixed(2));
+      prevSignal = signalLine;
+      const histogram = Number((entry.macdLine - signalLine).toFixed(2));
+      return { ...entry, signalLine, histogram };
     });
   }, [transactions, timeframe, smaWindow, localAmounts]);
 
@@ -100,45 +136,47 @@ const FinanceAnalytics = () => {
 
       <div className="analytics__chart-container">
         {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={260}>
-            <ComposedChart data={chartData}>
-              <defs>
-                <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={10} />
-              <YAxis stroke="var(--text-muted)" fontSize={10} />
-              <Tooltip contentStyle={{ background: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white' }} />
-              <Area 
-                name="Trend Fill"
-                type="monotone" 
-                dataKey="amount" 
-                stroke="none" 
-                fillOpacity={1} 
-                fill="url(#colorAmount)" 
-              />
-              <Bar 
-                name="Actual Spend"
-                dataKey="amount" 
-                barSize={20}
-                fill="var(--accent)" 
-                radius={[4, 4, 0, 0]}
-                opacity={0.8}
-              />
-              <Line 
-                name={`SMA (${smaWindow})`} 
-                type="monotone" 
-                dataKey="sma" 
-                stroke="var(--accent-secondary)" 
-                strokeWidth={3} 
-                dot={false}
-                strokeDasharray="5 5"
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
+          <>
+            <ResponsiveContainer width="100%" height={260}>
+              <ComposedChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="date" hide />
+                <YAxis stroke="var(--text-muted)" fontSize={10} />
+                <Tooltip contentStyle={{ background: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white' }} />
+                
+                <Area name="Trend Fill" type="monotone" dataKey="amount" stroke="none" fillOpacity={1} fill="url(#colorAmount)" />
+                <Bar name="Actual Spend" dataKey="amount" barSize={20} fill="var(--accent)" radius={[4, 4, 0, 0]} opacity={0.8} />
+                <Line name={`SMA (${smaWindow})`} type="monotone" dataKey="sma" stroke="var(--accent-secondary)" strokeWidth={3} dot={false} strokeDasharray="5 5" />
+              </ComposedChart>
+            </ResponsiveContainer>
+
+            {/* --- MACD INDICATOR PANE --- */}
+            <div style={{ height: '120px', marginTop: '10px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={10} />
+                  <YAxis stroke="var(--text-muted)" fontSize={10} hide />
+                  <Tooltip contentStyle={{ background: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'white' }} />
+                  <Legend verticalAlign="bottom" height={20} iconSize={8} wrapperStyle={{ fontSize: '10px' }} />
+                  
+                  <Bar name="MACD Histogram" dataKey="histogram" barSize={8}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.histogram >= 0 ? 'var(--success)' : 'var(--error)'} opacity={0.6} />
+                    ))}
+                  </Bar>
+                  <Line name="MACD" type="monotone" dataKey="macdLine" stroke="var(--accent)" strokeWidth={1.5} dot={false} />
+                  <Line name="Signal" type="monotone" dataKey="signalLine" stroke="var(--warning)" strokeWidth={1.5} dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </>
         ) : (
           <div className="analytics__empty"><p>Add more expenses for technical analysis.</p></div>
         )}
