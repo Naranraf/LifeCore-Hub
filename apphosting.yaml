@@ -1,12 +1,7 @@
 kind: "AppHostingYaml"
 schemaVersion: "v1"
 
-# Configuración de los scripts (Optimizado para Vite)
-scripts:
-  build: "npm run build"
-  run: "serve -s dist -l $PORT" # Usamos el 'serve' que instalamos localmente para máxima velocidad
-
-# Configuración del entorno y Secretos
+# Configuración del entorno y Secretos (Inyectados nativamente en el build)
 env:
   - variable: GEMINI_API_KEY
     secret: GEMINI_API_KEY
@@ -16,10 +11,11 @@ env:
     value: "lyfecore-hub.firebaseapp.com"
   - variable: VITE_FIREBASE_PROJECT_ID
     value: "lyfecore-hub"
-
-# Configuración de recursos (Blindaje de presupuesto)
-runConfig:
-  cpu: 1
-  memoryMiB: 512
-  minInstances: 0
-  maxInstances: 5
+  - variable: VITE_FIREBASE_STORAGE_BUCKET
+    value: "lyfecore-hub.firebasestorage.app"
+  - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
+    value: "500753360701"
+  - variable: VITE_FIREBASE_APP_ID
+    value: "1:500753360701:web:2d70c27d76a3ef42838754"
+  - variable: VITE_FIREBASE_MEASUREMENT_ID
+    value: "G-SCWSWL0TCC"
