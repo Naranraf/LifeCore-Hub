@@ -47,7 +47,11 @@ export default function MusicWidget() {
 
   const stopMusic = () => {
     setActiveMusicId(null);
-    setIsOpen(); // Toggle off
+    if (isOpen) setIsOpen(); // Only toggle off if already open
+  };
+
+  const clearActive = () => {
+    setActiveMusicId(null);
   };
 
   return (
@@ -101,16 +105,21 @@ export default function MusicWidget() {
 
           <div className="music-widget__content-area">
             {activeMusicId ? (
-              <div className="music-widget__player-container">
-                <iframe
-                  width="100%"
-                  height="180"
-                  src={`https://www.youtube.com/embed/${activeMusicId}?autoplay=1`}
-                  title="YouTube player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
+              <div className="music-widget__player-wrapper">
+                <div className="music-widget__player-container">
+                  <iframe
+                    width="100%"
+                    height="180"
+                    src={`https://www.youtube.com/embed/${activeMusicId}?autoplay=1`}
+                    title="YouTube player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                <button className="music-widget__back-btn" onClick={clearActive}>
+                  <X size={14} /> Stop & Back to Selection
+                </button>
               </div>
             ) : (
               <div className="music-widget__empty">
