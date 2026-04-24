@@ -17,7 +17,7 @@ import useAuthStore from '../../../hooks/useAuth';
 const useFinanceStore = create((set, get) => ({
   transactions: [],
   goals: {
-    savingGoal: 10000,
+    savingGoal: 0,
     currentProgress: 0
   },
   currency: localStorage.getItem('lyfecore_currency') || 'USD',
@@ -157,6 +157,41 @@ const useFinanceStore = create((set, get) => ({
     const { unsubscribe } = get();
     if (unsubscribe) unsubscribe();
     set({ transactions: [], unsubscribe: null });
+  },
+
+  getTelemetry: () => {
+    const { transactions, goals } = get();
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+    let monthlyIncome = 0;
+    let monthlyExpense = 0;
+
+    transactions.forEach(t => {
+      const tDate = new Date(t.date);
+      const isCurrentMonth = tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+
+      if (t.type === 'income') {
+        totalIncome += t.amount;
+        if (isCurrentMonth) monthlyIncome += t.amount;
+      } else {
+        totalExpense += t.amount;
+        if (isCurrentMonth) monthlyExpense += t.amount;
+      }
+    });
+
+    const netBalance = totalIncome - totalExpense;
+    const progress = goals.savingGoal > 0 ? (netBalance / goals.savingGoal) * 100 : 0;
+
+    return {
+      netBalance,
+      monthlyCashflow: monthlyIncome - monthlyExpense,
+      savingGoal: goals.savingGoal,
+      progress: Math.min(Math.max(progress, 0), 100) // Clamp between 0-100
+    };
   }
 }));
 

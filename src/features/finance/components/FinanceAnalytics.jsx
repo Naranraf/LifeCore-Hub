@@ -174,7 +174,7 @@ const FinanceAnalytics = () => {
                   
                   <Bar name="MACD Histogram" dataKey="histogram" barSize={8}>
                     {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.histogram >= 0 ? 'var(--success)' : 'var(--error)'} opacity={0.6} />
+                      <Cell key={`cell-${index}`} fill={entry.histogram >= 0 ? 'var(--accent-success)' : 'var(--error)'} opacity={0.6} />
                     ))}
                   </Bar>
                   <Line name="MACD" type="monotone" dataKey="macdLine" stroke="var(--accent)" strokeWidth={1.5} dot={false} />
@@ -193,7 +193,7 @@ const FinanceAnalytics = () => {
           <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '700' }}>
             <Table size={16} /> Dynamic Ledger
           </h4>
-          <div style={{ fontSize: '13px', fontWeight: '800', color: 'var(--accent)' }}>
+          <div className="stats-number" style={{ fontSize: '13px', fontWeight: '800', color: 'var(--primary)' }}>
             Autosuma Total: {currency} {totalLedgerAmount.toFixed(2)}
           </div>
         </div>
@@ -215,7 +215,8 @@ const FinanceAnalytics = () => {
                   <td style={{ padding: '12px' }}><span style={{ padding: '2px 8px', borderRadius: '4px', background: 'var(--glass-border)', fontSize: '11px' }}>{t.category}</span></td>
                   <td style={{ padding: '12px' }}>{t.description || '-'}</td>
                   <td 
-                    style={{ padding: '12px', textAlign: 'right', fontWeight: '700', color: 'var(--accent)', cursor: 'cell', outline: 'none' }}
+                    className="stats-number"
+                    style={{ padding: '12px', textAlign: 'right', fontWeight: '700', color: 'var(--primary)', cursor: 'cell', outline: 'none' }}
                     contentEditable
                     suppressContentEditableWarning
                     onBlur={(e) => handleEditAmount(t.id, e.target.innerText)}

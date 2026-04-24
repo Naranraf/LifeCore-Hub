@@ -44,7 +44,12 @@ const useNotesStore = create((set, get) => ({
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const notes = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        .sort((a, b) => {
+          // Sort by Pinned status first, then by date
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
       set({ notes, loading: false });
     }, (err) => {
       if (err.code === 'permission-denied') {
@@ -69,6 +74,8 @@ const useNotesStore = create((set, get) => ({
         content: '',
         color: 'var(--glass-border)',
         tags: [],
+        isPinned: false,
+        isArchived: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };

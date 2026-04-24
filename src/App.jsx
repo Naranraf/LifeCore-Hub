@@ -29,6 +29,7 @@ import MagicCursor from './components/ui/MagicCursor';
 import Aurora from './components/ui/Aurora';
 import SplashCursor from './components/ui/SplashCursor';
 import GlobalRestTimer from './features/workout/components/GlobalRestTimer';
+import useNotifications from './hooks/useNotifications';
 import './app/FeaturePages.css';
 
 // Aurora Color Stops Map (based on tactical tokens)
@@ -50,6 +51,9 @@ export default function App() {
   const { user, loading, init } = useAuthStore();
   const sidebarCollapsed = useAppStore((state) => state.ui.sidebarCollapsed);
   const toggleSidebar = useAppStore((state) => state.toggleSidebar);
+
+  // Initialize Global Watchdogs
+  useNotifications();
 
   useEffect(() => {
     const unsubscribe = init();

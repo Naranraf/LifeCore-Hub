@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import useFinanceStore from './hooks/useFinance';
 import TransactionModal from './components/TransactionModal';
 import FinanceAnalytics from './components/FinanceAnalytics';
+import { CATEGORIES } from './schemas';
 import './Finance.css';
 
 const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'MXN', 'BRL', 'CAD', 'AUD', 'CRC', 'COP', 'ARS', 'CLP', 'PEN', 'UYU'];
@@ -41,6 +42,17 @@ export default function Finance() {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
   };
+
+  const [filterTag, setFilterTag] = useState('All');
+
+  const filteredTransactions = useMemo(() => {
+    if (filterTag === 'All') return transactions;
+    return transactions.filter(t => t.category === filterTag);
+  }, [transactions, filterTag]);
+
+  const allCategories = useMemo(() => {
+    return ['All', ...CATEGORIES.income, ...CATEGORIES.expense];
+  }, []);
 
   const handleAddTransaction = async (data) => {
     await addTransaction(data);
@@ -82,19 +94,19 @@ export default function Finance() {
       <div className="finance-page__summary">
         <div className="finance-page__stat glass-panel">
           <span className="finance-page__stat-label">Total Balance</span>
-          <span className="finance-page__stat-value" style={{ color: balance < 0 ? 'var(--error)' : 'var(--text-main)' }}>
+          <span className={`finance-page__stat-value stats-number ${balance < 0 ? 'text-error' : ''}`}>
             {formatCurrency(balance)}
           </span>
         </div>
         <div className="finance-page__stat glass-panel">
           <span className="finance-page__stat-label">Income</span>
-          <span className="finance-page__stat-value" style={{ color: 'var(--success)' }}>
+          <span className="finance-page__stat-value stats-number" style={{ color: 'var(--accent-success)' }}>
             +{formatCurrency(totalIncome)}
           </span>
         </div>
         <div className="finance-page__stat glass-panel">
           <span className="finance-page__stat-label">Expenses</span>
-          <span className="finance-page__stat-value" style={{ color: 'var(--error)' }}>
+          <span className="finance-page__stat-value stats-number" style={{ color: 'var(--error)' }}>
             -{formatCurrency(totalExpense)}
           </span>
         </div>
@@ -132,21 +144,32 @@ export default function Finance() {
         <div className="finance-page__list glass-panel">
           <div className="finance-page__list-header">
             <h3>Recent Transactions</h3>
+            <div className="finance-page__filter">
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Filter by:</span>
+              <select 
+                value={filterTag} 
+                onChange={(e) => setFilterTag(e.target.value)}
+                className="lyfe-select"
+                style={{ padding: '4px 8px', fontSize: '12px' }}
+              >
+                {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+            </div>
           </div>
           <div className="finance-page__items">
-            {transactions.map(txn => (
+            {filteredTransactions.map(txn => (
               <div key={txn.id} className="finance-page__item">
                 <div className="finance-page__item-icon" style={{
                   background: txn.type === 'expense' ? 'var(--glass-border)' : 'var(--glass-border)',
-                  color: txn.type === 'expense' ? 'var(--error)' : 'var(--success)',
+                  color: txn.type === 'expense' ? 'var(--error)' : 'var(--accent-success)',
                 }}>
                   {txn.type === 'expense' ? <TrendingDown size={18} /> : <TrendingUp size={18} />}
                 </div>
                 <div className="finance-page__item-info">
-                  <span className="finance-page__item-cat">{txn.category.replace('_', ' ')}</span>
+                  <span className="finance-page__item-cat">{txn.category}</span>
                   <span className="finance-page__item-date">{new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium' }).format(new Date(txn.date))} {txn.description && `· ${txn.description}`}</span>
                 </div>
-                <div className="finance-page__item-amount" style={{ color: txn.type === 'expense' ? 'var(--error)' : 'var(--success)' }}>
+                <div className={`finance-page__item-amount stats-number`} style={{ color: txn.type === 'expense' ? 'var(--error)' : 'var(--accent-success)' }}>
                   {txn.type === 'expense' ? '-' : '+'}{formatCurrency(txn.amount)}
                 </div>
                 <button

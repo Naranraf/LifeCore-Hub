@@ -75,6 +75,13 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.ownerId);
     }
 
+    match /productivity_events/{eventId} {
+      allow read: if isOwner(resource.data.ownerId);
+      allow create: if isOwner(request.resource.data.ownerId);
+      allow update: if isOwner(resource.data.ownerId) && isOwner(request.resource.data.ownerId);
+      allow delete: if isOwner(resource.data.ownerId);
+    }
+
     // AI & Settings
     match /ai_preferences/{prefId} {
       allow read: if isOwner(resource.data.ownerId);

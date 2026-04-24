@@ -8,23 +8,19 @@
  * - Cloud-persisted layout preferences via Firebase.
  */
 import React, { useState, useEffect } from 'react';
-import { CalendarCheck, ListChecks, StickyNote, RefreshCw, AlertCircle, Plus, Check, ArrowUp, ArrowDown, Maximize2, Minimize2 } from 'lucide-react';
+import { CalendarCheck, ListChecks, RefreshCw, AlertCircle, Plus, Check, ArrowUp, ArrowDown, Maximize2, Minimize2 } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { motion } from 'framer-motion';
 import useAuthStore from '../../hooks/useAuth';
-import { fetchCalendarEvents, fetchTaskLists, fetchTasks, addTask } from '../../services/googleApi';
 import NotesWidget from './components/NotesWidget';
-import CalendarWidget from './components/CalendarWidget';
-import GoogleTasksWidget from './components/GoogleTasksWidget';
+import NativeCalendarWidget from './components/NativeCalendarWidget';
+import NativeTasksWidget from './components/NativeTasksWidget';
+import Card from '../../components/ui/Card';
 import './Productivity.css';
 
 export default function Productivity() {
-  const { googleAccessToken } = useAuthStore();
-  
-  const [events, setEvents] = useState([]);
-  const [loadingCal, setLoadingCal] = useState(false);
-  const [error, setError] = useState(null);
+  const { user } = useAuthStore();
 
   const defaultLayout = [
     { id: 'tasks', fullWidth: false },
@@ -53,7 +49,6 @@ export default function Productivity() {
     } catch(e) { return defaultLayout; }
   });
 
-  const { user } = useAuthStore();
 
   useEffect(() => {
     if (!user) return;
@@ -104,24 +99,7 @@ export default function Productivity() {
     saveLayout(newLayout);
   };
 
-  const loadCalendar = async () => {
-    if (!googleAccessToken) return;
-    setLoadingCal(true);
-    try {
-      const items = await fetchCalendarEvents(googleAccessToken);
-      setEvents(items);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoadingCal(false);
-    }
-  };
 
-  useEffect(() => {
-    if (googleAccessToken) {
-      loadCalendar();
-    }
-  }, [googleAccessToken]);
 
   return (
     <div id="page-productivity" className="feature-page prod-page">
@@ -137,19 +115,7 @@ export default function Productivity() {
 
       {/* Widgets are now dynamically rendered via layout map below */}
 
-      {!googleAccessToken && (
-        <div className="prod-page__alert glass-panel" style={{ borderColor: 'var(--warning)', color: 'var(--warning)', marginBottom: '24px' }}>
-          <AlertCircle size={20} />
-          <span>Google Calendar is currently disconnected. Sign in to sync your schedule.</span>
-        </div>
-      )}
 
-      {error && (
-        <div className="prod-page__alert glass-panel" style={{ borderColor: 'var(--error)', color: 'var(--error)', marginBottom: '24px' }}>
-          <AlertCircle size={20} />
-          <span>{error}</span>
-        </div>
-      )}
 
       <div className="prod-page__grid">
         {layout.map((widgetConfig) => {
@@ -168,30 +134,30 @@ export default function Productivity() {
 
           if (id === 'calendar') {
             return (
-              <section key={id} className="prod-widget glass-panel" style={{ position: 'relative', height: 'auto', minHeight: '350px', ...gridColumnStyle }}>
+              <Card key={id} className="prod-widget" style={{ position: 'relative', height: 'auto', minHeight: '350px', ...gridColumnStyle }}>
                 <LayoutControls />
-                <CalendarWidget events={events} onRefresh={loadCalendar} loading={loadingCal} />
-              </section>
+                <NativeCalendarWidget />
+              </Card>
             );
           }
 
           if (id === 'tasks') {
             return (
-              <section key={id} className="glass-panel" style={{ position: 'relative', height: 'auto', ...gridColumnStyle }}>
+              <Card key={id} style={{ position: 'relative', height: 'auto', ...gridColumnStyle }}>
                 <LayoutControls />
-                <div style={{ padding: '24px' }}>
-                  <GoogleTasksWidget />
+                <div style={{ padding: '0px' }}>
+                  <NativeTasksWidget />
                 </div>
-              </section>
+              </Card>
             );
           }
 
           if (id === 'notes') {
             return (
-              <section key={id} className="glass-panel" style={{ position: 'relative', height: 'auto', minHeight: '300px', ...gridColumnStyle }}>
+              <Card key={id} style={{ position: 'relative', height: 'auto', minHeight: '300px', ...gridColumnStyle }}>
                 <LayoutControls />
                 <NotesWidget />
-              </section>
+              </Card>
             );
           }
           return null;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  StickyNote, Plus, Trash2, Palette, Save, X, Loader2, CheckCircle2, Tag, Check 
+  StickyNote, Plus, Trash2, Palette, Save, X, Loader2, CheckCircle2, Tag, Check, Pin, Archive, PinOff 
 } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -97,7 +97,7 @@ export default function NotesWidget() {
           </div>
         ) : (
           <div className="notes-widget__grid">
-            {notes.map(note => {
+            {notes.filter(n => !n.isArchived).map(note => {
               const isEditing = editingId === note.id;
               const displayNote = isEditing ? localNote : note;
 
@@ -122,11 +122,26 @@ export default function NotesWidget() {
                       <h4 className="notes-widget__card-title">{note.title || 'Untitled Thought'}</h4>
                     )}
                     <div className="notes-widget__card-meta">
-                      {isEditing && (
+                      {isEditing ? (
                         <button className="notes-widget__icon-btn save" onClick={(e) => { e.stopPropagation(); handleCancelEdit(); }} title="Done Editing">
                           <Check size={14} />
                         </button>
+                      ) : (
+                        <button 
+                          className={`notes-widget__icon-btn pin ${note.isPinned ? 'active' : ''}`} 
+                          onClick={(e) => { e.stopPropagation(); updateNoteDebounced(note.id, { isPinned: !note.isPinned }); }}
+                          title={note.isPinned ? 'Unpin' : 'Pin'}
+                        >
+                          {note.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+                        </button>
                       )}
+                      <button 
+                        className="notes-widget__icon-btn archive" 
+                        onClick={(e) => { e.stopPropagation(); updateNoteDebounced(note.id, { isArchived: true }); }}
+                        title="Archive"
+                      >
+                        <Archive size={14} />
+                      </button>
                       <button className="notes-widget__icon-btn delete" onClick={(e) => { e.stopPropagation(); deleteNote(note.id); }}>
                         <Trash2 size={14} />
                       </button>

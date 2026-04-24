@@ -3,18 +3,14 @@ import { z } from 'zod';
 export const TRANSACTION_TYPES = ['income', 'expense'];
 
 export const CATEGORIES = {
-  income: ['salary', 'freelance', 'investments', 'gifts', 'other'],
+  income: ['Salary', 'Investment', 'Business', 'Other'],
   expense: [
-    'housing',
-    'transportation',
-    'food',
-    'utilities',
-    'insurance',
-    'healthcare',
-    'saving_investing',
-    'personal_spending',
-    'entertainment',
-    'miscellaneous'
+    'Housing & Utilities',
+    'Food & Survival',
+    'Education & Investment',
+    'Debt & Obligations',
+    'Leisure & Lifestyle',
+    'Other'
   ]
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Mail, Phone, ArrowLeft } from 'lucide-react';
+import { Bot, Mail, ArrowLeft } from 'lucide-react';
 import useAuthStore from '../hooks/useAuth';
 import './Login.css';
 
@@ -8,15 +8,11 @@ export default function Login() {
     signInWithGoogle, 
     signInWithEmail, 
     signUpWithEmail, 
-    signInWithPhone,
-    verifyPhoneOtp,
-    signInAsGuest,
-    setupRecaptcha,
     loading, 
     error 
   } = useAuthStore();
 
-  const [mode, setMode] = useState('google'); // google, email, phone
+  const [mode, setMode] = useState('google'); // google, email
   const [isSignUp, setIsSignUp] = useState(false);
 
   // Email form state
@@ -24,17 +20,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  // Phone form state
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [confirmationResult, setConfirmationResult] = useState(null);
 
-  useEffect(() => {
-    // Setup invisible recaptcha when we switch to phone tab
-    if (mode === 'phone') {
-      setupRecaptcha('recaptcha-container');
-    }
-  }, [mode, setupRecaptcha]);
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
@@ -45,28 +31,12 @@ export default function Login() {
     }
   };
 
-  const handlePhoneSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const confirmation = await signInWithPhone(phone);
-      setConfirmationResult(confirmation);
-    } catch(err) {
-      // Error handled in store
-    }
-  };
 
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
-    if (confirmationResult) {
-      await verifyPhoneOtp(confirmationResult, otp);
-    }
-  };
 
   const TopSelector = () => (
     <div className="login__selector">
       <button className={mode === 'google' ? 'active' : ''} onClick={() => setMode('google')}>Google</button>
       <button className={mode === 'email' ? 'active' : ''} onClick={() => setMode('email')}>Email</button>
-      <button className={mode === 'phone' ? 'active' : ''} onClick={() => { setMode('phone'); setConfirmationResult(null); }}>Phone</button>
     </div>
   );
 
@@ -110,17 +80,8 @@ export default function Login() {
             </button>
 
             <div className="login__divider">
-              <span>or</span>
+              <span>Secure Access</span>
             </div>
-
-            <button
-              className="login__guest-btn"
-              onClick={signInAsGuest}
-              disabled={loading}
-              id="btn-guest-signin"
-            >
-              Continue as Guest (Demo Mode)
-            </button>
           </div>
         )}
 
@@ -161,46 +122,7 @@ export default function Login() {
           </form>
         )}
 
-        {/* PHONE MODE */}
-        {mode === 'phone' && (
-          <div className="login__content fade-in">
-            <p className="login__subtitle">We will send you a verification code via SMS.</p>
-            
-            {!confirmationResult ? (
-              <form onSubmit={handlePhoneSubmit} style={{ width: '100%' }}>
-                 <input 
-                  type="tel" 
-                  placeholder="+1 555 123 4567" 
-                  className="login__input"
-                  value={phone} onChange={e => setPhone(e.target.value)}
-                  required
-                />
-                <button className="login__primary-btn" type="submit" disabled={loading}>
-                  <Phone size={18} /> {loading ? 'Sending...' : 'Send SMS Code'}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleOtpSubmit} style={{ width: '100%' }}>
-                <p className="login__subtitle" style={{color: 'var(--accent)'}}>Code sent to {phone}</p>
-                 <input 
-                  type="text" 
-                  placeholder="123456" 
-                  className="login__input login__input--center"
-                  value={otp} onChange={e => setOtp(e.target.value)}
-                  required
-                  maxLength={6}
-                />
-                <button className="login__primary-btn" type="submit" disabled={loading}>
-                  {loading ? 'Verifying...' : 'Verify Code'}
-                </button>
-                <button type="button" className="login__back-btn" onClick={() => setConfirmationResult(null)}>
-                  <ArrowLeft size={14} /> Back
-                </button>
-              </form>
-            )}
-            <div id="recaptcha-container"></div>
-          </div>
-        )}
+
 
         {error && (
           <div className="login__error">{error}</div>

@@ -1,0 +1,164 @@
+.wealth-tracker {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  position: relative;
+}
+
+.wealth-tracker__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wealth-tracker__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wealth-tracker__title h4 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.wealth-tracker__icon {
+  color: var(--primary);
+}
+
+.wealth-tracker__status {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-success);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.wealth-tracker__content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.wealth-tracker__goal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wealth-tracker__goal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.wealth-tracker__label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.wealth-tracker__value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.wealth-tracker__no-goal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--warning);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.wealth-tracker__progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wealth-tracker__progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.wealth-tracker__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wealth-tracker__progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wealth-tracker__progress-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.wealth-tracker__progress-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.wealth-tracker__stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.wealth-tracker__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wealth-tracker__stat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wealth-tracker__stat-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.wealth-tracker__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.6;
+  margin-top: auto;
+}
+
+.text-success {
+  color: var(--accent-success) !important;
+}
+
+.text-error {
+  color: #ff4d4d !important;
+}

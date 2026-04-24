@@ -27,7 +27,7 @@ import useTimerStore from '../features/timing/hooks/useTimer';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import QuoteWidget from '../components/ui/QuoteWidget';
-import GoalTracker from '../features/finance/components/GoalTracker';
+import WealthTracker from '../features/finance/components/WealthTracker';
 import './Dashboard.css';
 
 const cardVariants = {
@@ -182,7 +182,7 @@ export default function Dashboard() {
       <section className="dashboard__insights" style={{ marginTop: '32px' }}>
         <h2 className="dashboard__section-title">Performance Mastery</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-          <GoalTracker />
+          <WealthTracker />
         </div>
       </section>
 

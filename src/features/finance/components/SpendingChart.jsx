@@ -50,7 +50,7 @@ export default function SpendingChart({ transactions, currency }) {
                   style={{
                     width: '40%',
                     height: `${Math.max(incH, 2)}%`,
-                    background: 'var(--success)',
+                    background: 'var(--accent-success)',
                     borderRadius: '4px 4px 0 0',
                     transition: 'height 0.5s ease',
                     opacity: day.income > 0 ? 1 : 0.15,
@@ -75,7 +75,7 @@ export default function SpendingChart({ transactions, currency }) {
       </div>
       <div style={{ display: 'flex', gap: '16px', marginTop: '12px', justifyContent: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: 'var(--success)' }} /> Income
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: 'var(--accent-success)' }} /> Income
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
           <div style={{ width: 10, height: 10, borderRadius: 2, background: 'var(--error)' }} /> Expense

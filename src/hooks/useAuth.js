@@ -12,9 +12,8 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
-  signInWithPhoneNumber,
-  signInAnonymously,
-  RecaptchaVerifier
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, googleProvider, db, getServerTimestamp } from '../lib/firebase';
@@ -122,16 +121,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  signInAsGuest: async () => {
-    set({ loading: true, error: null });
-    try {
-      await signInAnonymously(auth);
-      // init() will handle the profile creation if it doesn't exist
-    } catch (err) {
-      console.error('[Auth] Guest Sign-In failed:', err.message);
-      set({ error: err.message, loading: false });
-    }
-  },
+
   
   /**
    * Execute reCAPTCHA Enterprise
@@ -245,46 +235,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Recaptcha Setup
-   */
-  setupRecaptcha: (containerId) => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
-        size: 'invisible',
-      });
-    }
-  },
 
-  /**
-   * Sign in with Phone Number
-   */
-  signInWithPhone: async (phoneNumber) => {
-    set({ loading: true, error: null });
-    try {
-      if (!window.recaptchaVerifier) throw new Error('Recaptcha missing.');
-      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-      set({ loading: false });
-      return confirmationResult;
-    } catch (err) {
-      console.error('[Auth] Phone Sign-In failed:', err.message);
-      set({ error: err.message, loading: false });
-      throw err;
-    }
-  },
-
-  verifyPhoneOtp: async (confirmationResult, code) => {
-    set({ loading: true, error: null });
-    try {
-      const result = await confirmationResult.confirm(code);
-      const profileRef = doc(db, 'users', result.user.uid);
-      await setDoc(profileRef, { lastLogin: getServerTimestamp() }, { merge: true });
-    } catch (err) {
-      console.error('[Auth] OTP verification failed:', err.message);
-      set({ error: 'Incorrect code', loading: false });
-      throw err;
-    }
-  },
 
   signOut: async () => {
     try {
