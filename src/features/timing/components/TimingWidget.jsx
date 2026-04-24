@@ -275,58 +275,60 @@ export default function TimingWidget() {
                           </div>
                         </div>
                       ) : mode === MODES.TIMER ? (
-                        <div className="timing-widget__field-group">
-                          <div className="timing-widget__field">
-                            <label>Min</label>
-                            <input 
-                              type="number" 
-                              value={countdownMinutes}
-                              onChange={(e) => setCountdownMinutes(Math.max(0, Math.min(1440, parseInt(e.target.value) || 0)))}
-                              onFocus={(e) => e.target.select()}
-                              min="0"
-                              max="1440"
-                            />
+                        <>
+                          <div className="timing-widget__field-group">
+                            <div className="timing-widget__field">
+                              <label>Min</label>
+                              <input 
+                                type="number" 
+                                value={countdownMinutes}
+                                onChange={(e) => setCountdownMinutes(Math.max(0, Math.min(1440, parseInt(e.target.value) || 0)))}
+                                onFocus={(e) => e.target.select()}
+                                min="0"
+                                max="1440"
+                              />
+                            </div>
+                            <div className="timing-widget__field">
+                              <label>Sec</label>
+                              <input 
+                                type="number" 
+                                value={countdownSeconds}
+                                onChange={(e) => setCountdownSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                                onFocus={(e) => e.target.select()}
+                                min="0"
+                                max="59"
+                              />
+                            </div>
                           </div>
-                          <div className="timing-widget__field">
-                            <label>Sec</label>
-                            <input 
-                              type="number" 
-                              value={countdownSeconds}
-                              onChange={(e) => setCountdownSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-                              onFocus={(e) => e.target.select()}
-                              min="0"
-                              max="59"
-                            />
-                          </div>
-                        </div>
 
-                        <div className="timing-widget__presets-section">
-                          <div className="timing-widget__presets-header">
-                            <label>Presets</label>
-                            <Button variant="glass" size="small" onClick={handleAddPreset} title="Save current as preset">
-                              <Plus size={12} />
-                            </Button>
+                          <div className="timing-widget__presets-section">
+                            <div className="timing-widget__presets-header">
+                              <label>Presets</label>
+                              <Button variant="glass" size="small" onClick={handleAddPreset} title="Save current as preset">
+                                <Plus size={12} />
+                              </Button>
+                            </div>
+                            <div className="timing-widget__presets-grid">
+                              {count.presets.map((p) => (
+                                <div key={p} className="timing-widget__preset-item">
+                                  <button 
+                                    className="timing-widget__preset-btn"
+                                    onClick={() => {
+                                      setCountdownMinutes(Math.floor(p / 60000));
+                                      setCountdownSeconds(Math.floor((p % 60000) / 1000));
+                                      count.setDuration(p);
+                                    }}
+                                  >
+                                    {Math.floor(p / 60000)}m {Math.floor((p % 60000) / 1000)}s
+                                  </button>
+                                  <button className="timing-widget__preset-del" onClick={() => count.removePreset(p)}>
+                                    <X size={10} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <div className="timing-widget__presets-grid">
-                            {count.presets.map((p) => (
-                              <div key={p} className="timing-widget__preset-item">
-                                <button 
-                                  className="timing-widget__preset-btn"
-                                  onClick={() => {
-                                    setCountdownMinutes(Math.floor(p / 60000));
-                                    setCountdownSeconds(Math.floor((p % 60000) / 1000));
-                                    count.setDuration(p);
-                                  }}
-                                >
-                                  {Math.floor(p / 60000)}m {Math.floor((p % 60000) / 1000)}s
-                                </button>
-                                <button className="timing-widget__preset-del" onClick={() => count.removePreset(p)}>
-                                  <X size={10} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        </>
                       ) : (
                         <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Stopwatch has no settings.</p>
                       )}
