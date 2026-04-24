@@ -342,47 +342,49 @@ function SettingsModal({
               />
             </>
           ) : mode === 'timer' ? (
-            <div className="timing-modal__field-group">
-              <SettingField
-                label="Minutes"
-                value={countdownMinutes}
-                onChange={(v) => onMinutesChange(Math.max(0, Math.min(1440, parseInt(v) || 0)))}
-                unit="min"
-              />
-              <SettingField
-                label="Seconds"
-                value={countdownSeconds}
-                onChange={(v) => onSecondsChange(Math.max(0, Math.min(59, parseInt(v) || 0)))}
-                unit="sec"
-              />
-            </div>
+            <>
+              <div className="timing-modal__field-group">
+                <SettingField
+                  label="Minutes"
+                  value={countdownMinutes}
+                  onChange={(v) => onMinutesChange(Math.max(0, Math.min(1440, parseInt(v) || 0)))}
+                  unit="min"
+                />
+                <SettingField
+                  label="Seconds"
+                  value={countdownSeconds}
+                  onChange={(v) => onSecondsChange(Math.max(0, Math.min(59, parseInt(v) || 0)))}
+                  unit="sec"
+                />
+              </div>
 
-            <div className="timing-modal__presets">
-              <div className="timing-modal__presets-header">
-                <span className="timing-modal__label">Presets</span>
-                <button className="timing-modal__add-preset" onClick={onAddPreset} title="Save current as preset">
-                  <Plus size={14} /> Add Preset
-                </button>
+              <div className="timing-modal__presets">
+                <div className="timing-modal__presets-header">
+                  <span className="timing-modal__label">Presets</span>
+                  <button className="timing-modal__add-preset" onClick={onAddPreset} title="Save current as preset">
+                    <Plus size={14} /> Add Preset
+                  </button>
+                </div>
+                <div className="timing-modal__presets-grid">
+                  {presets.map(p => (
+                    <div key={p} className="timing-modal__preset-item">
+                      <button 
+                        className="timing-modal__preset-select"
+                        onClick={() => {
+                          onMinutesChange(Math.floor(p / 60000));
+                          onSecondsChange(Math.floor((p % 60000) / 1000));
+                        }}
+                      >
+                        {Math.floor(p / 60000)}m {Math.floor((p % 60000) / 1000)}s
+                      </button>
+                      <button className="timing-modal__preset-remove" onClick={() => onRemovePreset(p)}>
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="timing-modal__presets-grid">
-                {presets.map(p => (
-                  <div key={p} className="timing-modal__preset-item">
-                    <button 
-                      className="timing-modal__preset-select"
-                      onClick={() => {
-                        onMinutesChange(Math.floor(p / 60000));
-                        onSecondsChange(Math.floor((p % 60000) / 1000));
-                      }}
-                    >
-                      {Math.floor(p / 60000)}m {Math.floor((p % 60000) / 1000)}s
-                    </button>
-                    <button className="timing-modal__preset-remove" onClick={() => onRemovePreset(p)}>
-                      <X size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            </>
           ) : (
             <p style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>Stopwatch has no settings.</p>
           )}
