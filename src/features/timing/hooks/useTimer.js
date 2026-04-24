@@ -32,6 +32,12 @@ const PHASES = {
   LONG_BREAK: 'longBreak',
 };
 
+const MODES = {
+  POMODORO: 'pomodoro',
+  STOPWATCH: 'stopwatch',
+  TIMER: 'timer',
+};
+
 /** Convert minutes to milliseconds. */
 function minToMs(min) {
   return min * 60 * 1000;
@@ -138,145 +144,161 @@ const useTimerStore = create((set, get) => {
 
   return {
     // State
-    phase: initialPhase,
+    mode: MODES.POMODORO,
     status: 'idle', // idle | running | paused
     remaining: persisted?.remaining || initialDuration,
+    stopwatchElapsed: persisted?.stopwatchElapsed || 0,
+    simpleTimerRemaining: persisted?.simpleTimerRemaining || 60000,
     targetEndTime: null,
+    startTime: null,
     completedCycles: persisted?.completedCycles || 0,
     totalFocusMs: persisted?.totalFocusMs || 0,
     settings: initialSettings,
     sessionCount: persisted?.sessionCount || 0,
 
-    /**
-     * Initialize the worker message handler.
-     * Call ONCE from the Timing component on mount.
-     */
+    setMode: (mode) => {
+      const w = getWorker();
+      w.postMessage({ type: 'STOP' });
+      set({ mode, status: 'idle', targetEndTime: null, startTime: null });
+    },
+
     initWorker: () => {
       requestNotificationPermission();
       const w = getWorker();
 
       w.onmessage = (event) => {
-        const { type, remaining } = event.data;
+        const { type, remaining, elapsed } = event.data;
         const state = get();
 
         if (type === 'TICK') {
           set({ remaining });
-          useAppStore.getState().syncTimerState({ 
-            remainingSeconds: Math.ceil(remaining / 1000),
-            isActive: state.status === 'running',
-            currentPhase: state.phase
-          });
+          if (state.mode === MODES.POMODORO) {
+            useAppStore.getState().syncTimerState({ 
+              remainingSeconds: Math.ceil(remaining / 1000),
+              isActive: true,
+              currentPhase: state.phase
+            });
+          }
+        }
+
+        if (type === 'TICK_STOPWATCH') {
+          set({ stopwatchElapsed: elapsed });
         }
 
         if (type === 'COMPLETE') {
-          const focusAdded = state.phase === PHASES.FOCUS
-            ? getPhaseDuration(PHASES.FOCUS, state.settings)
-            : 0;
+          if (state.mode === MODES.POMODORO) {
+            const focusAdded = state.phase === PHASES.FOCUS
+              ? getPhaseDuration(PHASES.FOCUS, state.settings)
+              : 0;
 
-          const { phase: nextPhase, cycles: nextCycles } = getNextPhase(
-            state.phase,
-            state.completedCycles,
-            state.settings
-          );
+            const { phase: nextPhase, cycles: nextCycles } = getNextPhase(
+              state.phase,
+              state.completedCycles,
+              state.settings
+            );
 
-          const nextDuration = getPhaseDuration(nextPhase, state.settings);
-          const phaseLabel =
-            nextPhase === PHASES.FOCUS ? '🎯 Focus Time' :
-            nextPhase === PHASES.SHORT_BREAK ? '☕ Short Break' :
-            '🌴 Long Break';
+            const nextDuration = getPhaseDuration(nextPhase, state.settings);
+            const phaseLabel =
+              nextPhase === PHASES.FOCUS ? '🎯 Focus Time' :
+              nextPhase === PHASES.SHORT_BREAK ? '☕ Short Break' :
+              '🌴 Long Break';
 
-          sendNotification(
-            'LyfeCore Timer',
-            `${state.phase === PHASES.FOCUS ? 'Focus session complete!' : 'Break is over!'} Next: ${phaseLabel}`
-          );
+            sendNotification(
+              'LyfeCore Timer',
+              `${state.phase === PHASES.FOCUS ? 'Focus session complete!' : 'Break is over!'} Next: ${phaseLabel}`
+            );
 
-          // Play audio cue
-          try {
-            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==');
-            audio.volume = 0.3;
+            // Audio Alert
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.volume = 0.4;
             audio.play().catch(() => {});
-          } catch {
-            // Audio playback might be blocked
+
+            set({
+              phase: nextPhase,
+              status: 'idle',
+              remaining: nextDuration,
+              targetEndTime: null,
+              completedCycles: nextCycles,
+              totalFocusMs: state.totalFocusMs + focusAdded,
+              sessionCount: state.phase === PHASES.FOCUS
+                ? state.sessionCount + 1
+                : state.sessionCount,
+            });
+
+            useAppStore.getState().syncTimerState({ 
+              remainingSeconds: Math.ceil(nextDuration / 1000),
+              isActive: false,
+              currentPhase: nextPhase
+            });
+          } else {
+            // Simple Timer Complete
+            sendNotification('LyfeCore Timer', 'Timer finished!');
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.volume = 0.4;
+            audio.play().catch(() => {});
+            set({ status: 'idle', remaining: 0 });
           }
-
-          set({
-            phase: nextPhase,
-            status: 'idle',
-            remaining: nextDuration,
-            targetEndTime: null,
-            completedCycles: nextCycles,
-            totalFocusMs: state.totalFocusMs + focusAdded,
-            sessionCount: state.phase === PHASES.FOCUS
-              ? state.sessionCount + 1
-              : state.sessionCount,
-          });
-
-          useAppStore.getState().syncTimerState({ 
-            remainingSeconds: Math.ceil(nextDuration / 1000),
-            isActive: false,
-            currentPhase: nextPhase
-          });
 
           saveState(get());
         }
       };
 
       // If page was refreshed while running, check if timer should still be active
-      if (persisted?.status === 'running' && persisted?.targetEndTime) {
-        if (persisted.targetEndTime > Date.now()) {
-          set({
-            status: 'running',
-            targetEndTime: persisted.targetEndTime,
-          });
-          w.postMessage({
-            type: 'START',
-            targetEndTime: persisted.targetEndTime,
-          });
+      const persisted = loadState();
+      if (persisted?.status === 'running') {
+        const { mode, targetEndTime, startTime } = persisted;
+        if ((mode === MODES.POMODORO || mode === MODES.TIMER) && targetEndTime > Date.now()) {
+          set({ status: 'running', targetEndTime });
+          w.postMessage({ type: 'START', targetEndTime });
+        } else if (mode === MODES.STOPWATCH && startTime) {
+          set({ status: 'running', startTime });
+          w.postMessage({ type: 'STOPWATCH_START', startTime });
         } else {
-          // Timer expired while page was closed
-          set({ status: 'idle', remaining: 0 });
+          set({ status: 'idle', remaining: persisted.remaining });
         }
       }
     },
 
-    /** Start or resume the timer. */
     start: () => {
-      requestNotificationPermission(); // Triggered by user gesture
       const state = get();
       const w = getWorker();
-      const targetEndTime = Date.now() + state.remaining;
-
-      set({ status: 'running', targetEndTime });
-      w.postMessage({ type: 'START', targetEndTime });
+      if (state.mode === MODES.STOPWATCH) {
+        const startTime = Date.now() - state.stopwatchElapsed;
+        set({ status: 'running', startTime });
+        w.postMessage({ type: 'STOPWATCH_START', startTime });
+      } else {
+        const targetEndTime = Date.now() + state.remaining;
+        set({ status: 'running', targetEndTime });
+        w.postMessage({ type: 'START', targetEndTime });
+      }
       saveState(get());
     },
 
-    /** Pause the timer, preserving remaining time. */
     pause: () => {
       const w = getWorker();
       w.postMessage({ type: 'PAUSE' });
-      set({ status: 'paused', targetEndTime: null });
+      set({ status: 'paused', targetEndTime: null, startTime: null });
       saveState(get());
     },
 
-    /** Reset the current phase to its full duration. */
     reset: () => {
       const state = get();
       const w = getWorker();
       w.postMessage({ type: 'STOP' });
 
-      const duration = getPhaseDuration(state.phase, state.settings);
-      set({
-        status: 'idle',
-        remaining: duration,
-        targetEndTime: null,
-      });
+      if (state.mode === MODES.STOPWATCH) {
+        set({ status: 'idle', stopwatchElapsed: 0, startTime: null });
+      } else if (state.mode === MODES.POMODORO) {
+        set({ status: 'idle', remaining: getPhaseDuration(state.phase, state.settings), targetEndTime: null });
+      } else {
+        set({ status: 'idle', remaining: 60000, targetEndTime: null });
+      }
       saveState(get());
     },
 
-    /** Skip to the next phase. */
     skip: () => {
       const state = get();
+      if (state.mode !== MODES.POMODORO) return;
       const w = getWorker();
       w.postMessage({ type: 'STOP' });
 
@@ -297,7 +319,6 @@ const useTimerStore = create((set, get) => {
       saveState(get());
     },
 
-    /** Update settings and reset timer. */
     updateSettings: (newSettings) => {
       const merged = { ...get().settings, ...newSettings };
       const duration = getPhaseDuration(get().phase, merged);
@@ -315,5 +336,5 @@ const useTimerStore = create((set, get) => {
   };
 });
 
-export { PHASES, DEFAULT_SETTINGS };
+export { PHASES, MODES, DEFAULT_SETTINGS };
 export default useTimerStore;

@@ -128,43 +128,7 @@ export default function Finance() {
         </div>
       ) : (
         <>
-        {/* TIER 1: Technical Analytics */}
-        <div className="tier1-marker" style={{ marginBottom: '24px', border: '2px solid var(--accent-secondary)', borderRadius: '16px', padding: '4px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--accent-secondary)', padding: '4px 12px', borderRadius: '12px 12px 0 0' }}>
-            <div style={{ color: 'white', fontSize: '10px', fontWeight: '900' }}>FINANCIAL ANALYTICS (TIER 1)</div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button 
-                onClick={() => {
-                  const categories = ['food', 'transport', 'entertainment', 'utilities'];
-                  for(let i=0; i<15; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    handleAddTransaction({
-                      amount: Math.floor(Math.random() * 100) + 10,
-                      category: categories[Math.floor(Math.random() * categories.length)],
-                      type: 'expense',
-                      date: date.toISOString(),
-                      description: 'Simulated Data'
-                    });
-                  }
-                }}
-                style={{ background: 'white', color: 'var(--accent-secondary)', border: 'none', borderRadius: '4px', fontSize: '9px', fontWeight: 'bold', cursor: 'pointer', padding: '2px 6px' }}
-              >
-                🚀 SIMULATE
-              </button>
-              <button 
-                onClick={() => {
-                  const simulated = transactions.filter(t => t.description === 'Simulated Data');
-                  simulated.forEach(t => deleteTransaction(t.id));
-                }}
-                style={{ background: 'var(--error)', color: 'white', border: 'none', borderRadius: '4px', fontSize: '9px', fontWeight: 'bold', cursor: 'pointer', padding: '2px 6px' }}
-              >
-                ☢️ WIPE SIMULATED
-              </button>
-            </div>
-          </div>
-          <FinanceAnalytics />
-        </div>
+        <FinanceAnalytics />
         <div className="finance-page__list glass-panel">
           <div className="finance-page__list-header">
             <h3>Recent Transactions</h3>

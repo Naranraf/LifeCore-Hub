@@ -31,10 +31,7 @@ const TaskView = () => {
   const completedTasks = tasks.filter(t => t.status === 'completed');
 
   return (
-    <div className="tier1-marker" style={{ border: '2px solid var(--success)', borderRadius: '16px', padding: '4px', background: 'rgba(16, 185, 129, 0.05)' }}>
-      <div style={{ background: 'var(--success)', color: 'white', fontSize: '10px', fontWeight: '900', padding: '2px 10px', borderRadius: '12px 12px 0 0', display: 'inline-block' }}>NATIVE TASKS (TIER 2)</div>
-      
-      <div className="task-view" style={{ padding: '20px' }}>
+      <div className="task-view">
         <header style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ fontSize: '20px', fontWeight: '800' }}>Task Manager</h2>
@@ -45,16 +42,26 @@ const TaskView = () => {
           </Button>
         </header>
 
-        <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
+        <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '8px', marginBottom: '32px' }}>
           <input 
             type="text" 
-            placeholder="What needs to be done?" 
+            placeholder="Type a mission and press Enter..." 
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
-            style={{ flex: 1, background: 'var(--glass-border)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '12px 16px', color: 'var(--text-main)', outline: 'none' }}
+            style={{ 
+              flex: 1, 
+              background: 'var(--bg-deep)', 
+              border: '1px solid var(--border-subtle)', 
+              borderRadius: 'var(--radius-tactical)', 
+              padding: '12px 16px', 
+              color: 'var(--text-main)', 
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+              fontWeight: '500'
+            }}
           />
           <Button type="submit" variant="primary">
-            <Plus size={18} /> Add Task
+            <Plus size={18} /> Add Mission
           </Button>
         </form>
 
@@ -114,7 +121,6 @@ const TaskView = () => {
           </section>
         </div>
       </div>
-    </div>
   );
 };
 

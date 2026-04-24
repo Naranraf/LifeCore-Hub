@@ -23,28 +23,28 @@
  */
 
 let intervalId = null;
-const TICK_INTERVAL_MS = 250; // 4 ticks/sec for smooth UI updates
+let mode = 'timer'; // timer | stopwatch
+const TICK_INTERVAL_MS = 250; 
 
-/**
- * Starts the internal tick loop.
- * @param {number} targetEndTime - Unix timestamp (ms) when timer should end.
- */
-function startTicking(targetEndTime) {
-  stopTicking(); // Clean up any previous interval
-
+function startTicking(targetEndTime, startTime) {
+  stopTicking();
+  
   intervalId = setInterval(() => {
-    const remaining = targetEndTime - Date.now();
-
-    if (remaining <= 0) {
-      stopTicking();
-      self.postMessage({ type: 'COMPLETE' });
+    if (mode === 'timer') {
+      const remaining = targetEndTime - Date.now();
+      if (remaining <= 0) {
+        stopTicking();
+        self.postMessage({ type: 'COMPLETE' });
+      } else {
+        self.postMessage({ type: 'TICK', remaining });
+      }
     } else {
-      self.postMessage({ type: 'TICK', remaining });
+      const elapsed = Date.now() - startTime;
+      self.postMessage({ type: 'TICK_STOPWATCH', elapsed });
     }
   }, TICK_INTERVAL_MS);
 }
 
-/** Clears the tick interval. */
 function stopTicking() {
   if (intervalId !== null) {
     clearInterval(intervalId);
@@ -52,24 +52,25 @@ function stopTicking() {
   }
 }
 
-// Listen for commands from the main thread
 self.onmessage = function handleMessage(event) {
-  const { type, targetEndTime } = event.data;
+  const { type, targetEndTime, startTime } = event.data;
 
   switch (type) {
     case 'START':
-    case 'RESUME':
-      if (typeof targetEndTime === 'number' && targetEndTime > Date.now()) {
+      mode = 'timer';
+      if (typeof targetEndTime === 'number') {
         startTicking(targetEndTime);
       }
       break;
-
+    case 'STOPWATCH_START':
+      mode = 'stopwatch';
+      if (typeof startTime === 'number') {
+        startTicking(null, startTime);
+      }
+      break;
     case 'PAUSE':
     case 'STOP':
       stopTicking();
       break;
-
-    default:
-      console.warn('[TimerWorker] Unknown message type:', type);
   }
 };

@@ -135,8 +135,48 @@
   border-radius: 50% !important;
 }
 
+.timing-widget__mode-mini {
+  display: flex;
+  background: var(--glass-border);
+  border-radius: 20px;
+  padding: 2px;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.timing-widget__mode-mini button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timing-widget__mode-mini button.active {
+  background: var(--bg-surface);
+  color: var(--accent);
+}
+
+.widget-generic-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.widget-generic-timer span {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+}
+
 .timing-widget__phase-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;

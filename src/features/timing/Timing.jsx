@@ -22,7 +22,7 @@ import {
   Target,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import useTimerStore, { PHASES, DEFAULT_SETTINGS } from './hooks/useTimer';
+import useTimerStore, { PHASES, MODES, DEFAULT_SETTINGS } from './hooks/useTimer';
 import PomodoroTimer from './components/PomodoroTimer';
 import './Timing.css';
 
@@ -38,11 +38,30 @@ function getPhaseDurationMs(phase, settings) {
   }
 }
 
+/**
+ * Format milliseconds to MM:SS.CC (Stopwatch)
+ */
+function formatStopwatch(ms) {
+  const mins = Math.floor(ms / 60000);
+  const secs = Math.floor((ms % 60000) / 1000);
+  const centis = Math.floor((ms % 1000) / 10);
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(centis).padStart(2, '0')}`;
+}
+
+/**
+ * Format milliseconds to MM:SS (Simple Timer)
+ */
+function formatSimple(ms) {
+  const mins = Math.floor(ms / 60000);
+  const secs = Math.floor((ms % 60000) / 1000);
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
 export default function Timing() {
   const {
-    phase, status, remaining, completedCycles,
-    totalFocusMs, settings, sessionCount,
-    initWorker, start, pause, reset, skip, updateSettings,
+    mode, phase, status, remaining, stopwatchElapsed,
+    completedCycles, totalFocusMs, settings, sessionCount,
+    initWorker, start, pause, reset, skip, updateSettings, setMode,
   } = useTimerStore();
 
   const [showSettings, setShowSettings] = useState(false);
@@ -73,9 +92,25 @@ export default function Timing() {
         <div>
           <h1 className="feature-page__title">Timing Engine</h1>
           <p className="feature-page__desc">
-            Pomodoro timer with background persistence via Web Workers.
+            Multi-mode precision timing with background persistence.
           </p>
         </div>
+        
+        <div className="timing-mode-switcher">
+          <button 
+            className={`mode-btn ${mode === MODES.POMODORO ? 'active' : ''}`}
+            onClick={() => setMode(MODES.POMODORO)}
+          >Pomodoro</button>
+          <button 
+            className={`mode-btn ${mode === MODES.STOPWATCH ? 'active' : ''}`}
+            onClick={() => setMode(MODES.STOPWATCH)}
+          >Stopwatch</button>
+          <button 
+            className={`mode-btn ${mode === MODES.TIMER ? 'active' : ''}`}
+            onClick={() => setMode(MODES.TIMER)}
+          >Timer</button>
+        </div>
+
         <button
           className="timing-page__settings-btn"
           onClick={() => setShowSettings(true)}
@@ -89,12 +124,21 @@ export default function Timing() {
       {/* Main Timer Area */}
       <div className="timing-page__main glass-panel">
         <div className="timing-page__timer-area">
-          <PomodoroTimer
-            phase={phase}
-            remaining={remaining}
-            totalDuration={totalDuration}
-            status={status}
-          />
+          {mode === MODES.POMODORO ? (
+            <PomodoroTimer
+              phase={phase}
+              remaining={remaining}
+              totalDuration={totalDuration}
+              status={status}
+            />
+          ) : (
+            <div className="generic-timer-display">
+              <div className="timer-val mono">
+                {mode === MODES.STOPWATCH ? formatStopwatch(stopwatchElapsed) : formatSimple(remaining)}
+              </div>
+              <div className="timer-mode-label">{mode.toUpperCase()}</div>
+            </div>
+          )}
 
           {/* Controls */}
           <div className="timing-page__controls">
@@ -115,45 +159,49 @@ export default function Timing() {
               id="btn-timer-toggle"
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.94 }}
+              style={{ color: '#FFFFFF' }} // Ensure visibility
             >
-              {status === 'running' ? <Pause size={28} /> : <Play size={28} />}
+              {status === 'running' ? <Pause size={28} /> : <Play size={28} fill="#FFFFFF" />}
             </motion.button>
 
-            <motion.button
-              className="timing-page__control-btn timing-page__control-btn--secondary"
-              onClick={skip}
-              title="Skip to next phase"
-              id="btn-timer-skip"
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-            >
-              <SkipForward size={20} />
-            </motion.button>
-          </div>
-
-          {/* Phase Indicators */}
-          <div className="timing-page__phases">
-            {[PHASES.FOCUS, PHASES.SHORT_BREAK, PHASES.LONG_BREAK].map((p) => (
-              <button
-                key={p}
-                className={`timing-page__phase-pill ${phase === p ? 'timing-page__phase-pill--active' : ''}`}
-                onClick={() => {
-                  if (status !== 'running') {
-                    // Allow manual phase switch when not running
-                    useTimerStore.setState({
-                      phase: p,
-                      remaining: getPhaseDurationMs(p, settings),
-                      status: 'idle',
-                    });
-                  }
-                }}
+            {mode === MODES.POMODORO && (
+              <motion.button
+                className="timing-page__control-btn timing-page__control-btn--secondary"
+                onClick={skip}
+                title="Skip to next phase"
+                id="btn-timer-skip"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
               >
-                {p === PHASES.FOCUS && '🎯 Focus'}
-                {p === PHASES.SHORT_BREAK && '☕ Short'}
-                {p === PHASES.LONG_BREAK && '🌴 Long'}
-              </button>
-            ))}
+                <SkipForward size={20} />
+              </motion.button>
+            )}
           </div>
+
+          {/* Phase Indicators (Only for Pomodoro) */}
+          {mode === MODES.POMODORO && (
+            <div className="timing-page__phases">
+              {[PHASES.FOCUS, PHASES.SHORT_BREAK, PHASES.LONG_BREAK].map((p) => (
+                <button
+                  key={p}
+                  className={`timing-page__phase-pill ${phase === p ? 'timing-page__phase-pill--active' : ''}`}
+                  onClick={() => {
+                    if (status !== 'running') {
+                      useTimerStore.setState({
+                        phase: p,
+                        remaining: getPhaseDurationMs(p, settings),
+                        status: 'idle',
+                      });
+                    }
+                  }}
+                >
+                  {p === PHASES.FOCUS && '🎯 Focus'}
+                  {p === PHASES.SHORT_BREAK && '☕ Short'}
+                  {p === PHASES.LONG_BREAK && '🌴 Long'}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

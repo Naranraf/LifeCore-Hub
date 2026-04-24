@@ -18,6 +18,37 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.music-widget__tabs {
+  display: flex;
+  gap: 12px;
+}
+
+.music-widget__tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.music-widget__tab:hover {
+  background: var(--glass-border);
+  color: var(--text-main);
+}
+
+.music-widget__tab.active {
+  color: var(--accent);
+  background: rgba(139, 92, 246, 0.1);
 }
 
 .music-widget__title {
@@ -89,6 +120,79 @@
   background: black;
   border: 1px solid var(--border-color);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.music-widget__visual-engine {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.visual-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.visual-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.visual-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--glass-border);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visual-toggle.active {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.visual-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.visual-mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  background: var(--glass-border);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visual-mode-btn span {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.visual-mode-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: transparent;
 }
 
 .music-widget__empty {

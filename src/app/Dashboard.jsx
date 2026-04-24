@@ -48,33 +48,18 @@ function StatCard({ icon: Icon, iconColor, title, value, subtitle, index, onClic
       initial="hidden"
       animate="visible"
       variants={cardVariants}
-      whileHover={{ y: -4, scale: 1.005 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
     >
-      <Card 
-        className="dashboard__card" 
-        style={{ 
-          overflow: 'hidden',
-          transition: 'all 0.3s ease',
-          cursor: 'pointer'
-        }}
-      >
+      <Card className="dashboard__card" style={{ cursor: 'pointer' }}>
         <div className="dashboard__card-header">
-          <div 
-            className="dashboard__card-icon" 
-            style={{ 
-              background: 'var(--glass-border)', 
-              color: iconColor,
-              boxShadow: `0 0 20px ${iconColor}33`,
-              border: `1px solid ${iconColor}22`
-            }}
-          >
-            <Icon size={22} />
+          <div className="dashboard__card-icon" style={{ color: iconColor }}>
+            <Icon size={20} />
           </div>
           <span className="dashboard__card-title">{title}</span>
         </div>
-        <div className="dashboard__card-value" style={{ fontWeight: '800', letterSpacing: '-0.03em' }}>{value}</div>
+        <div className="dashboard__card-value mono">{value}</div>
         <div className="dashboard__card-subtitle">{subtitle}</div>
       </Card>
     </motion.div>
@@ -135,16 +120,16 @@ export default function Dashboard() {
       <header className="dashboard__header">
         <div>
           <h1 className="dashboard__greeting">
-            {greeting}, <span className="dashboard__name">{profile?.displayName?.split(' ')[0] || 'User'}</span>
-            <span className="dashboard__alpha-badge">Alpha v1.0</span>
+            {greeting}, <span className="dashboard__name">{profile?.displayName?.split(' ')[0] || 'Operator'}</span>
+            <span className="dashboard__alpha-badge">Bunker v1.1</span>
           </h1>
-          <p className="dashboard__tagline">Here's your life optimization overview.</p>
+          <p className="dashboard__tagline">Life Optimization Engine // Tactical Status</p>
         </div>
         <div className="dashboard__date">
           {new Date().toLocaleDateString(navigator.language, {
-            weekday: 'long',
+            weekday: 'short',
             year: 'numeric',
-            month: 'long',
+            month: 'short',
             day: 'numeric',
           })}
         </div>
@@ -153,43 +138,43 @@ export default function Dashboard() {
       <div className="dashboard__grid">
         <StatCard
           icon={Wallet}
-          iconColor="var(--accent)"
-          title="Finance"
-          value={!loadingFinance && transactions.length > 0 ? formattedBalance : <div className="skeleton" style={{ width: '80px', height: '24px' }}></div>}
-          subtitle={transactions.length > 0 ? `${transactions.length} recent logs` : "No transactions yet"}
+          iconColor="var(--primary)"
+          title="Finance Hub"
+          value={!loadingFinance && transactions.length > 0 ? formattedBalance : "0.00"}
+          subtitle={transactions.length > 0 ? `${transactions.length} active logs` : "Standby"}
           index={0}
           onClick={() => navigate('/finance')}
         />
         <StatCard
           icon={Apple}
-          iconColor="var(--success)"
-          title="Nutrition"
-          value={!loadingNutrition && logs.length > 0 ? `${todayCalories} kcal` : <div className="skeleton" style={{ width: '60px', height: '24px' }}></div>}
-          subtitle={logs.length > 0 ? "Consumed today" : "Start tracking intake"}
+          iconColor="var(--accent-success)"
+          title="Bio Metrics"
+          value={!loadingNutrition && logs.length > 0 ? `${todayCalories} kcal` : "0 kcal"}
+          subtitle={logs.length > 0 ? "Fueling active" : "Await log"}
           index={1}
           onClick={() => navigate('/nutrition')}
         />
         <StatCard
           icon={CalendarCheck}
-          iconColor="var(--warning)"
-          title="Tasks"
-          value={loadingFinance ? <div className="skeleton" style={{ width: '50px', height: '24px' }}></div> : "Native"}
-          subtitle="Sovereign productivity active"
+          iconColor="var(--primary)"
+          title="Mission Control"
+          value="Native"
+          subtitle="Sovereign Tasks Active"
           index={2}
           onClick={() => navigate('/productivity')}
         />
         <StatCard
           icon={Timer}
-          iconColor="var(--accent-secondary)"
-          title="Focus Time"
-          value={sessionCount > 0 ? `${Math.floor(totalFocusMs / 60000)}m` : 'Ready'}
-          subtitle={sessionCount > 0 ? `${sessionCount} sessions` : 'Start a Pomodoro session'}
+          iconColor="var(--primary)"
+          title="Focus Engine"
+          value={sessionCount > 0 ? `${Math.floor(totalFocusMs / 60000)}m` : '0m'}
+          subtitle={sessionCount > 0 ? `${sessionCount} cycles complete` : 'Idle'}
           index={3}
           onClick={() => navigate('/timing')}
         />
       </div>
 
-      {/* Performance Mastery — TIER 3 Insights */}
+      {/* Performance Mastery — Data Insights */}
       <section className="dashboard__insights" style={{ marginTop: '32px' }}>
         <h2 className="dashboard__section-title">Performance Mastery</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>

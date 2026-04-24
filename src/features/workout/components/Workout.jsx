@@ -1,101 +1,271 @@
-import React, { useEffect } from 'react';
-import { Dumbbell, Plus, Play, History, Clock, Activity, Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { 
+  Dumbbell, Plus, Play, History, Clock, Activity, Loader2, 
+  Trash2, CheckCircle2, Circle, Layout, Library, X
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import useWorkoutStore from '../hooks/useWorkout';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
+import TemplateLibrary from './TemplateLibrary';
+import TemplateEditor from './TemplateEditor';
 import './Workout.css';
 
+import RestTimer from './RestTimer';
+
 /**
- * Workout — Dedicated Training & Performance Module.
+ * Workout — Dedicated Training & Performance Module 2.0.
  */
 const Workout = () => {
   const { 
-    activeWorkout, recentSessions, loading, initListener, startWorkout, finishWorkout, addExercise, cleanup 
+    activeWorkout, recentSessions, loading, 
+    initListener, startWorkout, finishWorkout, cancelWorkout,
+    addExercise, removeExercise, addSet, updateSet, removeSet, cleanup,
+    setRestTimer
   } = useWorkoutStore();
+
+  const [exerciseInput, setExerciseInput] = useState('');
+  const [view, setView] = useState('main'); // main, editor
+  const [editingTemplate, setEditingTemplate] = useState(null);
 
   useEffect(() => {
     initListener();
     return () => cleanup();
   }, []);
 
+  const handleSetToggle = (exerciseId, setIndex, currentStatus, exercise) => {
+    const newStatus = !currentStatus;
+    updateSet(exerciseId, setIndex, { completed: newStatus });
+    
+    // Auto-trigger/reset rest timer if completed
+    if (newStatus) {
+      setRestTimer(exerciseId, exercise.restTimer || 90);
+    }
+  };
+
+  const handleAddExercise = (e) => {
+    e.preventDefault();
+    if (!exerciseInput.trim()) return;
+    addExercise(exerciseInput.trim());
+    setExerciseInput('');
+  };
+
+  const openEditor = (template = null) => {
+    setEditingTemplate(template);
+    setView('editor');
+  };
+
   return (
-    <div className="workout-container" style={{ animation: 'fadeIn 0.5s ease-out' }}>
-      <header style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Dumbbell size={32} color="var(--accent)" />
-          Workout
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>High-performance training tracking and analytics.</p>
+    <div className="workout-container">
+      <header className="workout-header">
+        <div className="header-text">
+          <h1 className="workout-title">
+            <Dumbbell size={32} color="var(--accent)" />
+            Workout Studio
+          </h1>
+          <p className="workout-subtitle">High-performance training tracking and analytics.</p>
+        </div>
+        
+        {!(activeWorkout?.isActive) && view === 'main' && (
+          <div className="header-actions">
+            <Button variant="primary" onClick={() => startWorkout('Quick Session')}>
+              <Play size={16} /> Quick Start
+            </Button>
+          </div>
+        )}
       </header>
 
-      {!activeWorkout.isActive ? (
-        <Card className="glass-panel" style={{ textAlign: 'center', padding: '64px 32px', border: '1px dashed var(--glass-border)' }}>
-          <div style={{ background: 'var(--glass-glow)', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-            <Dumbbell size={40} color="var(--accent)" style={{ opacity: 0.8 }} />
-          </div>
-          <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '12px' }}>Ready for your next session?</h2>
-          <p style={{ marginBottom: '32px', color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto 32px' }}>
-            All your progress is synchronized with the LyfeCore Cloud for long-term performance analysis.
-          </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <Button variant="primary" size="large" onClick={() => startWorkout('Push Session')}>
-              <Play size={18} /> Start Session
-            </Button>
-            <Button variant="glass" size="large">
-              <Plus size={18} /> Custom Routine
-            </Button>
-          </div>
-        </Card>
-      ) : (
-        <div className="workout-active-view">
-          <Card className="glass-panel" style={{ borderLeft: '4px solid var(--accent)', padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-              <div>
-                <h3 style={{ fontSize: '20px', fontWeight: '800' }}>{activeWorkout.title}</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px', color: 'var(--text-muted)', fontSize: '14px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> {new Date(activeWorkout.startTime).toLocaleTimeString()}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Activity size={14} /> Active Session</span>
+      <AnimatePresence mode="wait">
+        {/* VIEW: TEMPLATE EDITOR */}
+        {view === 'editor' ? (
+          <motion.div
+            key="editor-view"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+          >
+            <TemplateEditor 
+              template={editingTemplate} 
+              onCancel={() => setView('main')} 
+            />
+          </motion.div>
+        ) : !(activeWorkout?.isActive) ? (
+          /* VIEW: DASHBOARD (LIBRARY + HISTORY) */
+          <motion.div
+            key="main-dashboard"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <div className="workout-dashboard-grid">
+              <TemplateLibrary onEdit={openEditor} />
+              
+              <section className="workout-history">
+                <h3 className="section-title">
+                  <History size={20} color="var(--accent)" /> Recent Activity
+                </h3>
+                <div className="workout-history-list">
+                  {(recentSessions || []).map(session => (
+                    <Card key={session.id} className="workout-history-card">
+                      <div className="history-main">
+                        <div className="history-info">
+                          <span className="history-title">{session?.title || 'Unnamed Session'}</span>
+                          <span className="history-meta">
+                            {session?.startTime ? new Date(session.startTime).toLocaleDateString() : 'N/A'} · {session?.durationMs ? Math.floor(session.durationMs / 60000) : 0} min
+                          </span>
+                        </div>
+                        <div className="history-stats">
+                          <span className="stat-value">{session?.exercises?.length || 0}</span>
+                          <span className="stat-label">Exercises</span>
+                        </div>
+                      </div>
+                      {(session?.exercises?.length > 0) && (
+                        <div className="history-preview">
+                          {session.exercises.map(ex => ex.name).join(', ')}
+                        </div>
+                      )}
+                    </Card>
+                  ))}
+                  {(!recentSessions || recentSessions.length === 0) && !loading && (
+                    <div className="workout-history-empty">No recent training sessions found.</div>
+                  )}
+                  {loading && (
+                    <div className="workout-history-loading">
+                      <Loader2 className="spin" size={24} />
+                    </div>
+                  )}
+                </div>
+              </section>
+            </div>
+          </motion.div>
+        ) : (
+          /* VIEW: ACTIVE SESSION */
+          <motion.div
+            key="active-workout"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="workout-active-view"
+          >
+            <Card className="workout-session-header">
+              <div className="workout-header-main">
+                <div>
+                  <h3>{activeWorkout?.title}</h3>
+                  <div className="workout-meta">
+                    <span><Clock size={14} /> {activeWorkout?.startTime ? new Date(activeWorkout.startTime).toLocaleTimeString() : '--:--'}</span>
+                    <span><Activity size={14} /> Tracking Progress</span>
+                  </div>
+                </div>
+                <div className="session-actions">
+                  <Button variant="glass" onClick={cancelWorkout} disabled={loading}>
+                    Cancel
+                  </Button>
+                  <Button variant="primary" onClick={finishWorkout} disabled={loading || !(activeWorkout?.exercises?.length > 0)}>
+                    {loading ? <Loader2 className="spin" size={16} /> : 'Finish Workout'}
+                  </Button>
                 </div>
               </div>
-              <Button variant="primary" size="small" onClick={finishWorkout} disabled={loading}>
-                {loading ? <Loader2 className="spin" size={14} /> : 'Finish Workout'}
-              </Button>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <Button variant="glass" size="small" onClick={() => addExercise('Bench Press')}>
-                <Plus size={14} /> Add Exercise
-              </Button>
-            </div>
-          </Card>
-        </div>
-      )}
-
-      <section style={{ marginTop: '48px' }}>
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', fontSize: '18px', fontWeight: '700' }}>
-          <History size={20} color="var(--accent)" /> Recent Activity
-        </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {recentSessions.map(session => (
-            <Card key={session.id} className="glass-panel" style={{ padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontWeight: '700' }}>{session.title}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {new Date(session.startTime).toLocaleDateString()} · {Math.floor(session.durationMs / 60000)} min
-                </div>
-              </div>
-              <div style={{ color: 'var(--accent)', fontWeight: '800', fontSize: '13px' }}>
-                {session.exercises?.length || 0} Exercises
-              </div>
+              
+              <form onSubmit={handleAddExercise} className="workout-add-exercise">
+                <input 
+                  type="text" 
+                  placeholder="What's next? (e.g. Bench Press)" 
+                  value={exerciseInput}
+                  onChange={(e) => setExerciseInput(e.target.value)}
+                />
+                <Button type="submit" variant="glass">
+                  <Plus size={16} /> Add Exercise
+                </Button>
+              </form>
             </Card>
-          ))}
-          {recentSessions.length === 0 && !loading && (
-            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', background: 'var(--glass-bg)', borderRadius: '24px' }}>
-              No recent training sessions found.
+
+            <div className="workout-exercises-list">
+              <AnimatePresence>
+                {(activeWorkout?.exercises || []).map((exercise) => (
+                  <motion.div
+                    key={exercise.id}
+                    layout
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <Card className="workout-exercise-card">
+                      <div className="workout-exercise-header">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <h4>{exercise?.name}</h4>
+                        </div>
+                        <button className="workout-remove-btn" onClick={() => removeExercise(exercise.id)}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+
+                      <div className="workout-sets-table">
+                        <div className="workout-table-header">
+                          <span className="col-set">Set</span>
+                          <span className="col-weight">Weight (kg)</span>
+                          <span className="col-reps">Reps</span>
+                          <span className="col-rpe">RPE</span>
+                          <span className="col-status">Done</span>
+                        </div>
+                        
+                        {(exercise?.sets || []).map((set, idx) => (
+                          <div key={idx} className={`workout-set-row ${set?.completed ? 'completed' : ''}`}>
+                            <span className="col-set">{idx + 1}</span>
+                            <input 
+                              type="number" 
+                              className="col-weight"
+                              value={set?.weight || ''}
+                              onChange={(e) => updateSet(exercise.id, idx, { weight: parseFloat(e.target.value) })}
+                              placeholder="0"
+                            />
+                            <input 
+                              type="number" 
+                              className="col-reps"
+                              value={set?.reps || ''}
+                              onChange={(e) => updateSet(exercise.id, idx, { reps: parseInt(e.target.value) })}
+                              placeholder="0"
+                            />
+                            <select 
+                              className="col-rpe"
+                              value={set?.rpe || 0}
+                              onChange={(e) => updateSet(exercise.id, idx, { rpe: parseInt(e.target.value) })}
+                            >
+                              {[0, 6, 7, 8, 9, 10].map(val => (
+                                <option key={val} value={val}>{val === 0 ? '-' : val}</option>
+                              ))}
+                            </select>
+                            <div className="col-status-group">
+                              <button 
+                                className="col-status"
+                                onClick={() => handleSetToggle(exercise.id, idx, set?.completed, exercise)}
+                                title={set?.completed ? 'Mark as active' : 'Mark as completed'}
+                              >
+                                {set?.completed ? <CheckCircle2 size={18} color="var(--accent-success)" /> : <Circle size={18} />}
+                              </button>
+                              <button 
+                                className="col-delete-set"
+                                onClick={() => removeSet(exercise.id, idx)}
+                                title="Remove set"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="workout-exercise-footer">
+                        <Button variant="glass" size="small" onClick={() => addSet(exercise.id)}>
+                          <Plus size={14} /> Add Set
+                        </Button>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
-          )}
-        </div>
-      </section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

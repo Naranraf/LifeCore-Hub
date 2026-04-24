@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Timer, X, Play, Pause, RotateCcw, SkipForward, Settings, Check } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useAppStore } from '../../../store/useAppStore';
-import useTimerStore, { PHASES } from '../hooks/useTimer';
+import useTimerStore, { PHASES, MODES } from '../hooks/useTimer';
 import PomodoroTimer from './PomodoroTimer';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
@@ -25,14 +25,24 @@ export default function TimingWidget() {
   const constraintsRef = useRef(null);
 
   // Persistence: Load initial position from LocalStorage
-  const [position, setPosition] = useState(() => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
     const saved = localStorage.getItem('lyfecore-timing-pos');
-    return saved ? JSON.parse(saved) : { x: window.innerWidth - 380, y: 80 };
-  });
+    if (saved) {
+      try {
+        setPosition(JSON.parse(saved));
+      } catch (e) {
+        setPosition({ x: window.innerWidth - 380, y: 80 });
+      }
+    } else {
+      setPosition({ x: window.innerWidth - 380, y: 80 });
+    }
+  }, []);
 
   const {
-    phase, status, remaining, 
-    initWorker, start, pause, reset, skip, settings, updateSettings
+    mode, phase, status, remaining, stopwatchElapsed,
+    initWorker, start, pause, reset, skip, settings, updateSettings, setMode
   } = useTimerStore();
 
   const [draftSettings, setDraftSettings] = useState(settings);
@@ -83,12 +93,19 @@ export default function TimingWidget() {
   const totalDuration = getPhaseDurationMs(phase);
   
   const getPhaseColor = () => {
+    if (mode !== MODES.POMODORO) return 'var(--primary)';
     switch (phase) {
       case PHASES.FOCUS: return 'var(--accent)';
       case PHASES.SHORT_BREAK: return 'var(--success)';
       case PHASES.LONG_BREAK: return 'var(--accent-secondary)';
       default: return 'var(--accent)';
     }
+  };
+
+  const formatStopwatch = (ms) => {
+    const mins = Math.floor(ms / 60000);
+    const secs = Math.floor((ms % 60000) / 1000);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
   const handleSaveSettings = () => {
@@ -106,7 +123,7 @@ export default function TimingWidget() {
           {isOpen && (
             <motion.div
               id="container-timing-window"
-              className="timing-widget__panel-motion tier1-marker"
+              className="timing-widget__panel-motion"
               drag
               dragControls={dragControls}
               dragListener={false}
@@ -118,7 +135,6 @@ export default function TimingWidget() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
             >
-              <div style={{ background: 'var(--accent)', color: 'white', fontSize: '9px', fontWeight: '900', padding: '1px 8px', borderRadius: '8px 8px 0 0', display: 'inline-block', position: 'absolute', top: '-15px', left: '10px' }}>TIMING PORTAL (TIER 1)</div>
               <Card className="timing-widget__panel">
                 {/* Drag Handle / Header */}
                 <div 
@@ -148,13 +164,27 @@ export default function TimingWidget() {
                 <div className="timing-widget__content">
                   {!showSettings ? (
                     <>
+                      <div className="timing-widget__mode-mini">
+                        <button onClick={() => setMode(MODES.POMODORO)} className={mode === MODES.POMODORO ? 'active' : ''}>Pomo</button>
+                        <button onClick={() => setMode(MODES.STOPWATCH)} className={mode === MODES.STOPWATCH ? 'active' : ''}>Stop</button>
+                        <button onClick={() => setMode(MODES.TIMER)} className={mode === MODES.TIMER ? 'active' : ''}>Timer</button>
+                      </div>
+
                       <div className="timing-widget__timer-mini">
-                        <PomodoroTimer 
-                          phase={phase}
-                          remaining={remaining}
-                          totalDuration={totalDuration}
-                          status={status}
-                        />
+                        {mode === MODES.POMODORO ? (
+                          <PomodoroTimer 
+                            phase={phase}
+                            remaining={remaining}
+                            totalDuration={totalDuration}
+                            status={status}
+                          />
+                        ) : (
+                          <div className="widget-generic-timer">
+                            <span className="mono">
+                              {mode === MODES.STOPWATCH ? formatStopwatch(stopwatchElapsed) : formatStopwatch(remaining)}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="timing-widget__controls">
@@ -166,19 +196,21 @@ export default function TimingWidget() {
                           variant="primary" 
                           size="large" 
                           onClick={status === 'running' ? pause : start}
-                          style={{ background: getPhaseColor() }}
+                          style={{ background: getPhaseColor(), color: '#FFFFFF' }}
                           className="timing-widget__ctrl--main"
                         >
-                          {status === 'running' ? <Pause size={20} /> : <Play size={20} />}
+                          {status === 'running' ? <Pause size={20} /> : <Play size={20} fill="#FFFFFF" />}
                         </Button>
 
-                        <Button variant="glass" size="small" onClick={skip} title="Skip Phase">
-                          <SkipForward size={16} />
-                        </Button>
+                        {mode === MODES.POMODORO && (
+                          <Button variant="glass" size="small" onClick={skip} title="Skip Phase">
+                            <SkipForward size={16} />
+                          </Button>
+                        )}
                       </div>
 
                       <div className="timing-widget__phase-label" style={{ color: getPhaseColor() }}>
-                        {phase.replace(/([A-Z])/g, ' $1').trim()}
+                        {mode === MODES.POMODORO ? phase.replace(/([A-Z])/g, ' $1').trim() : mode.toUpperCase()}
                       </div>
                     </>
                   ) : (

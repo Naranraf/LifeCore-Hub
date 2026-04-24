@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Music, X, Play, MonitorPlay, Minus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
+import { MousePointer2, Sparkles, Sword, Zap, Eye, EyeOff, Crosshair, Droplets } from 'lucide-react';
 import Card from './ui/Card';
 import Button from './ui/Button';
 import './MusicWidget.css';
@@ -72,11 +73,11 @@ export default function MusicWidget() {
       <Card className="music-widget__panel">
         <div className="music-widget__header">
           <div className="music-widget__title">
-            <MonitorPlay size={16} color="#ef4444" />
-            <span>Music Hub</span>
+            <MonitorPlay size={14} />
+            <span>Acoustic Focus</span>
           </div>
           <div className="music-widget__actions">
-            <button className="music-widget__minimize" onClick={() => setIsOpen(false)} title="Minimize (Keep Playing)">
+            <button className="music-widget__minimize" onClick={() => setIsOpen(false)} title="Minimize">
               <Minus size={16} />
             </button>
             <button className="music-widget__close" onClick={stopMusic} title="Stop & Close">
@@ -85,44 +86,46 @@ export default function MusicWidget() {
           </div>
         </div>
 
-        <form className="music-widget__form" onSubmit={handlePlay}>
-          <input
-            type="url"
-            placeholder="Paste YouTube URL..."
-            value={inputUrl}
-            onChange={(e) => setInputUrl(e.target.value)}
-          />
-          <Button type="submit" disabled={!inputUrl} variant="glass" size="small">
-            <Play size={14} />
-          </Button>
-        </form>
+        <div className="music-widget__content">
+          <form className="music-widget__form" onSubmit={handlePlay}>
+            <input
+              type="url"
+              placeholder="Paste YouTube URL..."
+              value={inputUrl}
+              onChange={(e) => setInputUrl(e.target.value)}
+            />
+            <Button type="submit" disabled={!inputUrl} variant="glass" size="small">
+              <Play size={14} />
+            </Button>
+          </form>
 
-        <div className="music-widget__content-area">
-          {activeMusicId ? (
-            <div className="music-widget__player-container">
-              <iframe
-                width="100%"
-                height="180"
-                src={`https://www.youtube.com/embed/${activeMusicId}?autoplay=1`}
-                title="YouTube player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-          ) : (
-            <div className="music-widget__empty">
-              <p className="music-widget__empty-text">Select a preset to focus:</p>
-              <div className="music-widget__presets">
-                <button onClick={() => setActiveMusicId('jfKfPfyJRdk')} className="music-widget__preset-btn">
-                  <Play size={14} style={{ color: 'var(--accent)' }}/> Lofi Focus Radio
-                </button>
-                <button onClick={() => setActiveMusicId('4xDzrJKXOOY')} className="music-widget__preset-btn">
-                  <Play size={14} style={{ color: 'var(--accent-secondary)' }}/> Synthwave Focus
-                </button>
+          <div className="music-widget__content-area">
+            {activeMusicId ? (
+              <div className="music-widget__player-container">
+                <iframe
+                  width="100%"
+                  height="180"
+                  src={`https://www.youtube.com/embed/${activeMusicId}?autoplay=1`}
+                  title="YouTube player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="music-widget__empty">
+                <p className="music-widget__empty-text">Select a preset to focus:</p>
+                <div className="music-widget__presets">
+                  <button onClick={() => setActiveMusicId('jfKfPfyJRdk')} className="music-widget__preset-btn">
+                    <Play size={14} style={{ color: 'var(--accent)' }}/> Lofi Focus Radio
+                  </button>
+                  <button onClick={() => setActiveMusicId('4xDzrJKXOOY')} className="music-widget__preset-btn">
+                    <Play size={14} style={{ color: 'var(--accent-secondary)' }}/> Synthwave Focus
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Card>
     </motion.div>

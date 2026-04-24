@@ -27,6 +27,7 @@ export default function Productivity() {
   const [error, setError] = useState(null);
 
   const defaultLayout = [
+    { id: 'tasks', fullWidth: true },
     { id: 'calendar', fullWidth: true },
     { id: 'notes', fullWidth: true }
   ];
@@ -34,7 +35,12 @@ export default function Productivity() {
   const [layout, setLayout] = useState(() => {
     try {
       const saved = localStorage.getItem('lyfe_prod_layout_v2');
-      return saved ? JSON.parse(saved) : defaultLayout;
+      const loaded = saved ? JSON.parse(saved) : defaultLayout;
+      // Migration: Ensure 'tasks' exists in layout
+      if (!loaded.find(w => w.id === 'tasks')) {
+        return [{ id: 'tasks', fullWidth: true }, ...loaded];
+      }
+      return loaded;
     } catch(e) { return defaultLayout; }
   });
 
@@ -119,10 +125,7 @@ export default function Productivity() {
         </div>
       </header>
 
-      {/* TIER 2: NATIVE TASKS - Now a primary structural component */}
-      <div style={{ marginBottom: '40px' }}>
-        <TaskView />
-      </div>
+      {/* Widgets are now dynamically rendered via layout map below */}
 
       {!googleAccessToken && (
         <div className="prod-page__alert glass-panel" style={{ borderColor: 'var(--warning)', color: 'var(--warning)', marginBottom: '24px' }}>
@@ -158,6 +161,17 @@ export default function Productivity() {
               <section key={id} className="prod-widget glass-panel" style={{ position: 'relative', height: 'auto', minHeight: '350px', ...gridColumnStyle }}>
                 <LayoutControls />
                 <CalendarWidget events={events} onRefresh={loadCalendar} loading={loadingCal} />
+              </section>
+            );
+          }
+
+          if (id === 'tasks') {
+            return (
+              <section key={id} className="glass-panel" style={{ position: 'relative', height: 'auto', ...gridColumnStyle }}>
+                <LayoutControls />
+                <div style={{ padding: '24px' }}>
+                  <TaskView />
+                </div>
               </section>
             );
           }

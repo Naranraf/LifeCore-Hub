@@ -34,7 +34,8 @@
 .prod-widget {
   display: flex;
   flex-direction: column;
-  height: 400px; /* Fixed height to keep it neat */
+  min-height: 400px;
+  height: auto;
 }
 
 .prod-widget__header {

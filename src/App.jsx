@@ -21,9 +21,28 @@ import Timing from './features/timing/Timing';
 import AiChat from './features/ai/components/AiChat';
 import Journal from './features/journal/Journal';
 import MusicWidget from './components/MusicWidget';
+import VisualsWidget from './components/ui/VisualsWidget';
 import TimingWidget from './features/timing/components/TimingWidget';
 import FloatingToolbar from './components/FloatingToolbar';
+import MagicCursor from './components/ui/MagicCursor';
+import Aurora from './components/ui/Aurora';
+import SplashCursor from './components/ui/SplashCursor';
+import GlobalRestTimer from './features/workout/components/GlobalRestTimer';
 import './app/FeaturePages.css';
+
+// Aurora Color Stops Map (based on tactical tokens)
+const FEATURE_COLORS = {
+  dashboard: ['#0D0D0E', '#161618', '#0D0D0E'],
+  finance: ['#064e3b', '#059669', '#064e3b'],
+  nutrition: ['#365314', '#65a30d', '#365314'],
+  workout: ['#450a0a', '#dc2626', '#450a0a'],
+  productivity: ['#1e293b', '#2563eb', '#1e293b'],
+  timing: ['#431407', '#ea580c', '#431407'],
+  journal: ['#1e1b4b', '#4f46e5', '#1e1b4b'],
+  ai: ['#1e1b4b', '#8b5cf6', '#1e1b4b']
+};
+
+const RAINBOW_COLORS = ['#ff0000', '#00ff00', '#0000ff'];
 
 export default function App() {
   const { user, loading, init } = useAuthStore();
@@ -39,8 +58,13 @@ export default function App() {
 
   // Atmospheric Context Controller
   const location = useLocation();
+  const [currentFeature, setCurrentFeature] = useState('dashboard');
+  const cursorConfig = useAppStore((state) => state.ui.cursor);
+  const { showBackground, auroraMode } = useAppStore((state) => state.ui);
+
   useEffect(() => {
     const path = location.pathname.split('/')[1] || 'dashboard';
+    setCurrentFeature(path);
     document.body.setAttribute('data-feature', path);
   }, [location]);
 
@@ -60,8 +84,19 @@ export default function App() {
   }
 
   // Authenticated layout
+  const auroraColors = auroraMode === 'rainbow' 
+    ? RAINBOW_COLORS 
+    : (FEATURE_COLORS[currentFeature] || FEATURE_COLORS.dashboard);
+
   return (
     <>
+      {showBackground && (
+        <Aurora 
+          colorStops={auroraColors}
+          amplitude={1.2}
+        />
+      )}
+      {cursorConfig.enabled && cursorConfig.mode === 'splash' && <SplashCursor COLOR={cursorConfig.color} />}
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={toggleSidebar}
@@ -69,12 +104,6 @@ export default function App() {
       <main
         id="main-content-area"
         className="main-content"
-        style={{
-          flex: 1,
-          padding: '32px',
-          overflowY: 'auto',
-          height: '100vh',
-        }}
       >
         <Routes>
           <Route path="/" element={<Dashboard />} />
@@ -90,8 +119,11 @@ export default function App() {
         </Routes>
       </main>
       <MusicWidget />
+      <VisualsWidget />
       <TimingWidget />
       <FloatingToolbar />
+      <MagicCursor />
+      <GlobalRestTimer />
     </>
   );
 }

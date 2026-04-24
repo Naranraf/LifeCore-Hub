@@ -45,16 +45,17 @@ const useTaskStore = create((set, get) => ({
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tasks = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // In-memory sort
+        .sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+          const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+          return dateB - dateA;
+        });
       
+      console.log(`[Tasks] Sync: ${tasks.length} tasks loaded.`);
       set({ tasks, loading: false });
     }, (err) => {
-      if (err.code === 'permission-denied') {
-        console.warn('[Tasks] Listener detached (Auth Transition)');
-      } else {
-        console.error('[Tasks] Sync Error:', err);
-        set({ error: err.message, loading: false });
-      }
+      console.error('[Tasks] Sync Error:', err);
+      set({ error: err.message, loading: false });
     });
 
     set({ unsubscribe });

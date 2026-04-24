@@ -8,7 +8,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100%;
+  max-width: 280px; /* Fixed size to prevent layout shifts */
+  margin: 0 auto;
   aspect-ratio: 1 / 1;
 }
 

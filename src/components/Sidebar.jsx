@@ -25,7 +25,7 @@ import {
   Moon,
 } from 'lucide-react';
 import useAuthStore from '../hooks/useAuth';
-import useThemeStore from '../hooks/useTheme';
+import ThemeSwitcher from './ui/ThemeSwitcher';
 import './Sidebar.css';
 
 const NAV_ITEMS = [
@@ -41,7 +41,6 @@ const NAV_ITEMS = [
 export default function Sidebar({ collapsed, onToggle }) {
   const location = useLocation();
   const { user, profile, signOut } = useAuthStore();
-  const { theme, toggleTheme } = useThemeStore();
 
   return (
     <aside id="sidebar-navigation" className={`sidebar glass-panel ${collapsed ? 'sidebar--collapsed' : ''}`}>
@@ -52,14 +51,17 @@ export default function Sidebar({ collapsed, onToggle }) {
             Lyfe<span className="sidebar__logo-accent">Core</span>
           </h1>
         )}
-        <button
-          className="sidebar__toggle"
-          onClick={onToggle}
-          aria-label="Toggle sidebar"
-          id="sidebar-toggle"
-        >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {!collapsed && <ThemeSwitcher />}
+          <button
+            className="sidebar__toggle"
+            onClick={onToggle}
+            aria-label="Toggle sidebar"
+            id="sidebar-toggle"
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        </div>
       </div>
 
       {/* Nav */}
@@ -107,13 +109,6 @@ export default function Sidebar({ collapsed, onToggle }) {
               <span className="sidebar__user-email">{user.email}</span>
             </div>
           )}
-          <button
-            className="sidebar__theme-btn"
-            onClick={toggleTheme}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
           <button
             className="sidebar__logout"
             onClick={signOut}

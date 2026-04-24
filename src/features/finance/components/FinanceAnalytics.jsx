@@ -188,11 +188,10 @@ const FinanceAnalytics = () => {
         )}
       </div>
 
-      {/* --- TIER 2: DYNAMIC LEDGER TABLE --- */}
       <div className="analytics__ledger" style={{ marginTop: '32px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '700' }}>
-            <Table size={16} /> Dynamic Ledger (Excel Style)
+            <Table size={16} /> Dynamic Ledger
           </h4>
           <div style={{ fontSize: '13px', fontWeight: '800', color: 'var(--accent)' }}>
             Autosuma Total: {currency} {totalLedgerAmount.toFixed(2)}
