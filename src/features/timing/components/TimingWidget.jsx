@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Timer, X, Play, Pause, RotateCcw, SkipForward, Settings, Check } from 'lucide-react';
+import { Timer, X, Play, Pause, RotateCcw, SkipForward, Settings, Check, Plus, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useAppStore } from '../../../store/useAppStore';
 import useTimerStore, { MODES } from '../hooks/useTimer';
@@ -133,6 +133,13 @@ export default function TimingWidget() {
       count.setDuration(totalMs);
     }
     setShowSettings(false);
+  };
+
+  const handleAddPreset = () => {
+    const totalMs = (countdownMinutes * 60 + countdownSeconds) * 1000;
+    if (totalMs > 0) {
+      count.addPreset(totalMs);
+    }
   };
 
   return (
@@ -290,6 +297,34 @@ export default function TimingWidget() {
                               min="0"
                               max="59"
                             />
+                          </div>
+                        </div>
+
+                        <div className="timing-widget__presets-section">
+                          <div className="timing-widget__presets-header">
+                            <label>Presets</label>
+                            <Button variant="glass" size="small" onClick={handleAddPreset} title="Save current as preset">
+                              <Plus size={12} />
+                            </Button>
+                          </div>
+                          <div className="timing-widget__presets-grid">
+                            {count.presets.map((p) => (
+                              <div key={p} className="timing-widget__preset-item">
+                                <button 
+                                  className="timing-widget__preset-btn"
+                                  onClick={() => {
+                                    setCountdownMinutes(Math.floor(p / 60000));
+                                    setCountdownSeconds(Math.floor((p % 60000) / 1000));
+                                    count.setDuration(p);
+                                  }}
+                                >
+                                  {Math.floor(p / 60000)}m {Math.floor((p % 60000) / 1000)}s
+                                </button>
+                                <button className="timing-widget__preset-del" onClick={() => count.removePreset(p)}>
+                                  <X size={10} />
+                                </button>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       ) : (

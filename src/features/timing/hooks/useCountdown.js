@@ -12,9 +12,21 @@ const useCountdown = create(
       duration: 60000, // Default 1 minute
       remaining: 60000,
       status: 'idle',
+      presets: [60000, 300000, 600000, 1500000], // Default presets: 1m, 5m, 10m, 25m
 
       setDuration: (ms) => {
         set({ duration: ms, remaining: ms, status: 'idle' });
+      },
+
+      addPreset: (ms) => {
+        const { presets } = get();
+        if (!presets.includes(ms)) {
+          set({ presets: [...presets, ms].sort((a, b) => a - b) });
+        }
+      },
+
+      removePreset: (ms) => {
+        set({ presets: get().presets.filter(p => p !== ms) });
       },
 
       start: () => {

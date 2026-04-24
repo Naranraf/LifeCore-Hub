@@ -192,9 +192,63 @@
   letter-spacing: 0.1em;
 }
 
-/* Responsive adjustment for Portal */
-@media (max-width: 600px) {
-  .timing-widget__panel {
-    width: calc(100vw - 40px);
-  }
+/* Presets Section */
+.timing-widget__presets-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.timing-widget__presets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timing-widget__presets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.timing-widget__preset-item {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.timing-widget__preset-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-main);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.timing-widget__preset-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent);
+}
+
+.timing-widget__preset-del {
+  background: none;
+  border: none;
+  border-left: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  padding: 0 6px;
+  cursor: pointer;
+}
+
+.timing-widget__preset-del:hover {
+  color: var(--error);
+  background: rgba(var(--error-rgb, 239, 68, 68), 0.1);
 }

@@ -224,6 +224,12 @@ export default function Timing() {
             countdownSeconds={countdownSeconds}
             onMinutesChange={setCountdownMinutes}
             onSecondsChange={setCountdownSeconds}
+            presets={count.presets}
+            onAddPreset={() => {
+              const ms = (countdownMinutes * 60 + countdownSeconds) * 1000;
+              if (ms > 0) count.addPreset(ms);
+            }}
+            onRemovePreset={count.removePreset}
             onChange={setDraftSettings}
             onSave={() => {
               if (mode === MODES.POMODORO) {
@@ -270,7 +276,10 @@ function SettingsModal({
   onSecondsChange, 
   onChange, 
   onSave, 
-  onClose 
+  onClose,
+  presets = [],
+  onAddPreset,
+  onRemovePreset
 }) {
   /** Update a single field in draft settings. */
   function handleField(field, rawValue, max = 120) {
@@ -346,6 +355,33 @@ function SettingsModal({
                 onChange={(v) => onSecondsChange(Math.max(0, Math.min(59, parseInt(v) || 0)))}
                 unit="sec"
               />
+            </div>
+
+            <div className="timing-modal__presets">
+              <div className="timing-modal__presets-header">
+                <span className="timing-modal__label">Presets</span>
+                <button className="timing-modal__add-preset" onClick={onAddPreset} title="Save current as preset">
+                  <Plus size={14} /> Add Preset
+                </button>
+              </div>
+              <div className="timing-modal__presets-grid">
+                {presets.map(p => (
+                  <div key={p} className="timing-modal__preset-item">
+                    <button 
+                      className="timing-modal__preset-select"
+                      onClick={() => {
+                        onMinutesChange(Math.floor(p / 60000));
+                        onSecondsChange(Math.floor((p % 60000) / 1000));
+                      }}
+                    >
+                      {Math.floor(p / 60000)}m {Math.floor((p % 60000) / 1000)}s
+                    </button>
+                    <button className="timing-modal__preset-remove" onClick={() => onRemovePreset(p)}>
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <p style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>Stopwatch has no settings.</p>
