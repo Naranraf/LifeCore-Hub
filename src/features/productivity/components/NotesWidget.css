@@ -86,11 +86,15 @@
   font-size: 13px;
   color: var(--text-muted);
   line-height: 1.6;
-  white-space: pre-wrap;
   display: -webkit-box;
-  -webkit-line-clamp: 6;
+  -webkit-line-clamp: 8;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.notes-widget__card-text.ql-editor {
+  padding: 0;
+  min-height: unset;
 }
 
 .is-editing .notes-widget__card-text {
@@ -98,17 +102,36 @@
   overflow: visible;
 }
 
-.notes-widget__content-input {
-  background: transparent;
-  border: none;
-  width: 100%;
-  height: 100%;
+/* Quill Overrides */
+.notes-widget .quill {
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.notes-widget .ql-toolbar {
+  border: none !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  background: rgba(255,255,255,0.03);
+}
+
+.notes-widget .ql-container {
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+}
+
+.notes-widget .ql-editor {
   min-height: 150px;
-  resize: none;
-  font-size: 14px;
+  padding: 12px;
   color: var(--text-main);
-  line-height: 1.6;
-  outline: none;
+}
+
+.notes-widget .ql-editor.ql-blank::before {
+  color: var(--text-muted);
+  font-style: normal;
+  opacity: 0.5;
 }
 
 .notes-widget__card-footer {
@@ -174,6 +197,11 @@
 .notes-widget__icon-btn:hover {
   background: var(--glass-border);
   color: var(--text-main);
+}
+
+.notes-widget__icon-btn.save:hover {
+  background: var(--success);
+  color: white;
 }
 
 .notes-widget__icon-btn.delete:hover {

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  StickyNote, Plus, Trash2, Palette, Save, X, Loader2, CheckCircle2, Tag 
+  StickyNote, Plus, Trash2, Palette, Save, X, Loader2, CheckCircle2, Tag, Check 
 } from 'lucide-react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import useNotesStore from '../hooks/useNotes';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
@@ -121,8 +123,8 @@ export default function NotesWidget() {
                     )}
                     <div className="notes-widget__card-meta">
                       {isEditing && (
-                        <button className="notes-widget__icon-btn cancel" onClick={(e) => { e.stopPropagation(); handleCancelEdit(); }}>
-                          <X size={14} />
+                        <button className="notes-widget__icon-btn save" onClick={(e) => { e.stopPropagation(); handleCancelEdit(); }} title="Done Editing">
+                          <Check size={14} />
                         </button>
                       )}
                       <button className="notes-widget__icon-btn delete" onClick={(e) => { e.stopPropagation(); deleteNote(note.id); }}>
@@ -133,14 +135,24 @@ export default function NotesWidget() {
 
                   <div className="notes-widget__card-body">
                     {isEditing ? (
-                      <textarea 
+                      <ReactQuill 
+                        theme="snow"
                         value={displayNote.content}
-                        onChange={(e) => handleUpdate('content', e.target.value)}
+                        onChange={(val) => handleUpdate('content', val)}
                         placeholder="Start typing your ideas..."
-                        className="notes-widget__content-input"
+                        modules={{
+                          toolbar: [
+                            ['bold', 'italic'],
+                            [{ 'list': 'bullet' }, { 'list': 'ordered' }],
+                            ['clean']
+                          ]
+                        }}
                       />
                     ) : (
-                      <p className="notes-widget__card-text">{note.content || 'No content yet...'}</p>
+                      <div 
+                        className="notes-widget__card-text ql-editor" 
+                        dangerouslySetInnerHTML={{ __html: note.content || 'No content yet...' }} 
+                      />
                     )}
                   </div>
 
@@ -156,9 +168,14 @@ export default function NotesWidget() {
                           />
                         ))}
                       </div>
-                      <div className="notes-widget__save-indicator">
-                        {saving ? <Loader2 size={12} className="spin" /> : <CheckCircle2 size={12} style={{ color: 'var(--success)' }} />}
-                        <span>{saving ? 'Saving' : 'Synced'}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="notes-widget__save-indicator">
+                          {saving ? <Loader2 size={12} className="spin" /> : <CheckCircle2 size={12} style={{ color: 'var(--success)' }} />}
+                          <span>{saving ? 'Saving' : 'Synced'}</span>
+                        </div>
+                        <Button variant="primary" size="small" onClick={(e) => { e.stopPropagation(); handleCancelEdit(); }}>
+                          Done
+                        </Button>
                       </div>
                     </div>
                   )}
