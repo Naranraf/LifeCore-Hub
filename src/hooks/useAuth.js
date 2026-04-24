@@ -105,6 +105,55 @@ const useAuthStore = create((set, get) => ({
       set({ error: err.message, loading: false });
     }
   },
+  
+  /**
+   * Execute reCAPTCHA Enterprise
+   * @param {string} action - The action name (e.g., 'LOGIN', 'SIGNUP')
+   * @returns {Promise<string>} - The reCAPTCHA token
+   */
+  executeRecaptcha: async (action) => {
+    return new Promise((resolve) => {
+      if (!window.grecaptcha || !window.grecaptcha.enterprise) {
+        console.warn('[Auth] reCAPTCHA Enterprise not loaded yet, waiting...');
+        // If not loaded, we can try to wait or just return null
+        // Standard practice is to wait for the script to be ready
+        let attempts = 0;
+        const checkReady = setInterval(async () => {
+          attempts++;
+          if (window.grecaptcha?.enterprise) {
+            clearInterval(checkReady);
+            window.grecaptcha.enterprise.ready(async () => {
+              try {
+                const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+                const token = await window.grecaptcha.enterprise.execute(siteKey, { action });
+                resolve(token);
+              } catch (err) {
+                console.error('[Auth] reCAPTCHA execution failed:', err);
+                resolve(null);
+              }
+            });
+          }
+          if (attempts > 20) { // 2 seconds timeout
+            clearInterval(checkReady);
+            console.error('[Auth] reCAPTCHA Enterprise failed to load');
+            resolve(null);
+          }
+        }, 100);
+        return;
+      }
+
+      window.grecaptcha.enterprise.ready(async () => {
+        try {
+          const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+          const token = await window.grecaptcha.enterprise.execute(siteKey, { action });
+          resolve(token);
+        } catch (err) {
+          console.error('[Auth] reCAPTCHA execution failed:', err);
+          resolve(null);
+        }
+      });
+    });
+  },
 
   /**
    * Sign in / Sign up with Email and Password
@@ -112,6 +161,21 @@ const useAuthStore = create((set, get) => ({
   signInWithEmail: async (email, password) => {
     set({ loading: true, error: null });
     try {
+      // 1. Execute reCAPTCHA Enterprise
+      const token = await get().executeRecaptcha('LOGIN');
+      
+      // 2. Verify via Cloud Function
+      if (token) {
+        const { httpsCallable } = await import('firebase/functions');
+        const { functions: fbFunctions } = await import('../lib/firebase');
+        const verifyFn = httpsCallable(fbFunctions, 'verifyRecaptcha');
+        const { data } = await verifyFn({ token, action: 'LOGIN' });
+        
+        if (!data.success || (data.score !== undefined && data.score < 0.3)) {
+          throw new Error('Security check failed. High risk detected.');
+        }
+      }
+
       const result = await signInWithEmailAndPassword(auth, email, password);
       const profileRef = doc(db, 'users', result.user.uid);
       await setDoc(profileRef, { lastLogin: getServerTimestamp() }, { merge: true });
@@ -124,6 +188,21 @@ const useAuthStore = create((set, get) => ({
   signUpWithEmail: async (email, password, name) => {
     set({ loading: true, error: null });
     try {
+      // 1. Execute reCAPTCHA Enterprise
+      const token = await get().executeRecaptcha('SIGNUP');
+      
+      // 2. Verify via Cloud Function
+      if (token) {
+        const { httpsCallable } = await import('firebase/functions');
+        const { functions: fbFunctions } = await import('../lib/firebase');
+        const verifyFn = httpsCallable(fbFunctions, 'verifyRecaptcha');
+        const { data } = await verifyFn({ token, action: 'SIGNUP' });
+        
+        if (!data.success || (data.score !== undefined && data.score < 0.3)) {
+          throw new Error('Security check failed. High risk detected.');
+        }
+      }
+
       const result = await createUserWithEmailAndPassword(auth, email, password);
       // Create initial profile
       const profileRef = doc(db, 'users', result.user.uid);

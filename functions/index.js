@@ -21,4 +21,6 @@ exports.chatWithGemini = ai.chatWithGemini;
 exports.analyzeFinancialRecords = finance.analyzeFinancialRecords;
 
 // Core/Auth Module
+const authModule = require("./src/auth");
 exports.onUserCreated = core.onUserCreated;
+exports.verifyRecaptcha = authModule.verifyRecaptcha;

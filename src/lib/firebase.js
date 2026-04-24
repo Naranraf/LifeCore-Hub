@@ -10,6 +10,8 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { getFirestore, serverTimestamp } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
+import { getStorage } from 'firebase/storage';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -22,6 +24,19 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// Initialize App Check with reCAPTCHA Enterprise
+if (typeof window !== 'undefined' && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+  try {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+      isTokenAutoRefreshEnabled: true,
+    });
+    console.log('[AppCheck] Initialized with Enterprise');
+  } catch (err) {
+    console.warn('[AppCheck] Initialization failed (non-fatal):', err.message);
+  }
+}
 
 export const auth = getAuth(app);
 
@@ -42,6 +57,7 @@ googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 googleProvider.addScope('https://www.googleapis.com/auth/tasks');
 
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 export const functions = getFunctions(app);
 export const getServerTimestamp = () => serverTimestamp();
 
