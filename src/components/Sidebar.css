@@ -208,17 +208,26 @@
 
   .sidebar__nav {
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-start; /* Changed from space-around for scalability */
     align-items: center;
     width: 100%;
     gap: 0;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    padding: 0 4px;
+  }
+
+  .sidebar__nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
 
   .sidebar__link {
     flex-direction: column;
     gap: 4px;
     padding: 8px;
-    flex: 1;
+    min-width: 60px; /* Constant width for scalability */
+    flex: 0 0 auto; /* Don't grow/shrink, use scroll */
     justify-content: center;
     font-size: 10px;
     border: none !important; /* Remove borders on mobile links */
@@ -247,19 +256,33 @@
     box-shadow: 0 0 10px var(--primary);
   }
 
-  /* Special AI Button handling for bottom bar */
+  /* Special AI Button handling — Transform into FAB */
+  .sidebar__ai-container {
+    position: fixed;
+    bottom: 85px; /* Floating above the bottom nav bar */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    pointer-events: all;
+  }
+
   .sidebar__ai-btn {
     margin-bottom: 0;
-    padding: 10px;
+    padding: 0;
     background: var(--primary-gradient);
     border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    width: 60px; /* Slightly larger for premium feel */
+    height: 60px;
+    display: flex;
     justify-content: center;
-    border: none;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-    position: relative;
-    top: -10px; /* Pop out effect */
+    align-items: center;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 30px rgba(var(--primary-rgb, 59, 130, 246), 0.6);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .sidebar__ai-btn:active {
+    transform: scale(0.9); /* Pure scale, container handles X-centering */
   }
 
   .sidebar__ai-btn span {
@@ -268,6 +291,8 @@
 
   .sidebar__ai-btn svg {
     color: white;
+    width: 28px;
+    height: 28px;
   }
 
   /* Ensure the sidebar collapsed state doesn't break things on mobile resize */

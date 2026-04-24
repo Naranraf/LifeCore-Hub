@@ -82,18 +82,22 @@ export default function Sidebar({ collapsed, onToggle }) {
         ))}
       </nav>
 
-      {/* AI Button (special) */}
-      <NavLink
-        to="/ai"
-        className={({ isActive }) =>
-          `sidebar__ai-btn ${isActive ? 'sidebar__ai-btn--active' : ''}`
-        }
-        title="Gemini AI"
-        id="nav-ai"
-      >
-        <Bot size={20} />
-        {!collapsed && <span>Gemini AI</span>}
-      </NavLink>
+      </nav>
+
+      {/* AI Button (Special FAB on Mobile, Bottom section on Desktop) */}
+      <div className="sidebar__ai-container">
+        <NavLink
+          to="/ai"
+          className={({ isActive }) =>
+            `sidebar__ai-btn ${isActive ? 'sidebar__ai-btn--active' : ''}`
+          }
+          title="Gemini AI"
+          id="nav-ai"
+        >
+          <Bot size={20} />
+          {!collapsed && <span>Gemini AI</span>}
+        </NavLink>
+      </div>
 
       {/* User + Logout */}
       {user && (

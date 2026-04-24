@@ -165,4 +165,29 @@ button:active {
   .dashboard, .feature-page, .workout-container {
     padding-bottom: 20px; /* Reset the large desktop padding */
   }
+
+  /* Universal Responsive Hardening */
+  .journal__layout,
+  .dashboard__header,
+  .feature-page__header,
+  .finance-page__header,
+  .workout-page__layout,
+  .nutrition-page__layout {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+
+  /* Sidebar/Sidebar adjustments in features */
+  .journal__sidebar,
+  .workout__sidebar {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 300px; /* Limit height of sidebar lists on mobile */
+  }
+
+  .journal__editor,
+  .workout__content {
+    min-height: 400px;
+  }
 }

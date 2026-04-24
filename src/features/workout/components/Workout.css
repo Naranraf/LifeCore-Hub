@@ -699,3 +699,50 @@
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 }
+
+@media (max-width: 600px) {
+  .workout-title {
+    font-size: 24px;
+  }
+  
+  .workout-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .template-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workout-table-header {
+    display: none; /* Hide header on mobile, use labels in rows */
+  }
+
+  .workout-set-row {
+    grid-template-columns: 1fr 1fr; /* Two columns for inputs */
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .col-set {
+    grid-column: 1 / -1; /* Full width for set number */
+    margin-bottom: 4px;
+  }
+
+  .col-status-group {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .workout-session-header {
+    padding: 20px;
+  }
+
+  .workout-meta {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
