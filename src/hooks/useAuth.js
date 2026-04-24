@@ -53,13 +53,30 @@ const useAuthStore = create((set, get) => ({
             };
             await setDoc(profileRef, profile);
           }
-          set({ user: firebaseUser, profile, loading: false, error: null });
+
+          // Fetch Google OAuth token if it exists
+          const tokenRef = doc(db, 'users', firebaseUser.uid, 'private', 'google_tokens');
+          const tokenSnap = await getDoc(tokenRef);
+          let googleAccessToken = null;
+          if (tokenSnap.exists()) {
+            googleAccessToken = tokenSnap.data().accessToken;
+            console.log('[Auth] Google Token restored from Firestore');
+          }
+
+          set({ 
+            user: firebaseUser, 
+            profile, 
+            googleAccessToken,
+            loading: false, 
+            error: null 
+          });
         } catch (err) {
           // Firestore rules may reject — still log user in with basic info
           console.warn('[Auth] Firestore profile error (non-fatal):', err.message);
           set({
             user: firebaseUser,
             profile: { displayName: firebaseUser.displayName, email: firebaseUser.email, photoURL: firebaseUser.photoURL },
+            googleAccessToken: null,
             loading: false,
             error: null,
           });

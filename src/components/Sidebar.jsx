@@ -82,8 +82,6 @@ export default function Sidebar({ collapsed, onToggle }) {
         ))}
       </nav>
 
-      </nav>
-
       {/* AI Button (Special FAB on Mobile, Bottom section on Desktop) */}
       <div className="sidebar__ai-container">
         <NavLink

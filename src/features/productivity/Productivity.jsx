@@ -16,7 +16,7 @@ import useAuthStore from '../../hooks/useAuth';
 import { fetchCalendarEvents, fetchTaskLists, fetchTasks, addTask } from '../../services/googleApi';
 import NotesWidget from './components/NotesWidget';
 import CalendarWidget from './components/CalendarWidget';
-import TaskView from './components/TaskView';
+import GoogleTasksWidget from './components/GoogleTasksWidget';
 import './Productivity.css';
 
 export default function Productivity() {
@@ -170,7 +170,7 @@ export default function Productivity() {
               <section key={id} className="glass-panel" style={{ position: 'relative', height: 'auto', ...gridColumnStyle }}>
                 <LayoutControls />
                 <div style={{ padding: '24px' }}>
-                  <TaskView />
+                  <GoogleTasksWidget />
                 </div>
               </section>
             );

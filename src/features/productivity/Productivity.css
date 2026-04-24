@@ -298,3 +298,49 @@
 .notes-widget__delete:hover {
   background: var(--error);
 }
+
+/* ==================================
+   Google Tasks Specific Styles
+   ================================== */
+.tasks-list-selector:hover {
+  color: var(--primary) !important;
+}
+
+.task-delete-btn {
+  transition: all 0.2s ease;
+}
+
+.prod-widget:hover .task-delete-btn {
+  opacity: 1 !important;
+}
+
+.tasks-placeholder h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.tasks-list-selector svg {
+  transition: transform 0.3s ease;
+}
+
+.tasks-list-selector:focus svg {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .google-tasks header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .google-tasks header div {
+    width: 100%;
+  }
+
+  .tasks-list-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
