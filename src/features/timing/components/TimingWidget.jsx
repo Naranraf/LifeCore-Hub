@@ -244,7 +244,8 @@ export default function TimingWidget() {
                             <input 
                               type="number" 
                               value={draftSettings.focusDuration}
-                              onChange={(e) => setDraftSettings({...draftSettings, focusDuration: parseInt(e.target.value)})}
+                              onChange={(e) => setDraftSettings({...draftSettings, focusDuration: Math.max(1, Math.min(120, parseInt(e.target.value) || 0))})}
+                              onFocus={(e) => e.target.select()}
                             />
                           </div>
                           <div className="timing-widget__field">
@@ -252,7 +253,8 @@ export default function TimingWidget() {
                             <input 
                               type="number" 
                               value={draftSettings.shortBreakDuration}
-                              onChange={(e) => setDraftSettings({...draftSettings, shortBreakDuration: parseInt(e.target.value)})}
+                              onChange={(e) => setDraftSettings({...draftSettings, shortBreakDuration: Math.max(1, Math.min(30, parseInt(e.target.value) || 0))})}
+                              onFocus={(e) => e.target.select()}
                             />
                           </div>
                           <div className="timing-widget__field">
@@ -260,7 +262,8 @@ export default function TimingWidget() {
                             <input 
                               type="number" 
                               value={draftSettings.longBreakDuration}
-                              onChange={(e) => setDraftSettings({...draftSettings, longBreakDuration: parseInt(e.target.value)})}
+                              onChange={(e) => setDraftSettings({...draftSettings, longBreakDuration: Math.max(1, Math.min(60, parseInt(e.target.value) || 0))})}
+                              onFocus={(e) => e.target.select()}
                             />
                           </div>
                         </div>
@@ -271,7 +274,8 @@ export default function TimingWidget() {
                             <input 
                               type="number" 
                               value={countdownMinutes}
-                              onChange={(e) => setCountdownMinutes(parseInt(e.target.value) || 0)}
+                              onChange={(e) => setCountdownMinutes(Math.max(0, Math.min(1440, parseInt(e.target.value) || 0)))}
+                              onFocus={(e) => e.target.select()}
                               min="0"
                               max="1440"
                             />
@@ -281,7 +285,8 @@ export default function TimingWidget() {
                             <input 
                               type="number" 
                               value={countdownSeconds}
-                              onChange={(e) => setCountdownSeconds(parseInt(e.target.value) || 0)}
+                              onChange={(e) => setCountdownSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                              onFocus={(e) => e.target.select()}
                               min="0"
                               max="59"
                             />

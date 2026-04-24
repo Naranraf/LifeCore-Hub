@@ -86,6 +86,7 @@ export default function MealModal({ isOpen, onClose, onSave }) {
                   type="number" 
                   value={formData.calories} 
                   onChange={e => setFormData({...formData, calories: e.target.value})}
+                  onFocus={(e) => e.target.select()}
                   className="modal-input" 
                   required
                 />
@@ -95,15 +96,15 @@ export default function MealModal({ isOpen, onClose, onSave }) {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '12px' }}>
                   <div className="form-group">
                     <label>Protein (g)</label>
-                    <input type="number" value={formData.protein} onChange={e => setFormData({...formData, protein: e.target.value})} className="modal-input" />
+                    <input type="number" value={formData.protein} onChange={e => setFormData({...formData, protein: e.target.value})} onFocus={(e) => e.target.select()} className="modal-input" />
                   </div>
                   <div className="form-group">
                     <label>Carbs (g)</label>
-                    <input type="number" value={formData.carbs} onChange={e => setFormData({...formData, carbs: e.target.value})} className="modal-input" />
+                    <input type="number" value={formData.carbs} onChange={e => setFormData({...formData, carbs: e.target.value})} onFocus={(e) => e.target.select()} className="modal-input" />
                   </div>
                   <div className="form-group">
                     <label>Fat (g)</label>
-                    <input type="number" value={formData.fat} onChange={e => setFormData({...formData, fat: e.target.value})} className="modal-input" />
+                    <input type="number" value={formData.fat} onChange={e => setFormData({...formData, fat: e.target.value})} onFocus={(e) => e.target.select()} className="modal-input" />
                   </div>
                 </div>
               )}

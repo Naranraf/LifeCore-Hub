@@ -129,6 +129,7 @@ export default function TransactionModal({ isOpen, onClose, onSave }) {
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  onFocus={(e) => e.target.select()}
                   className={errors.amount ? 'error-input' : ''}
                 />
                 {errors.amount && <span className="field-error">{errors.amount}</span>}

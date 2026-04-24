@@ -273,10 +273,12 @@ function SettingsModal({
   onClose 
 }) {
   /** Update a single field in draft settings. */
-  function handleField(field, rawValue) {
+  function handleField(field, rawValue, max = 120) {
     const num = parseInt(rawValue, 10);
-    if (!isNaN(num) && num > 0 && num <= 120) {
-      onChange({ ...draft, [field]: num });
+    if (!isNaN(num)) {
+      onChange({ ...draft, [field]: Math.max(1, Math.min(max, num)) });
+    } else {
+      onChange({ ...draft, [field]: 0 });
     }
   }
 
@@ -335,13 +337,13 @@ function SettingsModal({
               <SettingField
                 label="Minutes"
                 value={countdownMinutes}
-                onChange={(v) => onMinutesChange(parseInt(v) || 0)}
+                onChange={(v) => onMinutesChange(Math.max(0, Math.min(1440, parseInt(v) || 0)))}
                 unit="min"
               />
               <SettingField
                 label="Seconds"
                 value={countdownSeconds}
-                onChange={(v) => onSecondsChange(parseInt(v) || 0)}
+                onChange={(v) => onSecondsChange(Math.max(0, Math.min(59, parseInt(v) || 0)))}
                 unit="sec"
               />
             </div>
@@ -369,8 +371,7 @@ function SettingField({ label, value, onChange, unit }) {
           className="timing-modal__input"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          min={1}
-          max={120}
+          onFocus={(e) => e.target.select()}
         />
         <span className="timing-modal__unit">{unit}</span>
       </div>
