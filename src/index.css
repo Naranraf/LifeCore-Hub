@@ -148,3 +148,21 @@ button {
 button:active {
   transform: scale(0.97);
 }
+
+/* ==========================================================================
+   Mobile Global Adjustments
+   ========================================================================== */
+@media (max-width: 768px) {
+  #root {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 20px 16px;
+    padding-bottom: 100px; /* Space for the bottom bar */
+  }
+
+  .dashboard, .feature-page, .workout-container {
+    padding-bottom: 20px; /* Reset the large desktop padding */
+  }
+}

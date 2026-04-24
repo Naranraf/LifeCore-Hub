@@ -137,3 +137,10 @@
 .toolbar-btn.disabled {
   opacity: 0.5;
 }
+
+@media (max-width: 768px) {
+  .floating-toolbar {
+    bottom: 100px; /* Elevated to stay above the bottom nav bar */
+    right: 12px;
+  }
+}
