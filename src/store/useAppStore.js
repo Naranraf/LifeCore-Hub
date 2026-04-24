@@ -32,17 +32,20 @@ export const useAppStore = create(
           enabled: true,
           mode: 'target', // splash, target
           color: '#F97316'
-        }
+        },
+        accentColor: '#F97316'
       },
 
-      toggleTheme: () => {
-        const currentTheme = get().ui.theme;
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      setTheme: (newTheme) => {
         document.documentElement.setAttribute('data-theme', newTheme);
         set((state) => ({
           ui: { ...state.ui, theme: newTheme }
         }));
       },
+
+      setAccentColor: (color) => set((state) => ({
+        ui: { ...state.ui, accentColor: color }
+      })),
 
       setCursorConfig: (config) => set((state) => ({
         ui: { ...state.ui, cursor: { ...state.ui.cursor, ...config } }
@@ -108,7 +111,12 @@ export const useAppStore = create(
           ...state.session, 
           quota: { ...state.session.quota, used: usedCount } 
         }
-      }))
+      })),
+
+      hardResetApp: () => {
+        localStorage.clear();
+        window.location.reload();
+      }
     }),
     {
       name: 'lyfecore-app-storage',

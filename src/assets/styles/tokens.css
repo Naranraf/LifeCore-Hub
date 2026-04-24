@@ -65,6 +65,34 @@
   --glass-border: rgba(203, 213, 225, 0.8);
 }
 
+/* Tema: Cyber-Matrix — Stealth Neon Protocol */
+[data-theme='cyber'] {
+  --bg-deep: #0a0f0d;
+  --bg-surface: #111a14;
+  --border-subtle: #1c2b21;
+  --primary: #10b981; /* Verde Neón */
+  --accent-success: #34d399;
+  --text-main: #a7f3d0;
+  --text-muted: #047857;
+  /* Glass Overrides */
+  --glass-bg: rgba(16, 185, 129, 0.05);
+  --glass-border: rgba(16, 185, 129, 0.1);
+}
+
+/* Tema: Monochrome Elegance — Pure Minimalist Architecture */
+[data-theme='mono'] {
+  --bg-deep: #fafafa;
+  --bg-surface: #ffffff;
+  --border-subtle: #e4e4e7;
+  --primary: #18181b; /* Negro Absoluto */
+  --accent-success: #52525b;
+  --text-main: #18181b;
+  --text-muted: #a1a1aa;
+  /* Glass Overrides */
+  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
 body {
   background-color: var(--bg-deep);
   color: var(--text-main);

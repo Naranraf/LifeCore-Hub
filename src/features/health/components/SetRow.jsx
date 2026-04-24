@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 import useWorkoutStore from '../hooks/useWorkoutStore';
 
 /**
@@ -6,25 +7,35 @@ import useWorkoutStore from '../hooks/useWorkoutStore';
  * Connects directly to atomic store actions.
  */
 const SetRow = ({ exerciseId, set, index }) => {
-  const updateActiveSet = useWorkoutStore((state) => state.updateActiveSet);
+  const { preferences, updateActiveSet, setRestTimer } = useWorkoutStore();
 
   const handleChange = (field, value) => {
-    const numericValue = parseFloat(value) || 0;
-    updateActiveSet(exerciseId, set.id, field, numericValue);
+    updateActiveSet(exerciseId, set.id, field, value);
+  };
+
+  const handleToggleComplete = () => {
+    const newState = !set.completed;
+    updateActiveSet(exerciseId, set.id, 'completed', newState);
+    
+    // Auto-start rest timer if enabled and marking as complete
+    if (newState && preferences.autoStartRest) {
+      setRestTimer(set.id, preferences.defaultRestTime);
+    }
   };
 
   return (
-    <div className="workout-set-row-v2">
+    <div className={`workout-set-row-v2 ${set.completed ? 'completed' : ''}`}>
       <span className="set-number">#{index + 1}</span>
       
       <div className="set-input-group">
-        <label>KG</label>
+        <label>{preferences.weightUnit.toUpperCase()}</label>
         <input 
           type="number" 
           step="0.5"
           value={set.weight || ''} 
-          onChange={(e) => handleChange('weight', e.target.value)}
+          onChange={(e) => handleChange('weight', parseFloat(e.target.value) || 0)}
           placeholder="0"
+          disabled={set.completed}
         />
       </div>
 
@@ -33,22 +44,18 @@ const SetRow = ({ exerciseId, set, index }) => {
         <input 
           type="number" 
           value={set.reps || ''} 
-          onChange={(e) => handleChange('reps', e.target.value)}
+          onChange={(e) => handleChange('reps', parseInt(e.target.value) || 0)}
           placeholder="0"
+          disabled={set.completed}
         />
       </div>
 
-      <div className="set-input-group">
-        <label>RPE</label>
-        <input 
-          type="number" 
-          max="10"
-          min="0"
-          value={set.rpe || ''} 
-          onChange={(e) => handleChange('rpe', e.target.value)}
-          placeholder="-"
-        />
-      </div>
+      <button 
+        className={`set-complete-btn ${set.completed ? 'active' : ''}`}
+        onClick={handleToggleComplete}
+      >
+        <Check size={16} />
+      </button>
     </div>
   );
 };

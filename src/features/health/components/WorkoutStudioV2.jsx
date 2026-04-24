@@ -4,6 +4,7 @@ import TemplateLibrary from './TemplateLibrary';
 import TemplateBuilder from './TemplateBuilder';
 import ActiveWorkoutSession from './ActiveWorkoutSession';
 import WorkoutHUD from './WorkoutHUD';
+import GlobalRestTimer from './GlobalRestTimer';
 import './Health.css';
 
 /**
@@ -20,6 +21,7 @@ const WorkoutStudioV2 = () => {
       <div className="workout-studio-v2">
         <ActiveWorkoutSession />
         <WorkoutHUD />
+        <GlobalRestTimer />
       </div>
     );
   }

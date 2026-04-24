@@ -14,6 +14,24 @@ const useWorkoutStore = create(
       activeWorkout: null,
       history: [],
       status: 'idle', // 'idle' | 'active' | 'paused'
+      
+      activeTimer: {
+        id: null,
+        key: 0,
+        duration: 90
+      },
+
+      setRestTimer: (id, duration) => set((state) => ({
+        activeTimer: {
+          id,
+          key: state.activeTimer.key + 1,
+          duration: duration || state.preferences.defaultRestTime
+        }
+      })),
+
+      clearRestTimer: () => set({
+        activeTimer: { id: null, key: 0, duration: 90 }
+      }),
 
       // --- PASO 2: Mutadores Atómicos ---
 
@@ -115,7 +133,21 @@ const useWorkoutStore = create(
         status: 'idle',
         templates: [],
         history: []
-      })
+      }),
+
+      // --- Preferencias de Entrenamiento ---
+      preferences: {
+        weightUnit: 'lbs',
+        defaultRestTime: 90,
+        autoStartRest: true
+      },
+
+      updatePreference: (key, value) => set((state) => ({
+        preferences: {
+          ...state.preferences,
+          [key]: value
+        }
+      }))
     }),
     {
       name: 'lyfecore-workout-v2-storage'

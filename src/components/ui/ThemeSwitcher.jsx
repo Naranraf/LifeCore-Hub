@@ -7,11 +7,15 @@ import { useAppStore } from '../../store/useAppStore';
  */
 const ThemeSwitcher = () => {
   const theme = useAppStore((state) => state.ui.theme);
-  const toggleTheme = useAppStore((state) => state.toggleTheme);
+  const setTheme = useAppStore((state) => state.setTheme);
+
+  const toggle = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <button 
-      onClick={toggleTheme}
+      onClick={toggle}
       className="theme-switcher-btn"
       title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
       style={{

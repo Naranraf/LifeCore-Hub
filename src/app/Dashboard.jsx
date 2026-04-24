@@ -26,6 +26,7 @@ import useWorkoutStore from '../features/workout/hooks/useWorkout';
 import useTimerStore from '../features/timing/hooks/useTimer';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import QuoteWidget from '../components/ui/QuoteWidget';
 import GoalTracker from '../features/finance/components/GoalTracker';
 import './Dashboard.css';
 
@@ -125,6 +126,9 @@ export default function Dashboard() {
           </h1>
           <p className="dashboard__tagline">Life Optimization Engine // Tactical Status</p>
         </div>
+        
+        <QuoteWidget />
+
         <div className="dashboard__date">
           {new Date().toLocaleDateString(navigator.language, {
             weekday: 'short',

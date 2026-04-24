@@ -226,6 +226,7 @@
     flex-direction: column;
     gap: 4px;
     padding: 8px;
+    position: relative;
     min-width: 60px; /* Constant width for scalability */
     flex: 0 0 auto; /* Don't grow/shrink, use scroll */
     justify-content: center;

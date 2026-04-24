@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Sun,
   Moon,
+  Settings,
 } from 'lucide-react';
 import useAuthStore from '../hooks/useAuth';
 import ThemeSwitcher from './ui/ThemeSwitcher';
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
   { path: '/productivity', label: 'Productivity', icon: CalendarCheck },
   { path: '/timing', label: 'Timing', icon: Timer },
   { path: '/journal', label: 'Journal', icon: Book },
+  { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export default function Sidebar({ collapsed, onToggle }) {

@@ -20,6 +20,7 @@ import Productivity from './features/productivity/Productivity';
 import Timing from './features/timing/Timing';
 import AiChat from './features/ai/components/AiChat';
 import Journal from './features/journal/Journal';
+import SettingsView from './features/settings/SettingsView';
 import MusicWidget from './components/MusicWidget';
 import VisualsWidget from './components/ui/VisualsWidget';
 import TimingWidget from './features/timing/components/TimingWidget';
@@ -39,7 +40,8 @@ const FEATURE_COLORS = {
   productivity: ['#1e293b', '#2563eb', '#1e293b'],
   timing: ['#431407', '#ea580c', '#431407'],
   journal: ['#1e1b4b', '#4f46e5', '#1e1b4b'],
-  ai: ['#1e1b4b', '#8b5cf6', '#1e1b4b']
+  ai: ['#1e1b4b', '#8b5cf6', '#1e1b4b'],
+  settings: ['#27272a', '#52525b', '#27272a']
 };
 
 const RAINBOW_COLORS = ['#ff0000', '#00ff00', '#0000ff'];
@@ -67,6 +69,26 @@ export default function App() {
     setCurrentFeature(path);
     document.body.setAttribute('data-feature', path);
   }, [location]);
+
+  // Global Accent Color Sync
+  const accentColor = useAppStore((state) => state.ui.accentColor);
+
+  useEffect(() => {
+    if (!accentColor) return;
+    
+    // Update CSS Variable
+    document.documentElement.style.setProperty('--primary', accentColor);
+    
+    // Also update --accent-rgb for rgba colors
+    const hexToRgb = (hex) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? 
+        `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : 
+        '249, 115, 22';
+    };
+    
+    document.documentElement.style.setProperty('--accent-rgb', hexToRgb(accentColor));
+  }, [accentColor]);
 
   // Loading state while Firebase checks auth
   if (loading) {
@@ -116,6 +138,7 @@ export default function App() {
           <Route path="/ai" element={<AiChat />} />
           <Route path="/ai-chat" element={<AiChat />} />
           <Route path="/journal" element={<Journal />} />
+          <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
       <MusicWidget />

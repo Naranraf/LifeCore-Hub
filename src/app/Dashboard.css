@@ -62,6 +62,64 @@
   letter-spacing: 0.05em;
 }
 
+/* Quote Widget */
+.quote-widget {
+  flex: 1;
+  max-width: 450px;
+  margin: 0 24px;
+  padding: 8px 16px;
+  background: rgba(var(--accent-rgb), 0.03);
+  border-left: 2px solid var(--primary);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+}
+
+.quote-widget__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.quote-widget__icon {
+  color: var(--primary);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.quote-widget__text-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.quote-widget__text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.quote-widget__author {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 1024px) {
+  .quote-widget {
+    max-width: 100%;
+    margin: 16px 0;
+    order: 3;
+    flex: none;
+    width: 100%;
+  }
+}
+
 /* Stats Grid */
 .dashboard__grid {
   margin-bottom: 48px;
