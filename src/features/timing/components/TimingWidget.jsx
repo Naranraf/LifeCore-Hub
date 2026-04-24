@@ -99,14 +99,14 @@ export default function TimingWidget() {
 
   const getPhaseDurationMs = (p) => {
     switch (p) {
-      case PHASES.FOCUS: return settings.focusDuration * 60 * 1000;
-      case PHASES.SHORT_BREAK: return settings.shortBreakDuration * 60 * 1000;
-      case PHASES.LONG_BREAK: return settings.longBreakDuration * 60 * 1000;
-      default: return settings.focusDuration * 60 * 1000;
+      case PHASES.FOCUS: return pomo.settings.focusDuration * 60 * 1000;
+      case PHASES.SHORT_BREAK: return pomo.settings.shortBreakDuration * 60 * 1000;
+      case PHASES.LONG_BREAK: return pomo.settings.longBreakDuration * 60 * 1000;
+      default: return pomo.settings.focusDuration * 60 * 1000;
     }
   };
 
-  const totalDuration = getPhaseDurationMs(phase);
+  const totalDuration = mode === MODES.POMODORO ? getPhaseDurationMs(pomo.phase) : 0;
   
   const getPhaseColor = () => {
     if (mode !== MODES.POMODORO) return 'var(--primary)';
