@@ -22,7 +22,10 @@ import {
   Target,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import useTimerStore, { PHASES, MODES, DEFAULT_SETTINGS } from './hooks/useTimer';
+import useTimerStore, { MODES } from './hooks/useTimer';
+import usePomodoro, { PHASES } from './hooks/usePomodoro';
+import useStopwatch from './hooks/useStopwatch';
+import useCountdown from './hooks/useCountdown';
 import PomodoroTimer from './components/PomodoroTimer';
 import './Timing.css';
 
@@ -58,27 +61,25 @@ function formatSimple(ms) {
 }
 
 export default function Timing() {
-  const {
-    mode, phase, status, remaining, stopwatchElapsed,
-    completedCycles, totalFocusMs, settings, sessionCount,
-    initWorker, start, pause, reset, skip, updateSettings, setMode,
-  } = useTimerStore();
+  const { mode, setMode } = useTimerStore();
+  const pomo = usePomodoro();
+  const stop = useStopwatch();
+  const count = useCountdown();
+
+  // Active logic
+  const active = mode === MODES.POMODORO ? pomo : (mode === MODES.STOPWATCH ? stop : count);
 
   const [showSettings, setShowSettings] = useState(false);
-  const [draftSettings, setDraftSettings] = useState(settings);
+  const [draftSettings, setDraftSettings] = useState(pomo.settings);
+  const [countdownInput, setCountdownInput] = useState(count.duration / 60000);
 
-  // Initialize Web Worker on mount
+  // Sync draft settings
   useEffect(() => {
-    initWorker();
-  }, [initWorker]);
+    setDraftSettings(pomo.settings);
+  }, [pomo.settings]);
 
-  // Sync draft settings when settings change
-  useEffect(() => {
-    setDraftSettings(settings);
-  }, [settings]);
-
-  const totalDuration = getPhaseDurationMs(phase, settings);
-  const totalFocusMin = Math.floor(totalFocusMs / 60000);
+  const totalDuration = mode === MODES.POMODORO ? pomo.settings[`${pomo.phase}Duration`] * 60 * 1000 : 0;
+  const totalFocusMin = Math.floor(pomo.totalFocusMs / 60000);
 
   return (
     <div id="page-timing" className="feature-page timing-page">
@@ -126,15 +127,15 @@ export default function Timing() {
         <div className="timing-page__timer-area">
           {mode === MODES.POMODORO ? (
             <PomodoroTimer
-              phase={phase}
-              remaining={remaining}
+              phase={pomo.phase}
+              remaining={pomo.remaining}
               totalDuration={totalDuration}
-              status={status}
+              status={pomo.status}
             />
           ) : (
             <div className="generic-timer-display">
               <div className="timer-val mono">
-                {mode === MODES.STOPWATCH ? formatStopwatch(stopwatchElapsed) : formatSimple(remaining)}
+                {mode === MODES.STOPWATCH ? formatStopwatch(stop.elapsed) : formatSimple(count.remaining)}
               </div>
               <div className="timer-mode-label">{mode.toUpperCase()}</div>
             </div>
@@ -144,7 +145,7 @@ export default function Timing() {
           <div className="timing-page__controls">
             <motion.button
               className="timing-page__control-btn timing-page__control-btn--secondary"
-              onClick={reset}
+              onClick={active.reset}
               title="Reset"
               id="btn-timer-reset"
               whileHover={{ scale: 1.08 }}
@@ -155,19 +156,19 @@ export default function Timing() {
 
             <motion.button
               className="timing-page__control-btn timing-page__control-btn--primary"
-              onClick={status === 'running' ? pause : start}
+              onClick={active.status === 'running' ? active.pause : active.start}
               id="btn-timer-toggle"
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.94 }}
               style={{ color: '#FFFFFF' }} // Ensure visibility
             >
-              {status === 'running' ? <Pause size={28} /> : <Play size={28} fill="#FFFFFF" />}
+              {active.status === 'running' ? <Pause size={28} /> : <Play size={28} fill="#FFFFFF" />}
             </motion.button>
 
             {mode === MODES.POMODORO && (
               <motion.button
                 className="timing-page__control-btn timing-page__control-btn--secondary"
-                onClick={skip}
+                onClick={pomo.skip}
                 title="Skip to next phase"
                 id="btn-timer-skip"
                 whileHover={{ scale: 1.08 }}
@@ -184,12 +185,12 @@ export default function Timing() {
               {[PHASES.FOCUS, PHASES.SHORT_BREAK, PHASES.LONG_BREAK].map((p) => (
                 <button
                   key={p}
-                  className={`timing-page__phase-pill ${phase === p ? 'timing-page__phase-pill--active' : ''}`}
+                  className={`timing-page__phase-pill ${pomo.phase === p ? 'timing-page__phase-pill--active' : ''}`}
                   onClick={() => {
-                    if (status !== 'running') {
-                      useTimerStore.setState({
+                    if (pomo.status !== 'running') {
+                      usePomodoro.setState({
                         phase: p,
-                        remaining: getPhaseDurationMs(p, settings),
+                        remaining: p === PHASES.FOCUS ? pomo.settings.focusDuration * 60000 : (p === PHASES.SHORT_BREAK ? pomo.settings.shortBreakDuration * 60000 : pomo.settings.longBreakDuration * 60000),
                         status: 'idle',
                       });
                     }
@@ -207,23 +208,30 @@ export default function Timing() {
 
       {/* Stats Cards */}
       <div className="timing-page__stats">
-        <StatMini icon={Zap} label="Sessions" value={sessionCount} color="var(--warning)" />
+        <StatMini icon={Zap} label="Sessions" value={pomo.sessionCount || 0} color="var(--warning)" />
         <StatMini icon={Clock} label="Focus Time" value={`${totalFocusMin}m`} color="var(--accent)" />
-        <StatMini icon={Target} label="Cycle" value={`${completedCycles}/${settings.cyclesBeforeLongBreak}`} color="var(--accent-secondary)" />
+        <StatMini icon={Target} label="Cycle" value={`${pomo.completedCycles || 0}/${pomo.settings.cyclesBeforeLongBreak}`} color="var(--accent-secondary)" />
       </div>
 
       {/* Settings Modal */}
       <AnimatePresence>
         {showSettings && (
           <SettingsModal
+            mode={mode}
             draft={draftSettings}
+            countdownInput={countdownInput}
+            onCountdownChange={setCountdownInput}
             onChange={setDraftSettings}
             onSave={() => {
-              updateSettings(draftSettings);
+              if (mode === MODES.POMODORO) {
+                pomo.updateSettings(draftSettings);
+              } else if (mode === MODES.TIMER) {
+                count.setDuration(countdownInput * 60 * 1000);
+              }
               setShowSettings(false);
             }}
             onClose={() => {
-              setDraftSettings(settings);
+              setDraftSettings(pomo.settings);
               setShowSettings(false);
             }}
           />
@@ -249,7 +257,7 @@ function StatMini({ icon: Icon, label, value, color }) {
 }
 
 /** Settings modal overlay. */
-function SettingsModal({ draft, onChange, onSave, onClose }) {
+function SettingsModal({ mode, draft, countdownInput, onCountdownChange, onChange, onSave, onClose }) {
   /** Update a single field in draft settings. */
   function handleField(field, rawValue) {
     const num = parseInt(rawValue, 10);
@@ -274,37 +282,50 @@ function SettingsModal({ draft, onChange, onSave, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="timing-modal__header">
-          <h2>Timer Settings</h2>
+          <h2>{mode === 'timer' ? 'Timer Settings' : 'Pomodoro Settings'}</h2>
           <button onClick={onClose} className="timing-modal__close" id="btn-close-settings">
             <X size={20} />
           </button>
         </div>
 
         <div className="timing-modal__fields">
-          <SettingField
-            label="Focus Duration"
-            value={draft.focusDuration}
-            onChange={(v) => handleField('focusDuration', v)}
-            unit="min"
-          />
-          <SettingField
-            label="Short Break"
-            value={draft.shortBreakDuration}
-            onChange={(v) => handleField('shortBreakDuration', v)}
-            unit="min"
-          />
-          <SettingField
-            label="Long Break"
-            value={draft.longBreakDuration}
-            onChange={(v) => handleField('longBreakDuration', v)}
-            unit="min"
-          />
-          <SettingField
-            label="Cycles before Long Break"
-            value={draft.cyclesBeforeLongBreak}
-            onChange={(v) => handleField('cyclesBeforeLongBreak', v)}
-            unit="cycles"
-          />
+          {mode === 'pomodoro' ? (
+            <>
+              <SettingField
+                label="Focus Duration"
+                value={draft.focusDuration}
+                onChange={(v) => handleField('focusDuration', v)}
+                unit="min"
+              />
+              <SettingField
+                label="Short Break"
+                value={draft.shortBreakDuration}
+                onChange={(v) => handleField('shortBreakDuration', v)}
+                unit="min"
+              />
+              <SettingField
+                label="Long Break"
+                value={draft.longBreakDuration}
+                onChange={(v) => handleField('longBreakDuration', v)}
+                unit="min"
+              />
+              <SettingField
+                label="Cycles before Long Break"
+                value={draft.cyclesBeforeLongBreak}
+                onChange={(v) => handleField('cyclesBeforeLongBreak', v)}
+                unit="cycles"
+              />
+            </>
+          ) : mode === 'timer' ? (
+            <SettingField
+              label="Countdown Duration"
+              value={countdownInput}
+              onChange={(v) => onCountdownChange(parseInt(v))}
+              unit="min"
+            />
+          ) : (
+            <p style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>Stopwatch has no settings.</p>
+          )}
         </div>
 
         <button className="timing-modal__save" onClick={onSave} id="btn-save-settings">

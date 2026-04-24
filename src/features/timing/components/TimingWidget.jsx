@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Timer, X, Play, Pause, RotateCcw, SkipForward, Settings, Check } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useAppStore } from '../../../store/useAppStore';
-import useTimerStore, { PHASES, MODES } from '../hooks/useTimer';
+import useTimerStore, { MODES } from '../hooks/useTimer';
+import usePomodoro, { PHASES } from '../hooks/usePomodoro';
+import useStopwatch from '../hooks/useStopwatch';
+import useCountdown from '../hooks/useCountdown';
 import PomodoroTimer from './PomodoroTimer';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
@@ -48,17 +51,22 @@ export default function TimingWidget() {
     }
   }, []);
 
-  const {
-    mode, phase, status, remaining, stopwatchElapsed,
-    initWorker, start, pause, reset, skip, settings, updateSettings, setMode
-  } = useTimerStore();
+  const { mode, setMode } = useTimerStore();
+  const pomo = usePomodoro();
+  const stop = useStopwatch();
+  const count = useCountdown();
 
-  const [draftSettings, setDraftSettings] = useState(settings);
+  // Determine active logic
+  const active = mode === MODES.POMODORO ? pomo : (mode === MODES.STOPWATCH ? stop : count);
 
-  // Initialize Web Worker on mount
+  const [draftSettings, setDraftSettings] = useState(pomo.settings);
+  const [countdownInput, setCountdownInput] = useState(count.duration / 60000);
+
+  // Initialize active logic worker connection on mount/mode switch
   useEffect(() => {
-    initWorker();
-  }, [initWorker]);
+    active.start(); // This sets up the listener without necessarily starting the tick
+    active.pause(); // Ensure it doesn't auto-start
+  }, [mode]);
 
   // Handle Window Resize: Keep widget inside viewport
   useEffect(() => {
@@ -102,7 +110,7 @@ export default function TimingWidget() {
   
   const getPhaseColor = () => {
     if (mode !== MODES.POMODORO) return 'var(--primary)';
-    switch (phase) {
+    switch (pomo.phase) {
       case PHASES.FOCUS: return 'var(--accent)';
       case PHASES.SHORT_BREAK: return 'var(--success)';
       case PHASES.LONG_BREAK: return 'var(--accent-secondary)';
@@ -117,7 +125,11 @@ export default function TimingWidget() {
   };
 
   const handleSaveSettings = () => {
-    updateSettings(draftSettings);
+    if (mode === MODES.POMODORO) {
+      pomo.updateSettings(draftSettings);
+    } else if (mode === MODES.TIMER) {
+      count.setDuration(countdownInput * 60 * 1000);
+    }
     setShowSettings(false);
   };
 
@@ -181,74 +193,90 @@ export default function TimingWidget() {
                       <div className="timing-widget__timer-mini">
                         {mode === MODES.POMODORO ? (
                           <PomodoroTimer 
-                            phase={phase}
-                            remaining={remaining}
-                            totalDuration={totalDuration}
-                            status={status}
+                            phase={pomo.phase}
+                            remaining={pomo.remaining}
+                            totalDuration={pomo.settings[`${pomo.phase}Duration`] * 60 * 1000}
+                            status={pomo.status}
                           />
                         ) : (
                           <div className="widget-generic-timer">
                             <span className="mono">
-                              {mode === MODES.STOPWATCH ? formatStopwatch(stopwatchElapsed) : formatStopwatch(remaining)}
+                              {mode === MODES.STOPWATCH ? formatStopwatch(stop.elapsed) : formatStopwatch(count.remaining)}
                             </span>
                           </div>
                         )}
                       </div>
 
                       <div className="timing-widget__controls">
-                        <Button variant="glass" size="small" onClick={reset} title="Reset">
+                        <Button variant="glass" size="small" onClick={active.reset} title="Reset">
                           <RotateCcw size={16} />
                         </Button>
                         
                         <Button 
                           variant="primary" 
                           size="large" 
-                          onClick={status === 'running' ? pause : start}
+                          onClick={active.status === 'running' ? active.pause : active.start}
                           style={{ background: getPhaseColor(), color: '#FFFFFF' }}
                           className="timing-widget__ctrl--main"
                         >
-                          {status === 'running' ? <Pause size={20} /> : <Play size={20} fill="#FFFFFF" />}
+                          {active.status === 'running' ? <Pause size={20} /> : <Play size={20} fill="#FFFFFF" />}
                         </Button>
 
                         {mode === MODES.POMODORO && (
-                          <Button variant="glass" size="small" onClick={skip} title="Skip Phase">
+                          <Button variant="glass" size="small" onClick={pomo.skip} title="Skip Phase">
                             <SkipForward size={16} />
                           </Button>
                         )}
                       </div>
 
                       <div className="timing-widget__phase-label" style={{ color: getPhaseColor() }}>
-                        {mode === MODES.POMODORO ? phase.replace(/([A-Z])/g, ' $1').trim() : mode.toUpperCase()}
+                        {mode === MODES.POMODORO ? pomo.phase.replace(/([A-Z])/g, ' $1').trim() : mode.toUpperCase()}
                       </div>
                     </>
                   ) : (
                     <div className="timing-widget__settings">
-                      <div className="timing-widget__settings-grid">
+                      {mode === MODES.POMODORO ? (
+                        <div className="timing-widget__settings-grid">
+                          <div className="timing-widget__field">
+                            <label>Focus</label>
+                            <input 
+                              type="number" 
+                              value={draftSettings.focusDuration}
+                              onChange={(e) => setDraftSettings({...draftSettings, focusDuration: parseInt(e.target.value)})}
+                            />
+                          </div>
+                          <div className="timing-widget__field">
+                            <label>Short</label>
+                            <input 
+                              type="number" 
+                              value={draftSettings.shortBreakDuration}
+                              onChange={(e) => setDraftSettings({...draftSettings, shortBreakDuration: parseInt(e.target.value)})}
+                            />
+                          </div>
+                          <div className="timing-widget__field">
+                            <label>Long</label>
+                            <input 
+                              type="number" 
+                              value={draftSettings.longBreakDuration}
+                              onChange={(e) => setDraftSettings({...draftSettings, longBreakDuration: parseInt(e.target.value)})}
+                            />
+                          </div>
+                        </div>
+                      ) : mode === MODES.TIMER ? (
                         <div className="timing-widget__field">
-                          <label>Focus</label>
+                          <label>Timer Duration (min)</label>
                           <input 
                             type="number" 
-                            value={draftSettings.focusDuration}
-                            onChange={(e) => setDraftSettings({...draftSettings, focusDuration: parseInt(e.target.value)})}
+                            value={countdownInput}
+                            onChange={(e) => setCountdownInput(parseInt(e.target.value))}
+                            min="1"
+                            max="1440"
                           />
                         </div>
-                        <div className="timing-widget__field">
-                          <label>Short</label>
-                          <input 
-                            type="number" 
-                            value={draftSettings.shortBreakDuration}
-                            onChange={(e) => setDraftSettings({...draftSettings, shortBreakDuration: parseInt(e.target.value)})}
-                          />
-                        </div>
-                        <div className="timing-widget__field">
-                          <label>Long</label>
-                          <input 
-                            type="number" 
-                            value={draftSettings.longBreakDuration}
-                            onChange={(e) => setDraftSettings({...draftSettings, longBreakDuration: parseInt(e.target.value)})}
-                          />
-                        </div>
-                      </div>
+                      ) : (
+                        <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Stopwatch has no settings.</p>
+                      )}
+                      
                       <Button variant="primary" size="small" className="timing-widget__save-btn" onClick={handleSaveSettings}>
                         <Check size={14} /> Save Changes
                       </Button>
