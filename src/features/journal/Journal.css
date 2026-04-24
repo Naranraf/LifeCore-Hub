@@ -35,8 +35,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--glass-border);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-deep);
 }
 .journal__sidebar-header h3 {
   font-size: 16px;
@@ -44,20 +44,22 @@
   color: var(--text-main);
   margin: 0;
 }
-.journal__new-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: rgba(var(--accent-rgb, 59, 130, 246), 0.15);
-  color: var(--accent);
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-}
-.journal__new-btn:hover {
-  background: rgba(var(--accent-rgb, 59, 130, 246), 0.25);
+.lyfe-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-tactical);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
 }
 
 .journal__list {
@@ -76,19 +78,32 @@
   font-size: 14px;
 }
 
+.modal-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-tactical);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
 .journal__item {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   padding: 14px;
-  background: var(--glass-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   cursor: pointer;
-  border: 1px solid transparent;
   transition: all 0.2s;
 }
 .journal__item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-deep);
 }
 .journal__item--active {
   background: rgba(var(--accent-rgb, 59, 130, 246), 0.1);
@@ -156,8 +171,8 @@
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--glass-border);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-deep);
 }
 
 .journal__title-input {

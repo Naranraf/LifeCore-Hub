@@ -245,7 +245,8 @@
 /* Mode Switcher */
 .timing-mode-switcher {
   display: flex;
-  background: var(--glass-border);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 4px;
   gap: 4px;
@@ -265,6 +266,7 @@
 
 .mode-btn.active {
   background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   color: var(--accent);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
@@ -352,15 +354,16 @@
 
 .timing-modal__preset-item {
   display: flex;
-  background: var(--glass-border);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid transparent;
   transition: all 0.2s;
 }
 
 .timing-modal__preset-item:hover {
   border-color: var(--accent);
+  background: var(--bg-surface);
 }
 
 .timing-modal__preset-select {

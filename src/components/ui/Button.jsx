@@ -8,19 +8,15 @@ import './Button.css';
  */
 const Button = ({ 
   children, 
-  onClick, 
   variant = 'primary', 
   size = 'medium', 
-  disabled = false,
   className = '',
-  id
+  ...props 
 }) => {
   return (
     <button
-      id={id}
       className={`lyfecore-btn btn-${variant} btn-${size} ${className}`}
-      onClick={onClick}
-      disabled={disabled}
+      {...props}
     >
       {children}
     </button>

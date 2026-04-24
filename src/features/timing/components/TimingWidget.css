@@ -36,8 +36,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border-subtle);
   touch-action: none;
   cursor: grab;
 }
@@ -147,7 +147,8 @@
 
 .timing-widget__mode-mini {
   display: flex;
-  background: var(--glass-border);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
   border-radius: 20px;
   padding: 2px;
   gap: 2px;
@@ -155,13 +156,13 @@
 }
 
 .timing-widget__mode-mini button {
-  background: none;
+  background: transparent;
   border: none;
   color: var(--text-muted);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.2s;
@@ -169,7 +170,9 @@
 
 .timing-widget__mode-mini button.active {
   background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .widget-generic-timer {
@@ -217,10 +220,16 @@
 
 .timing-widget__preset-item {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.timing-widget__preset-item:hover {
+  border-color: var(--accent);
+  background: var(--bg-surface);
 }
 
 .timing-widget__preset-btn {
@@ -230,12 +239,11 @@
   color: var(--text-main);
   font-size: 11px;
   font-weight: 600;
-  padding: 6px;
+  padding: 8px;
   cursor: pointer;
 }
 
 .timing-widget__preset-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
   color: var(--accent);
 }
 
