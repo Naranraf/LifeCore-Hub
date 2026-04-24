@@ -145,6 +145,7 @@ const useTimerStore = create((set, get) => {
   return {
     // State
     mode: MODES.POMODORO,
+    phase: initialPhase,
     status: 'idle', // idle | running | paused
     remaining: persisted?.remaining || initialDuration,
     stopwatchElapsed: persisted?.stopwatchElapsed || 0,
