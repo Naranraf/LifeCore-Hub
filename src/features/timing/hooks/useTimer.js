@@ -25,5 +25,4 @@ const useTimerStore = create(
   )
 );
 
-export { MODES };
 export default useTimerStore;

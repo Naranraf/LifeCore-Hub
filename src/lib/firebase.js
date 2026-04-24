@@ -7,7 +7,7 @@
  * but API keys for Gemini/Google APIs live ONLY in Cloud Functions.
  */
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, setPersistence, browserSessionPersistence } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore, serverTimestamp } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
 import { getStorage } from 'firebase/storage';
@@ -40,8 +40,8 @@ if (typeof window !== 'undefined' && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
 
 export const auth = getAuth(app);
 
-// Enforce Session-Only Persistence (Mitigates Session Hijacking)
-setPersistence(auth, browserSessionPersistence)
+// Enforce Local Persistence (Session survives browser restarts)
+setPersistence(auth, browserLocalPersistence)
   .catch((err) => console.warn('[Auth] Persistence setup failed:', err.message));
 
 
@@ -51,7 +51,7 @@ setPersistence(auth, browserSessionPersistence)
  * implemented, to avoid the 'unverified app' OAuth warning during development.
  */
 export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
+// googleProvider.setCustomParameters({ prompt: 'select_account' });
 // Added scopes for Google Calendar and Google Tasks integrations
 googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 googleProvider.addScope('https://www.googleapis.com/auth/tasks');
