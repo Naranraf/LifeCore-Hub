@@ -71,7 +71,8 @@ export default function Timing() {
 
   const [showSettings, setShowSettings] = useState(false);
   const [draftSettings, setDraftSettings] = useState(pomo.settings);
-  const [countdownInput, setCountdownInput] = useState(count.duration / 60000);
+  const [countdownMinutes, setCountdownMinutes] = useState(Math.floor(count.duration / 60000));
+  const [countdownSeconds, setCountdownSeconds] = useState(Math.floor((count.duration % 60000) / 1000));
 
   // Sync draft settings
   useEffect(() => {
@@ -219,14 +220,17 @@ export default function Timing() {
           <SettingsModal
             mode={mode}
             draft={draftSettings}
-            countdownInput={countdownInput}
-            onCountdownChange={setCountdownInput}
+            countdownMinutes={countdownMinutes}
+            countdownSeconds={countdownSeconds}
+            onMinutesChange={setCountdownMinutes}
+            onSecondsChange={setCountdownSeconds}
             onChange={setDraftSettings}
             onSave={() => {
               if (mode === MODES.POMODORO) {
                 pomo.updateSettings(draftSettings);
               } else if (mode === MODES.TIMER) {
-                count.setDuration(countdownInput * 60 * 1000);
+                const totalMs = (countdownMinutes * 60 + countdownSeconds) * 1000;
+                count.setDuration(totalMs);
               }
               setShowSettings(false);
             }}
@@ -257,7 +261,17 @@ function StatMini({ icon: Icon, label, value, color }) {
 }
 
 /** Settings modal overlay. */
-function SettingsModal({ mode, draft, countdownInput, onCountdownChange, onChange, onSave, onClose }) {
+function SettingsModal({ 
+  mode, 
+  draft, 
+  countdownMinutes, 
+  countdownSeconds, 
+  onMinutesChange, 
+  onSecondsChange, 
+  onChange, 
+  onSave, 
+  onClose 
+}) {
   /** Update a single field in draft settings. */
   function handleField(field, rawValue) {
     const num = parseInt(rawValue, 10);
@@ -317,12 +331,20 @@ function SettingsModal({ mode, draft, countdownInput, onCountdownChange, onChang
               />
             </>
           ) : mode === 'timer' ? (
-            <SettingField
-              label="Countdown Duration"
-              value={countdownInput}
-              onChange={(v) => onCountdownChange(parseInt(v))}
-              unit="min"
-            />
+            <div className="timing-modal__field-group">
+              <SettingField
+                label="Minutes"
+                value={countdownMinutes}
+                onChange={(v) => onMinutesChange(parseInt(v) || 0)}
+                unit="min"
+              />
+              <SettingField
+                label="Seconds"
+                value={countdownSeconds}
+                onChange={(v) => onSecondsChange(parseInt(v) || 0)}
+                unit="sec"
+              />
+            </div>
           ) : (
             <p style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>Stopwatch has no settings.</p>
           )}

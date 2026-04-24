@@ -60,7 +60,8 @@ export default function TimingWidget() {
   const active = mode === MODES.POMODORO ? pomo : (mode === MODES.STOPWATCH ? stop : count);
 
   const [draftSettings, setDraftSettings] = useState(pomo.settings);
-  const [countdownInput, setCountdownInput] = useState(count.duration / 60000);
+  const [countdownMinutes, setCountdownMinutes] = useState(Math.floor(count.duration / 60000));
+  const [countdownSeconds, setCountdownSeconds] = useState(Math.floor((count.duration % 60000) / 1000));
 
   // Initialize active logic worker connection on mount/mode switch
   useEffect(() => {
@@ -128,7 +129,8 @@ export default function TimingWidget() {
     if (mode === MODES.POMODORO) {
       pomo.updateSettings(draftSettings);
     } else if (mode === MODES.TIMER) {
-      count.setDuration(countdownInput * 60 * 1000);
+      const totalMs = (countdownMinutes * 60 + countdownSeconds) * 1000;
+      count.setDuration(totalMs);
     }
     setShowSettings(false);
   };
@@ -263,15 +265,27 @@ export default function TimingWidget() {
                           </div>
                         </div>
                       ) : mode === MODES.TIMER ? (
-                        <div className="timing-widget__field">
-                          <label>Timer Duration (min)</label>
-                          <input 
-                            type="number" 
-                            value={countdownInput}
-                            onChange={(e) => setCountdownInput(parseInt(e.target.value))}
-                            min="1"
-                            max="1440"
-                          />
+                        <div className="timing-widget__field-group">
+                          <div className="timing-widget__field">
+                            <label>Min</label>
+                            <input 
+                              type="number" 
+                              value={countdownMinutes}
+                              onChange={(e) => setCountdownMinutes(parseInt(e.target.value) || 0)}
+                              min="0"
+                              max="1440"
+                            />
+                          </div>
+                          <div className="timing-widget__field">
+                            <label>Sec</label>
+                            <input 
+                              type="number" 
+                              value={countdownSeconds}
+                              onChange={(e) => setCountdownSeconds(parseInt(e.target.value) || 0)}
+                              min="0"
+                              max="59"
+                            />
+                          </div>
                         </div>
                       ) : (
                         <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Stopwatch has no settings.</p>

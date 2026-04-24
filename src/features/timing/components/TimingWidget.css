@@ -109,6 +109,16 @@
   outline: none;
 }
 
+.timing-widget__field-group {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.timing-widget__field-group .timing-widget__field {
+  flex: 1;
+}
+
 .timing-widget__save-btn {
   width: 100%;
   margin-top: 8px;
