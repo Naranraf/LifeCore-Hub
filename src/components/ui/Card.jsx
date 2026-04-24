@@ -6,9 +6,9 @@ import './Card.css';
  * 
  * Container with glassmorphism, blur, and premium borders.
  */
-const Card = ({ children, className = '', id }) => {
+const Card = ({ children, className = '', id, ...props }) => {
   return (
-    <div id={id} className={`lyfecore-card ${className}`}>
+    <div id={id} className={`lyfecore-card ${className}`} {...props}>
       {children}
     </div>
   );
