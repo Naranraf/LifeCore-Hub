@@ -29,14 +29,22 @@ export default function TimingWidget() {
 
   useEffect(() => {
     const saved = localStorage.getItem('lyfecore-timing-pos');
+    const defaultPos = { x: window.innerWidth - 360, y: 100 };
+    
     if (saved) {
       try {
-        setPosition(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        // Safety check: Is the parsed position sane?
+        if (parsed.x < -100 || parsed.x > window.innerWidth || parsed.y < -100 || parsed.y > window.innerHeight) {
+          setPosition(defaultPos);
+        } else {
+          setPosition(parsed);
+        }
       } catch (e) {
-        setPosition({ x: window.innerWidth - 380, y: 80 });
+        setPosition(defaultPos);
       }
     } else {
-      setPosition({ x: window.innerWidth - 380, y: 80 });
+      setPosition(defaultPos);
     }
   }, []);
 
