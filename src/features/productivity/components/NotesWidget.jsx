@@ -56,7 +56,17 @@ export default function NotesWidget() {
 
   const handleCreate = async () => {
     const newId = await createNote();
-    if (newId) setEditingId(newId);
+    if (newId) {
+      setEditingId(newId);
+      // Initialize local state for the new note immediately to prevent null pointer crash
+      setLocalNote({
+        id: newId,
+        title: '',
+        content: '',
+        color: NOTE_COLORS[0],
+        tags: []
+      });
+    }
   };
 
   return (
