@@ -27,20 +27,29 @@ export default function Productivity() {
   const [error, setError] = useState(null);
 
   const defaultLayout = [
-    { id: 'tasks', fullWidth: true },
-    { id: 'calendar', fullWidth: true },
-    { id: 'notes', fullWidth: true }
+    { id: 'tasks', fullWidth: false },
+    { id: 'calendar', fullWidth: false },
+    { id: 'notes', fullWidth: false }
   ];
   
+  /** Migration Helper: Ensures all mandatory widgets exist in the layout array. */
+  const migrateLayout = (loaded) => {
+    if (!Array.isArray(loaded)) return defaultLayout;
+    const required = ['tasks', 'calendar', 'notes'];
+    let updated = [...loaded];
+    required.forEach(id => {
+      if (!updated.find(w => w.id === id)) {
+        updated.push({ id, fullWidth: false });
+      }
+    });
+    return updated;
+  };
+
   const [layout, setLayout] = useState(() => {
     try {
       const saved = localStorage.getItem('lyfe_prod_layout_v2');
       const loaded = saved ? JSON.parse(saved) : defaultLayout;
-      // Migration: Ensure 'tasks' exists in layout
-      if (!loaded.find(w => w.id === 'tasks')) {
-        return [{ id: 'tasks', fullWidth: true }, ...loaded];
-      }
-      return loaded;
+      return migrateLayout(loaded);
     } catch(e) { return defaultLayout; }
   });
 
@@ -54,8 +63,9 @@ export default function Productivity() {
         const snap = await getDoc(ref);
         if (snap.exists() && snap.data().productivityLayoutV2) {
           const cloudLayout = snap.data().productivityLayoutV2;
-          localStorage.setItem('lyfe_prod_layout_v2', JSON.stringify(cloudLayout));
-          setLayout(cloudLayout);
+          const finalized = migrateLayout(cloudLayout);
+          localStorage.setItem('lyfe_prod_layout_v2', JSON.stringify(finalized));
+          setLayout(finalized);
         }
       } catch (err) {
         console.warn('Could not fetch cloud layout:', err);
