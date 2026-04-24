@@ -3,6 +3,7 @@ import { Settings, Shield, User } from 'lucide-react';
 import AppearanceSettings from './AppearanceSettings';
 import WorkoutPreferences from './WorkoutPreferences';
 import DangerZone from './DangerZone';
+import LegalCompliance from './components/LegalCompliance';
 import './Settings.css';
 
 /**
@@ -37,6 +38,7 @@ const SettingsView = () => {
           <AppearanceSettings />
           <WorkoutPreferences />
           <DangerZone />
+          <LegalCompliance />
         </div>
       </div>
     </div>

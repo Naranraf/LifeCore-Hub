@@ -44,13 +44,13 @@
 }
 
 [data-theme='light'] {
-  /* Field Operative Theme (Light - High Contrast) */
-  --bg-deep: #F1F5F9;
-  --bg-surface: #FFFFFF;
-  --border-subtle: #CBD5E1;
+  /* Field Operative Theme — Tactical Sand/Stone Protocol */
+  --bg-deep: #E7E5E4; /* Stone 200 - Desaturated Field Gray */
+  --bg-surface: #F5F5F4; /* Stone 100 */
+  --border-subtle: #D6D3D1; /* Stone 300 */
   --primary: #C2410C; /* Deeper Tactical Orange */
-  --text-main: #020617; /* Obsidian - Maximum Contrast */
-  --text-muted: #475569;
+  --text-main: #1C1917; /* Stone 900 - High Contrast */
+  --text-muted: #57534E; /* Stone 600 */
   
   /* Feature Context Colors (Field - Vibrant Tints) */
   --bg-finance: #10b981;
@@ -61,35 +61,35 @@
   --bg-journal: #6366f1;
   
   /* Overrides for glassmorphism in light mode */
-  --glass-bg: rgba(255, 255, 255, 0.95);
-  --glass-border: rgba(203, 213, 225, 0.8);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(214, 211, 209, 0.8);
 }
 
-/* Tema: Cyber-Matrix — Stealth Neon Protocol */
+/* Tema: Cyber-Matrix — Deep Terminal Protocol */
 [data-theme='cyber'] {
-  --bg-deep: #0a0f0d;
-  --bg-surface: #111a14;
-  --border-subtle: #1c2b21;
-  --primary: #10b981; /* Verde Neón */
-  --accent-success: #34d399;
-  --text-main: #a7f3d0;
-  --text-muted: #047857;
+  --bg-deep: #020617; /* Slate 950 - Infinite Void */
+  --bg-surface: #0f172a; /* Slate 900 */
+  --border-subtle: #1e293b; /* Slate 800 */
+  --primary: #22c55e; /* Matrix Green - Level 500 */
+  --accent-success: #4ade80;
+  --text-main: #f0fdf4; /* Ultra Light Green */
+  --text-muted: #166534; /* Deep Moss */
   /* Glass Overrides */
-  --glass-bg: rgba(16, 185, 129, 0.05);
-  --glass-border: rgba(16, 185, 129, 0.1);
+  --glass-bg: rgba(2, 6, 23, 0.8);
+  --glass-border: rgba(34, 197, 94, 0.2);
 }
 
-/* Tema: Monochrome Elegance — Pure Minimalist Architecture */
+/* Tema: Monochrome Elegance — High-Contrast Architecture */
 [data-theme='mono'] {
-  --bg-deep: #fafafa;
-  --bg-surface: #ffffff;
-  --border-subtle: #e4e4e7;
-  --primary: #18181b; /* Negro Absoluto */
-  --accent-success: #52525b;
-  --text-main: #18181b;
-  --text-muted: #a1a1aa;
+  --bg-deep: #FFFFFF; /* Pure White */
+  --bg-surface: #F8FAFC; /* Slate 50 */
+  --border-subtle: #E2E8F0; /* Slate 200 */
+  --primary: #000000; /* Absolute Black */
+  --accent-success: #475569;
+  --text-main: #000000;
+  --text-muted: #64748B; /* Slate 500 */
   /* Glass Overrides */
-  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-bg: rgba(255, 255, 255, 0.95);
   --glass-border: rgba(0, 0, 0, 0.1);
 }
 

@@ -14,9 +14,9 @@ const AppearanceSettings = () => {
 
   const THEMES = [
     { id: 'dark', name: 'Bunker Matte', desc: 'High-stealth dark mode', class: 'bunker' },
-    { id: 'light', name: 'Field Operative', desc: 'High-contrast light mode', class: 'field' },
-    { id: 'cyber', name: 'Cyber Matrix', desc: 'Stealth Neon Protocol', class: 'cyber' },
-    { id: 'mono', name: 'Monochrome', desc: 'Pure Minimalist Arch', class: 'mono' },
+    { id: 'light', name: 'Field Operative', desc: 'Tactical Sand/Gray Protocol', class: 'field' },
+    { id: 'cyber', name: 'Cyber Matrix', desc: 'Deep Terminal Protocol', class: 'cyber' },
+    { id: 'mono', name: 'Monochrome', desc: 'High-Contrast Architecture', class: 'mono' },
   ];
 
   const PRESET_COLORS = [

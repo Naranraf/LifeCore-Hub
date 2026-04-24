@@ -234,11 +234,11 @@
 }
 
 .theme-preview.bunker { background: #0D0D0E; }
-.theme-preview.field { background: #F1F5F9; }
-.theme-preview.cyber { background: #0a0f0d; }
-.theme-preview.cyber .preview-accent { background: #10b981; }
-.theme-preview.mono { background: #ffffff; }
-.theme-preview.mono .preview-accent { background: #18181b; }
+.theme-preview.field { background: #E7E5E4; }
+.theme-preview.cyber { background: #020617; }
+.theme-preview.cyber .preview-accent { background: #22c55e; }
+.theme-preview.mono { background: #FFFFFF; }
+.theme-preview.mono .preview-accent { background: #000000; }
 
 .preview-accent {
   position: absolute;
