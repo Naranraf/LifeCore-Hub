@@ -12,9 +12,8 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signInWithPhoneNumber,
+  signInAnonymously,
   RecaptchaVerifier
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
@@ -119,6 +118,17 @@ const useAuthStore = create((set, get) => ({
 
     } catch (err) {
       console.error('[Auth] Google Sign-In failed:', err.message);
+      set({ error: err.message, loading: false });
+    }
+  },
+
+  signInAsGuest: async () => {
+    set({ loading: true, error: null });
+    try {
+      await signInAnonymously(auth);
+      // init() will handle the profile creation if it doesn't exist
+    } catch (err) {
+      console.error('[Auth] Guest Sign-In failed:', err.message);
       set({ error: err.message, loading: false });
     }
   },
