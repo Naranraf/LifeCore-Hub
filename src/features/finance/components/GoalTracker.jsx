@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Target, TrendingUp, DollarSign, Edit2, Check } from 'lucide-react';
+import React, { useMemo, useEffect, useState } from 'react';
+import { Target, TrendingUp, DollarSign, Edit2, Check, X } from 'lucide-react';
 import useFinanceStore from '../hooks/useFinance';
 import Card from '../../../components/ui/Card';
 import './GoalTracker.css';
@@ -14,8 +14,13 @@ import './GoalTracker.css';
  */
 const GoalTracker = () => {
   const { transactions, goals, currency, setGoal } = useFinanceStore();
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [tempGoal, setTempGoal] = React.useState(goals.savingGoal);
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempGoal, setTempGoal] = useState(goals.savingGoal);
+
+  // Sync tempGoal with store value when it changes (e.g. after cloud fetch)
+  useEffect(() => {
+    setTempGoal(goals.savingGoal);
+  }, [goals.savingGoal]);
 
   // --- LOGIC: Calculate Liquid Progress ---
   const { totalBalance, percentage } = useMemo(() => {
@@ -23,7 +28,9 @@ const GoalTracker = () => {
       return t.type === 'income' ? acc + Number(t.amount) : acc - Number(t.amount);
     }, 0);
 
-    const rawPercentage = (balance / goals.savingGoal) * 100;
+    const goal = goals.savingGoal || 1; // Prevent division by zero
+    const rawPercentage = (balance / goal) * 100;
+    
     return {
       totalBalance: balance,
       percentage: Math.min(Math.max(rawPercentage, 0), 100).toFixed(1)
@@ -31,7 +38,15 @@ const GoalTracker = () => {
   }, [transactions, goals.savingGoal]);
 
   const handleSaveGoal = () => {
-    setGoal(Number(tempGoal));
+    const numericGoal = Number(tempGoal);
+    if (!isNaN(numericGoal) && numericGoal >= 0) {
+      setGoal(numericGoal);
+      setIsEditing(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setTempGoal(goals.savingGoal);
     setIsEditing(false);
   };
 
@@ -40,11 +55,24 @@ const GoalTracker = () => {
       <div className="goal-tracker__header">
         <div className="goal-tracker__title">
           <Target size={18} className="goal-tracker__icon" />
-          <h4>Financial Mastery Goal</h4>
+          <h4 className="stats-number">Financial Mastery Goal</h4>
         </div>
-        <button className="goal-tracker__edit" onClick={() => setIsEditing(!isEditing)}>
-          {isEditing ? <Check size={14} onClick={handleSaveGoal} /> : <Edit2 size={14} />}
-        </button>
+        <div className="goal-tracker__actions">
+          {isEditing ? (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button className="goal-tracker__btn cancel" onClick={handleCancel} title="Cancel">
+                <X size={14} />
+              </button>
+              <button className="goal-tracker__btn save" onClick={handleSaveGoal} title="Save Goal">
+                <Check size={14} />
+              </button>
+            </div>
+          ) : (
+            <button className="goal-tracker__btn edit" onClick={() => setIsEditing(true)} title="Edit Goal">
+              <Edit2 size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="goal-tracker__content">
@@ -54,11 +82,14 @@ const GoalTracker = () => {
             <circle 
               className="goal-tracker__progress" 
               cx="50" cy="50" r="45" 
-              style={{ strokeDashoffset: 283 - (283 * percentage) / 100 }}
+              style={{ 
+                strokeDashoffset: 283 - (283 * Number(percentage)) / 100,
+                stroke: percentage >= 100 ? 'var(--accent-success)' : 'var(--primary)'
+              }}
             />
           </svg>
           <div className="goal-tracker__percentage">
-            <span className="percent-val">{percentage}%</span>
+            <span className="percent-val stats-number">{percentage}%</span>
             <span className="percent-label">COMPLETE</span>
           </div>
         </div>
@@ -66,21 +97,29 @@ const GoalTracker = () => {
         <div className="goal-tracker__info">
           <div className="goal-tracker__stat">
             <span className="stat-label">Current Balance</span>
-            <span className="stat-val">{currency} {totalBalance.toLocaleString()}</span>
+            <span className="stat-val stats-number" style={{ color: totalBalance >= 0 ? 'var(--accent-success)' : 'var(--error)' }}>
+              {currency} {totalBalance.toLocaleString()}
+            </span>
           </div>
           
           <div className="goal-tracker__stat">
-            <span className="stat-label">Master Goal</span>
+            <span className="stat-label">Master Saving Goal</span>
             {isEditing ? (
-              <input 
-                type="number" 
-                className="goal-tracker__input"
-                value={tempGoal}
-                onChange={(e) => setTempGoal(e.target.value)}
-                autoFocus
-              />
+              <div className="goal-input-container">
+                <span className="currency-prefix">{currency}</span>
+                <input 
+                  type="number" 
+                  className="goal-tracker__input stats-number"
+                  value={tempGoal}
+                  onChange={(e) => setTempGoal(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSaveGoal()}
+                  autoFocus
+                />
+              </div>
             ) : (
-              <span className="stat-val goal-val">{currency} {goals.savingGoal.toLocaleString()}</span>
+              <span className="stat-val goal-val stats-number" onClick={() => setIsEditing(true)} style={{ cursor: 'pointer' }}>
+                {currency} {goals.savingGoal.toLocaleString()}
+              </span>
             )}
           </div>
         </div>

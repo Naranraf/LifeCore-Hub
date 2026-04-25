@@ -1,0 +1,210 @@
+.finance-intel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.intel-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.intel-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.intel-card__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.intel-card__title h4 {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.intel-icon {
+  color: var(--primary);
+}
+
+.status-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Runway Specific */
+.runway-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.runway-value-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.runway-number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+}
+
+.runway-unit {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.runway-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.runway-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gauge-track {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-deep);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Leak Specific */
+.leak-legend {
+  display: flex;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dot.survival { background: var(--primary); }
+.dot.lifestyle { background: var(--accent-secondary); }
+
+.leak-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.leak-chart {
+  position: relative;
+  width: 160px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.leak-center-text {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.leak-center-text .stats-number {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.leak-center-text .label {
+  font-size: 8px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.leak-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.leak-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.leak-stat-row .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.leak-stat-row .value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.leak-assessment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(var(--accent-rgb), 0.05);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+@media (max-width: 480px) {
+  .leak-content {
+    flex-direction: column;
+    height: auto;
+  }
+}

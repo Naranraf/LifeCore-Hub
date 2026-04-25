@@ -160,5 +160,5 @@
 }
 
 .text-error {
-  color: #ff4d4d !important;
+  color: var(--error) !important;
 }

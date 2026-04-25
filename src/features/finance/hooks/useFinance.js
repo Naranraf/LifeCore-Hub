@@ -192,6 +192,76 @@ const useFinanceStore = create((set, get) => ({
       savingGoal: goals.savingGoal,
       progress: Math.min(Math.max(progress, 0), 100) // Clamp between 0-100
     };
+  },
+
+  getIntelligence: () => {
+    const { transactions } = get();
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // 1. Calculate Average Monthly Expenses (last 3 months or all if less)
+    const expenses = transactions.filter(t => t.type === 'expense');
+    if (expenses.length === 0) return { 
+      runway: 0, 
+      avgMonthlySpend: 0, 
+      survivalRatio: 0, 
+      lifestyleRatio: 0, 
+      survivalSpend: 0, 
+      lifestyleSpend: 0,
+      monthlyIncome: 0
+    };
+
+    const monthGroups = {};
+    expenses.forEach(t => {
+      const d = new Date(t.date);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      monthGroups[key] = (monthGroups[key] || 0) + Number(t.amount);
+    });
+
+    const monthlyValues = Object.values(monthGroups);
+    const avgMonthlySpend = monthlyValues.reduce((a, b) => a + b, 0) / monthlyValues.length;
+
+    // 2. Current Net Balance
+    const netBalance = transactions.reduce((acc, t) => {
+      return t.type === 'income' ? acc + Number(t.amount) : acc - Number(t.amount);
+    }, 0);
+
+    // 3. Runway in Months
+    const runway = avgMonthlySpend > 0 ? (netBalance / avgMonthlySpend).toFixed(1) : '∞';
+
+    // 4. Survival vs Lifestyle (Current Month)
+    let survivalSpend = 0;
+    let lifestyleSpend = 0;
+    let monthlyIncome = 0;
+
+    const survivalCats = ['Housing & Utilities', 'Food & Survival', 'Debt & Obligations'];
+    
+    transactions.forEach(t => {
+      const d = new Date(t.date);
+      if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+        if (t.type === 'income') {
+          monthlyIncome += Number(t.amount);
+        } else {
+          if (survivalCats.includes(t.category)) {
+            survivalSpend += Number(t.amount);
+          } else {
+            lifestyleSpend += Number(t.amount);
+          }
+        }
+      }
+    });
+
+    const incomeBase = monthlyIncome || 1; // Prevent div by zero
+    return {
+      runway: Number(runway),
+      avgMonthlySpend: Math.round(avgMonthlySpend),
+      survivalRatio: Math.round((survivalSpend / incomeBase) * 100),
+      lifestyleRatio: Math.round((lifestyleSpend / incomeBase) * 100),
+      survivalSpend,
+      lifestyleSpend,
+      monthlyIncome
+    };
   }
 }));
 

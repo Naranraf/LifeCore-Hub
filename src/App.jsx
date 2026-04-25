@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import useAuthStore from './hooks/useAuth';
 import { useAppStore } from './store/useAppStore';
+import useThemeStore from './hooks/useTheme';
 import Sidebar from './components/Sidebar';
 import Login from './app/Login';
 import Dashboard from './app/Dashboard';
@@ -76,11 +77,13 @@ export default function App() {
 
   // Global Accent Color Sync
   const accentColor = useAppStore((state) => state.ui.accentColor);
+  const theme = useThemeStore((state) => state.theme);
 
   useEffect(() => {
     if (!accentColor) return;
     
-    // Update CSS Variable
+    // Update CSS Variable on documentElement
+    // Applying directly to element style ensures it overrides CSS rules with lower specificity.
     document.documentElement.style.setProperty('--primary', accentColor);
     
     // Also update --accent-rgb for rgba colors
@@ -92,7 +95,7 @@ export default function App() {
     };
     
     document.documentElement.style.setProperty('--accent-rgb', hexToRgb(accentColor));
-  }, [accentColor]);
+  }, [accentColor, theme]);
 
   // Loading state while Firebase checks auth
   if (loading) {

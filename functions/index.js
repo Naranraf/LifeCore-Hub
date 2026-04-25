@@ -13,12 +13,17 @@ initializeApp();
 const ai = require("./src/ai");
 const finance = require("./src/finance");
 const core = require("./src/core");
+const payments = require("./src/payments");
 
 // AI Module
 exports.chatWithGemini = ai.chatWithGemini;
 
 // Finance Module
 exports.analyzeFinancialRecords = finance.analyzeFinancialRecords;
+
+// Payments Module
+exports.createStripeCheckout = payments.createStripeCheckout;
+exports.fulfillUpgrade = payments.fulfillUpgrade;
 
 // Core/Auth Module
 const authModule = require("./src/auth");

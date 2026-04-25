@@ -19,7 +19,14 @@ service cloud.firestore {
 
     // Perfiles de Usuario (Regla: Solo el propio usuario puede leer/escribir su perfil)
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) 
+        && !request.resource.data.keys().hasAny(['isPremium', 'geminiUsageCount', 'premiumSince']);
+      
+      allow update: if isOwner(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'geminiUsageCount', 'premiumSince']);
+
+      allow delete: if false; // Perfiles no se borran por el usuario
 
       // Private subcollection for OAuth tokens (Google Calendar/Tasks)
       // Only the owner can write; Cloud Functions (Admin SDK) bypass rules for reads.

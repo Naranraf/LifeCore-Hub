@@ -1,32 +1,52 @@
 /**
  * FullCalendar Custom Tactical Styling
+ * Optimized for Dynamic Theme Support (Bunker, Field, Cyber, Mono)
  */
 .calendar-widget-v2 {
   padding: 10px;
   background: var(--bg-surface);
   color: var(--text-main);
   border-radius: var(--radius-tactical);
+  transition: all 0.3s ease;
 }
 
 .fc {
   --fc-border-color: var(--border-subtle);
   --fc-daygrid-event-dot-width: 8px;
-  --fc-today-bg-color: rgba(var(--accent-rgb), 0.05);
+  --fc-today-bg-color: rgba(var(--accent-rgb), 0.1);
+  --fc-page-bg-color: var(--bg-surface);
+  --fc-neutral-bg-color: var(--bg-deep);
+  --fc-list-event-hover-bg-color: var(--bg-deep);
+  
   font-family: var(--font-sans);
+  color: var(--text-main);
+}
+
+/* Ensure all internal tables and text use tokens */
+.fc table, 
+.fc th, 
+.fc td, 
+.fc a, 
+.fc button,
+.fc-col-header-cell-cushion {
+  color: var(--text-main) !important;
+  border-color: var(--border-subtle) !important;
+  text-decoration: none !important;
 }
 
 .fc .fc-toolbar-title {
   font-size: 1.1rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   font-family: var(--font-mono);
+  color: var(--text-main) !important;
 }
 
 .fc .fc-button-primary {
   background: var(--bg-deep);
   border: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  color: var(--text-main) !important;
   font-weight: 600;
   text-transform: uppercase;
   font-size: 0.75rem;
@@ -36,66 +56,97 @@
 .fc .fc-button-primary:hover {
   background: var(--primary);
   border-color: var(--primary);
-  color: white;
+  color: #fff !important;
 }
 
 .fc .fc-button-primary:disabled {
   opacity: 0.3;
+  background: var(--bg-deep);
+  color: var(--text-muted) !important;
 }
 
 .fc .fc-button-active {
   background: var(--primary) !important;
   border-color: var(--primary) !important;
+  color: #fff !important;
 }
 
-.fc th {
-  padding: 10px 0;
+.fc th.fc-col-header-cell {
+  padding: 12px 0;
+  background: var(--bg-deep);
   font-size: 0.7rem;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--primary) !important; /* Changed from text-muted to primary for better theme visibility */
   font-weight: 800;
   letter-spacing: 1px;
+  border-bottom: 2px solid var(--border-subtle) !important;
 }
 
-.fc td {
-  border-color: var(--border-subtle) !important;
+.fc td.fc-daygrid-day {
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.fc td.fc-daygrid-day:hover {
+  background: rgba(var(--accent-rgb), 0.03);
 }
 
 .fc-daygrid-day-number {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   padding: 8px !important;
-  opacity: 0.6;
+  opacity: 0.7;
+  color: var(--text-main) !important;
 }
 
 .fc-event {
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 600;
   border: none !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: var(--primary) !important;
+  color: #fff !important;
 }
 
 .fc-event:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
-}
-
-.fc-v-event {
-  background-color: var(--primary) !important;
-}
-
-.fc-h-event {
-  background-color: var(--primary) !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .fc-day-today {
   background: rgba(var(--accent-rgb), 0.08) !important;
 }
 
+.fc-day-today .fc-daygrid-day-number {
+  color: var(--primary) !important;
+  font-weight: 800;
+  opacity: 1;
+}
+
 /* Modal specific */
 .cal-input:focus {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+}
+
+/* Scrollgrid fixes */
+.fc-scrollgrid {
+  border-color: var(--border-subtle) !important;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border: 1px solid var(--border-subtle);
+}
+
+/* Ensure deep inheritance for nested scrollers */
+.fc-scroller {
+  background: transparent !important;
+}
+
+.fc-scrollgrid-sync-inner {
+  background: transparent !important;
 }

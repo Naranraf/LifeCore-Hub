@@ -10,7 +10,8 @@ const vertexAI = new VertexAI({
 });
 
 exports.chatWithGemini = onCall({
-  cors: [/localhost/, "https://lyfecore-hub.web.app", "https://lyfecore-hub.firebaseapp.com"],
+  enforceAppCheck: true,
+  cors: [/localhost/, "https://lyfecore-hub.web.app", "https://lyfecore-hub.firebaseapp.com", "https://lyfecore-hub.com"],
 }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para hablar con Gemini.");
@@ -23,21 +24,26 @@ exports.chatWithGemini = onCall({
 
   const uid = request.auth.uid;
   const userRef = db.collection('users').doc(uid);
-  const MAX_FREE_MESSAGES = 15;
+  const MAX_FREE_MESSAGES = 100;
 
   try {
     await db.runTransaction(async (t) => {
       const userSnap = await t.get(userRef);
-      const currentUsage = userSnap.exists ? (userSnap.data().geminiUsageCount || 0) : 0;
+      const userData = userSnap.exists ? userSnap.data() : {};
+      const currentUsage = userData.geminiUsageCount || 0;
+      const isPremium = userData.isPremium || false;
       
-      if (currentUsage >= MAX_FREE_MESSAGES) {
-        throw new HttpsError("resource-exhausted", "Free plan usage limit reached.");
+      logger.info(`[AI Usage] User: ${uid} | Usage: ${currentUsage}/${MAX_FREE_MESSAGES} | Premium: ${isPremium}`);
+
+      if (!isPremium && currentUsage >= MAX_FREE_MESSAGES) {
+        throw new HttpsError("resource-exhausted", `Cuota agotada (${currentUsage}/${MAX_FREE_MESSAGES}). Mejora tu cuenta a Elite para acceso ilimitado.`);
       }
+      
       t.set(userRef, { geminiUsageCount: FieldValue.increment(1) }, { merge: true });
     });
 
     const model = vertexAI.getGenerativeModel({
-      model: "gemini-1.5-flash-001",
+      model: "gemini-1.5-flash",
     });
 
     const contents = [];

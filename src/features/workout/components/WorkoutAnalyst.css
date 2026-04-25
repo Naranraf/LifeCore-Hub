@@ -1,0 +1,134 @@
+.workout-analyst {
+  padding: 24px;
+  grid-column: 1 / -1; /* Full width in the grid */
+  background: rgba(var(--accent-rgb), 0.01);
+  border-left: 3px solid var(--accent-success);
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.workout-analyst__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.workout-analyst__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.workout-analyst__title h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.analyst-icon {
+  color: var(--accent-success);
+}
+
+.workout-analyst__refresh {
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+}
+
+.workout-analyst__refresh:hover {
+  border-color: var(--accent-success);
+  color: var(--accent-success);
+}
+
+.workout-analyst__refresh.spinning svg {
+  animation: spin 1.2s linear infinite;
+}
+
+.workout-analyst__content {
+  min-height: 100px;
+}
+
+.workout-analyst__text p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-main);
+  white-space: pre-wrap;
+}
+
+.workout-analyst__loading {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.loading-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-text span {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.loading-text p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.workout-analyst__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.primary-scan-btn {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: var(--accent-success);
+  color: var(--bg-deep);
+  border: none;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primary-scan-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 20px rgba(163, 230, 53, 0.2);
+}
+
+.workout-analyst__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

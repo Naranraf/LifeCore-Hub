@@ -9,6 +9,7 @@ import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import TemplateLibrary from './TemplateLibrary';
 import TemplateEditor from './TemplateEditor';
+import WorkoutAnalyst from './WorkoutAnalyst';
 import './Workout.css';
 
 import RestTimer from './RestTimer';
@@ -98,6 +99,7 @@ const Workout = () => {
             exit={{ opacity: 0, y: -20 }}
           >
             <div className="workout-dashboard-grid">
+              <WorkoutAnalyst />
               <TemplateLibrary onEdit={openEditor} />
               
               <section className="workout-history">
@@ -203,7 +205,7 @@ const Workout = () => {
                           <span className="col-set">Set</span>
                           <span className="col-weight">Weight (kg)</span>
                           <span className="col-reps">Reps</span>
-                          <span className="col-rpe">RPE</span>
+                          <span className="col-reps">RPE</span>
                           <span className="col-status">Done</span>
                         </div>
                         

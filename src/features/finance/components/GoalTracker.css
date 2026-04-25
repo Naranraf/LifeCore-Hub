@@ -1,8 +1,10 @@
 .goal-tracker {
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
 }
 
 .goal-tracker__header {
@@ -18,46 +20,59 @@
 }
 
 .goal-tracker__title h4 {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-main);
   margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  text-transform: uppercase;
 }
 
 .goal-tracker__icon {
-  color: var(--accent);
+  color: var(--primary);
 }
 
-.goal-tracker__edit {
-  background: var(--glass-border);
-  border: none;
+.goal-tracker__btn {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   width: 28px;
   height: 28px;
-  border-radius: 8px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
-.goal-tracker__edit:hover {
-  background: var(--accent);
-  color: white;
+.goal-tracker__btn:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+  background: var(--border-subtle);
+}
+
+.goal-tracker__btn.save {
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.goal-tracker__btn.cancel {
+  background: rgba(var(--error-rgb, 239, 68, 68), 0.05);
+  border-color: rgba(var(--error-rgb, 239, 68, 68), 0.2);
+  color: var(--error);
 }
 
 .goal-tracker__content {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
 }
 
 .goal-tracker__viz {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   flex-shrink: 0;
 }
 
@@ -67,17 +82,17 @@
 
 .goal-tracker__bg {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.05);
+  stroke: var(--bg-deep);
   stroke-width: 8;
 }
 
 .goal-tracker__progress {
   fill: none;
-  stroke: var(--accent);
+  stroke: var(--primary);
   stroke-width: 8;
   stroke-linecap: round;
   stroke-dasharray: 283;
-  transition: stroke-dashoffset 1s ease-out;
+  transition: stroke-dashoffset 0.8s ease, stroke 0.3s ease;
 }
 
 .goal-tracker__percentage {
@@ -91,69 +106,93 @@
 }
 
 .percent-val {
-  font-size: 20px;
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--text-main);
 }
 
 .percent-label {
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 0.55rem;
+  font-weight: 800;
   color: var(--text-muted);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
 }
 
 .goal-tracker__info {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
 }
 
 .goal-tracker__stat {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .stat-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 0.65rem;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 2px;
 }
 
 .stat-val {
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .goal-val {
-  color: var(--accent);
+  transition: color 0.2s;
+}
+
+.goal-val:hover {
+  color: var(--primary);
+}
+
+.goal-input-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-deep);
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.currency-prefix {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--primary);
 }
 
 .goal-tracker__input {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  padding: 4px 8px;
-  color: white;
-  font-size: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  font-size: 0.95rem;
   font-weight: 700;
   width: 100%;
   outline: none;
+  padding: 0;
 }
 
 .goal-tracker__footer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 10px;
-  font-weight: 600;
+  gap: 6px;
+  font-size: 0.65rem;
   color: var(--text-muted);
-  text-transform: uppercase;
+  opacity: 0.5;
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .goal-tracker__content {
+    flex-direction: column;
+    text-align: center;
+  }
 }

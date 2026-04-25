@@ -6,7 +6,8 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const db = getFirestore();
 
 exports.analyzeFinancialRecords = onCall({
-  cors: [/localhost/, "https://lyfecore-hub.web.app", "https://lyfecore-hub.firebaseapp.com"],
+  enforceAppCheck: true,
+  cors: [/localhost/, "https://lyfecore-hub.web.app", "https://lyfecore-hub.firebaseapp.com", "https://lyfecore-hub.com"],
 }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Auth is required to run quantitative analysis.");

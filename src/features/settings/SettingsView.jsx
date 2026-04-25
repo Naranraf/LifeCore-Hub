@@ -1,7 +1,9 @@
 import React from 'react';
-import { Settings, Shield, User } from 'lucide-react';
+import { Settings, Shield, User, Crown } from 'lucide-react';
 import AppearanceSettings from './AppearanceSettings';
 import WorkoutPreferences from './WorkoutPreferences';
+import MembershipSettings from './components/MembershipSettings';
+import InstallApp from './components/InstallApp';
 import DangerZone from './DangerZone';
 import LegalCompliance from './components/LegalCompliance';
 import './Settings.css';
@@ -35,6 +37,8 @@ const SettingsView = () => {
         </div>
 
         <div className="settings-content">
+          <MembershipSettings />
+          <InstallApp />
           <AppearanceSettings />
           <WorkoutPreferences />
           <DangerZone />

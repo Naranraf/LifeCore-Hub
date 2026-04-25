@@ -1,0 +1,131 @@
+.exec-summary {
+  padding: 24px;
+  background: rgba(var(--accent-rgb), 0.02);
+  border-left: 3px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.exec-summary__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.exec-summary__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exec-summary__title h4 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.exec-icon {
+  color: var(--primary);
+}
+
+.exec-summary__refresh {
+  color: var(--text-muted);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.exec-summary__refresh:hover {
+  opacity: 1;
+  background: var(--bg-deep);
+  color: var(--primary);
+}
+
+.exec-summary__refresh.spinning svg {
+  animation: spin 1s linear infinite;
+}
+
+.exec-summary__content {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.exec-summary__text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-main);
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+
+.exec-summary__loading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.exec-summary__error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--error);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pulse-icon {
+  color: var(--primary);
+  animation: pulse 2s infinite;
+}
+
+.exec-summary__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-success);
+}
+
+.status-dot.pulse {
+  box-shadow: 0 0 8px var(--accent-success);
+  animation: glow 2s infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 2px var(--accent-success); }
+  50% { box-shadow: 0 0 8px var(--accent-success); }
+  100% { box-shadow: 0 0 2px var(--accent-success); }
+}

@@ -267,3 +267,118 @@
     text-align: left;
   }
 }
+
+/* Finance Summary Card — Strategic Overview */
+.finance-summary-card {
+  padding: 32px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.finance-summary-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.05);
+  transform: translateY(-2px);
+}
+
+.finance-summary-card__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+}
+
+.summary-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.summary-icon {
+  color: var(--primary);
+}
+
+.summary-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.summary-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-deep);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.summary-divider {
+  width: 1px;
+  height: 80px;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.summary-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.summary-action {
+  color: var(--text-muted);
+  opacity: 0.3;
+  transition: all 0.3s ease;
+}
+
+.finance-summary-card:hover .summary-action {
+  opacity: 1;
+  color: var(--primary);
+  transform: translateX(4px);
+}
+
+@media (max-width: 768px) {
+  .finance-summary-card__content {
+    flex-direction: column;
+    gap: 32px;
+    align-items: flex-start;
+  }
+  
+  .summary-divider {
+    width: 100%;
+    height: 1px;
+  }
+  
+  .summary-value {
+    font-size: 28px;
+  }
+  
+  .summary-action {
+    display: none;
+  }
+}

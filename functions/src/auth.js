@@ -5,7 +5,10 @@ const { RecaptchaEnterpriseServiceClient } = require("@google-cloud/recaptcha-en
 /**
  * Verify reCAPTCHA Enterprise Token
  */
-exports.verifyRecaptcha = onCall(async (request) => {
+exports.verifyRecaptcha = onCall({
+  enforceAppCheck: true,
+  cors: [/localhost/, "https://lyfecore-hub.web.app", "https://lyfecore-hub.firebaseapp.com", "https://lyfecore-hub.com"],
+}, async (request) => {
   const { token, action } = request.data;
   
   if (!token || !action) {
@@ -13,7 +16,7 @@ exports.verifyRecaptcha = onCall(async (request) => {
   }
 
   const projectID = process.env.GCLOUD_PROJECT || "lyfecore-hub";
-  const recaptchaKey = "6LcON8csAAAAAMCvqmNde2sybCkV76uZFnms_Nmb";
+  const recaptchaKey = "6LczIMksAAAAACIjxSYuV8evxmymT4FgSTDGQ56c";
 
   const client = new RecaptchaEnterpriseServiceClient();
   const projectPath = client.projectPath(projectID);

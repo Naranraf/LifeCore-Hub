@@ -17,6 +17,8 @@ import {
   Target,
   Clock,
   Flame,
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useAuthStore from '../hooks/useAuth';
@@ -24,10 +26,10 @@ import useFinanceStore from '../features/finance/hooks/useFinance';
 import useNutritionStore from '../features/nutrition/hooks/useNutrition';
 import useWorkoutStore from '../features/workout/hooks/useWorkout';
 import useTimerStore from '../features/timing/hooks/useTimer';
+import ExecutiveSummary from '../features/ai/components/ExecutiveSummary';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import QuoteWidget from '../components/ui/QuoteWidget';
-import WealthTracker from '../features/finance/components/WealthTracker';
 import './Dashboard.css';
 
 const cardVariants = {
@@ -68,8 +70,8 @@ function StatCard({ icon: Icon, iconColor, title, value, subtitle, index, onClic
 }
 
 export default function Dashboard() {
-  const { profile, googleAccessToken } = useAuthStore();
-  const { transactions, initListener: initFinance, currency, loading: loadingFinance } = useFinanceStore();
+  const { profile } = useAuthStore();
+  const { transactions, goals, initListener: initFinance, currency, loading: loadingFinance } = useFinanceStore();
   const { logs, initListener: initNutrition, loading: loadingNutrition } = useNutritionStore();
   const { recentSessions, initListener: initWorkout } = useWorkoutStore();
   const { sessionCount, totalFocusMs } = useTimerStore();
@@ -81,12 +83,6 @@ export default function Dashboard() {
     initFinance();
     initNutrition();
     initWorkout();
-
-    return () => {
-      // We don't necessarily want to wipe the store data, 
-      // but we could detach listeners if needed for strict memory management.
-      // For now, keeping data fresh is preferred, but we ensure no race conditions exist.
-    };
   }, [initFinance, initNutrition, initWorkout]);
 
   // Calculate Finance Balance
@@ -99,22 +95,22 @@ export default function Dashboard() {
     return inc - exp;
   }, [transactions]);
 
-  // Calculate Health Calories today
-  const todayCalories = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
-    let cal = 0;
-    logs.forEach(log => {
-      if (log.type === 'meal' && log.date === today) {
-        cal += log.calories || 0;
-      }
-    });
-    return cal;
-  }, [logs]);
+  // Calculate Progress Percentage
+  const progressPercentage = useMemo(() => {
+    if (!goals.savingGoal) return 0;
+    const p = (balance / goals.savingGoal) * 100;
+    return Math.min(Math.max(p, 0), 100).toFixed(1);
+  }, [balance, goals.savingGoal]);
 
   const formattedBalance = new Intl.NumberFormat('en-US', { 
     style: 'currency', 
     currency: currency || 'USD' 
   }).format(balance || 0);
+
+  const formattedGoal = new Intl.NumberFormat('en-US', { 
+    style: 'currency', 
+    currency: currency || 'USD' 
+  }).format(goals.savingGoal || 0);
 
   return (
     <div className="dashboard">
@@ -139,23 +135,19 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {/* TIER 1: Tactical Intelligence Brief */}
+      <section className="dashboard__brief" style={{ marginBottom: '32px' }}>
+        <ExecutiveSummary />
+      </section>
+
       <div className="dashboard__grid">
-        <StatCard
-          icon={Wallet}
-          iconColor="var(--primary)"
-          title="Finance Hub"
-          value={!loadingFinance && transactions.length > 0 ? formattedBalance : "0.00"}
-          subtitle={transactions.length > 0 ? `${transactions.length} active logs` : "Standby"}
-          index={0}
-          onClick={() => navigate('/finance')}
-        />
         <StatCard
           icon={Apple}
           iconColor="var(--accent-success)"
           title="Bio Metrics"
-          value={!loadingNutrition && logs.length > 0 ? `${todayCalories} kcal` : "0 kcal"}
+          value={!loadingNutrition && logs.length > 0 ? `${todayCalories(logs)} kcal` : "0 kcal"}
           subtitle={logs.length > 0 ? "Fueling active" : "Await log"}
-          index={1}
+          index={0}
           onClick={() => navigate('/nutrition')}
         />
         <StatCard
@@ -164,7 +156,7 @@ export default function Dashboard() {
           title="Mission Control"
           value="Native"
           subtitle="Sovereign Tasks Active"
-          index={2}
+          index={1}
           onClick={() => navigate('/productivity')}
         />
         <StatCard
@@ -173,17 +165,48 @@ export default function Dashboard() {
           title="Focus Engine"
           value={sessionCount > 0 ? `${Math.floor(totalFocusMs / 60000)}m` : '0m'}
           subtitle={sessionCount > 0 ? `${sessionCount} cycles complete` : 'Idle'}
-          index={3}
+          index={2}
           onClick={() => navigate('/timing')}
         />
       </div>
 
-      {/* Performance Mastery — Data Insights */}
+      {/* Performance Mastery — New Integrated Summary Card */}
       <section className="dashboard__insights" style={{ marginTop: '32px' }}>
-        <h2 className="dashboard__section-title">Performance Mastery</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-          <WealthTracker />
-        </div>
+        <h2 className="dashboard__section-title">Strategic Overview</h2>
+        <Card className="finance-summary-card glass-panel" onClick={() => navigate('/finance')} style={{ cursor: 'pointer' }}>
+          <div className="finance-summary-card__content">
+            <div className="summary-section">
+              <div className="summary-header">
+                <Target size={16} className="summary-icon" />
+                <span>MASTER SAVING GOAL</span>
+              </div>
+              <div className="summary-value stats-number">{formattedGoal}</div>
+              <div className="summary-progress-bar">
+                <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
+              </div>
+            </div>
+
+            <div className="summary-divider"></div>
+
+            <div className="summary-section">
+              <div className="summary-header">
+                <ShieldCheck size={16} className="summary-icon" />
+                <span>TOTAL LIQUID ASSETS</span>
+              </div>
+              <div className="summary-value stats-number" style={{ color: balance >= 0 ? 'var(--accent-success)' : 'var(--error)' }}>
+                {formattedBalance}
+              </div>
+              <div className="summary-footer">
+                <TrendingUp size={12} />
+                <span>{progressPercentage}% of objective reached</span>
+              </div>
+            </div>
+
+            <div className="summary-action">
+              <ArrowRight size={20} />
+            </div>
+          </div>
+        </Card>
       </section>
 
       {/* Quick Actions */}
@@ -227,6 +250,14 @@ export default function Dashboard() {
       </footer>
     </div>
   );
+}
+
+function todayCalories(logs) {
+  const today = new Date().toISOString().split('T')[0];
+  return logs.reduce((acc, log) => {
+    if (log.type === 'meal' && log.date === today) return acc + (log.calories || 0);
+    return acc;
+  }, 0);
 }
 
 function QuickAction({ icon: Icon, label, color, onClick }) {

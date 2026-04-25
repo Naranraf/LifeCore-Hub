@@ -21,7 +21,7 @@
   background: var(--accent-gradient);
   border: none;
   border-radius: 10px;
-  color: #fff;
+  color: white;
   font-size: 14px;
   font-weight: 600;
   box-shadow: 0 4px 16px rgba(var(--accent-rgb, 59, 130, 246), 0.25);
@@ -151,7 +151,7 @@
 
 .finance-page__item-del:hover {
   background: var(--glass-border);
-  color: #ef4444;
+  color: var(--error);
   opacity: 1;
 }
 

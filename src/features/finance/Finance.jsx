@@ -5,13 +5,17 @@
  * - Real-time sync with Firestore using Zustand store
  * - Strict structural typing and schema checking using Zod (TransactionModal)
  * - Auto-calculation of Income, Expense, and Balance
+ * - Financial Intelligence (Runway & Leak Analysis)
  */
 import React, { useEffect, useState, useMemo } from 'react';
-import { Wallet, Plus, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
+import { Wallet, Plus, TrendingUp, TrendingDown, Trash2, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useFinanceStore from './hooks/useFinance';
 import TransactionModal from './components/TransactionModal';
 import FinanceAnalytics from './components/FinanceAnalytics';
+import GoalTracker from './components/GoalTracker';
+import WealthTracker from './components/WealthTracker';
+import FinancialIntelligence from './components/FinancialIntelligence';
 import { CATEGORIES } from './schemas';
 import './Finance.css';
 
@@ -66,8 +70,8 @@ export default function Finance() {
             <Wallet size={24} />
           </div>
           <div>
-            <h1 className="feature-page__title">Finance Tracker</h1>
-            <p className="feature-page__desc">Manage your income, expenses, and budgets securely.</p>
+            <h1 className="feature-page__title">Finance Hub</h1>
+            <p className="feature-page__desc">Master your capital with sovereign telemetry.</p>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -112,6 +116,25 @@ export default function Finance() {
         </div>
       </div>
 
+      {/* Financial Intelligence Hub */}
+      <section className="finance-page__intel-section" style={{ marginBottom: '32px' }}>
+        <h2 className="dashboard__section-title" style={{ marginBottom: '20px' }}>
+          <BrainCircuit size={18} /> Financial Intelligence
+        </h2>
+        <FinancialIntelligence />
+      </section>
+
+      {/* Telemetry Grid */}
+      <section className="finance-page__telemetry" style={{ marginBottom: '32px' }}>
+        <h2 className="dashboard__section-title" style={{ marginBottom: '20px' }}>
+          <TrendingUp size={18} /> Financial Telemetry
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          <GoalTracker />
+          <WealthTracker />
+        </div>
+      </section>
+
       {loading && transactions.length === 0 ? (
         <div className="loading-screen" style={{ minHeight: '300px' }}>
           <div className="loading-spinner" />
@@ -140,49 +163,49 @@ export default function Finance() {
         </div>
       ) : (
         <>
-        <FinanceAnalytics />
-        <div className="finance-page__list glass-panel">
-          <div className="finance-page__list-header">
-            <h3>Recent Transactions</h3>
-            <div className="finance-page__filter">
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Filter by:</span>
-              <select 
-                value={filterTag} 
-                onChange={(e) => setFilterTag(e.target.value)}
-                className="lyfe-select"
-                style={{ padding: '4px 8px', fontSize: '12px' }}
-              >
-                {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
+          <FinanceAnalytics />
+          <div className="finance-page__list glass-panel" style={{ marginTop: '32px' }}>
+            <div className="finance-page__list-header">
+              <h3>Recent Transactions</h3>
+              <div className="finance-page__filter">
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Filter by:</span>
+                <select 
+                  value={filterTag} 
+                  onChange={(e) => setFilterTag(e.target.value)}
+                  className="lyfe-select"
+                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                >
+                  {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="finance-page__items">
+              {filteredTransactions.map(txn => (
+                <div key={txn.id} className="finance-page__item">
+                  <div className="finance-page__item-icon" style={{
+                    background: txn.type === 'expense' ? 'var(--glass-border)' : 'var(--glass-border)',
+                    color: txn.type === 'expense' ? 'var(--error)' : 'var(--accent-success)',
+                  }}>
+                    {txn.type === 'expense' ? <TrendingDown size={18} /> : <TrendingUp size={18} />}
+                  </div>
+                  <div className="finance-page__item-info">
+                    <span className="finance-page__item-cat">{txn.category}</span>
+                    <span className="finance-page__item-date">{new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium' }).format(new Date(txn.date))} {txn.description && `· ${txn.description}`}</span>
+                  </div>
+                  <div className={`finance-page__item-amount stats-number`} style={{ color: txn.type === 'expense' ? 'var(--error)' : 'var(--accent-success)' }}>
+                    {txn.type === 'expense' ? '-' : '+'}{formatCurrency(txn.amount)}
+                  </div>
+                  <button
+                    className="finance-page__item-del"
+                    onClick={() => deleteTransaction(txn.id)}
+                    title="Delete Transaction"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="finance-page__items">
-            {filteredTransactions.map(txn => (
-              <div key={txn.id} className="finance-page__item">
-                <div className="finance-page__item-icon" style={{
-                  background: txn.type === 'expense' ? 'var(--glass-border)' : 'var(--glass-border)',
-                  color: txn.type === 'expense' ? 'var(--error)' : 'var(--accent-success)',
-                }}>
-                  {txn.type === 'expense' ? <TrendingDown size={18} /> : <TrendingUp size={18} />}
-                </div>
-                <div className="finance-page__item-info">
-                  <span className="finance-page__item-cat">{txn.category}</span>
-                  <span className="finance-page__item-date">{new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium' }).format(new Date(txn.date))} {txn.description && `· ${txn.description}`}</span>
-                </div>
-                <div className={`finance-page__item-amount stats-number`} style={{ color: txn.type === 'expense' ? 'var(--error)' : 'var(--accent-success)' }}>
-                  {txn.type === 'expense' ? '-' : '+'}{formatCurrency(txn.amount)}
-                </div>
-                <button
-                  className="finance-page__item-del"
-                  onClick={() => deleteTransaction(txn.id)}
-                  title="Delete Transaction"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
         </>
       )}
 
